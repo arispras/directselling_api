@@ -1,0 +1,164 @@
+<?php
+
+
+class AccSalesPerformaModel extends CI_Model
+{
+
+	public function delete($id)
+	{
+		$id = (int)$id;
+
+		$this->db->where('id', $id);
+		$this->db->delete('acc_sales_performa');
+		return true;
+	}
+
+	public function retrieve($id)
+	{
+		$id = (int)$id;
+
+		$query  = "SELECT a.*,b.no_spk, c.nama_customer as customer from acc_sales_performa a 
+		left join sls_kontrak b on a.sls_kontrak_id=b.id
+		left join gbm_customer c on a.customer_id=c.id
+		where a.id=" . $id . "";
+		$result = $this->db->query($query)->row_array();
+
+		return $result;
+	}
+	public function retrieve_all()
+	{
+		$query  = "SELECT * from acc_sales_performa ";
+
+		return $this->db->query($query)->result_array();;
+	}
+
+	public function create(
+		$arrdata
+	) {
+
+		$lokasi_id = $arrdata['lokasi_id']['id'];
+		$sls_kontrak_id = $arrdata['sls_kontrak_id']['id'];
+		$customer_id = $arrdata['customer_id']['id'];
+		$jenis_performa = $arrdata['jenis_performa']['id'];
+		$user_ttd = $arrdata['user_ttd']['id'];
+		// $acc_akun_id_kredit = $arrdata['acc_akun_id_kredit']['id'];
+		// $acc_akun_id_debet = $arrdata['acc_akun_id_debet']['id'];
+
+		$no_performa  = $arrdata['no_performa'];
+		$deskripsi    =  $arrdata['deskripsi'];
+		$no_referensi    =  $arrdata['no_referensi'];
+		$tanggal    =  $arrdata['tanggal'];
+		$tanggal_tempo    =  $arrdata['tanggal_tempo'];
+		$jumlah    =  $arrdata['jumlah'];
+		$harga_satuan    =  $arrdata['harga_satuan'];
+		$diskon    =  $arrdata['diskon'];
+		$uang_muka    =  $arrdata['uang_muka'];
+		$ppn    =  $arrdata['ppn'];
+		$qty    =  $arrdata['qty'];
+		$grand_total    =  $arrdata['grand_total'];
+
+		$dibuat_tanggal    =  date('Y-m-d H:i:s');
+
+		$data = array(
+			'sls_kontrak_id' => $sls_kontrak_id,
+			'lokasi_id' => $lokasi_id,
+			'no_performa' => $no_performa,
+			'jenis_performa' => $jenis_performa,
+			'user_ttd' => $user_ttd,
+			// 'acc_akun_id_debet' => $acc_akun_id_debet,
+			// 'acc_akun_id_kredit' => $acc_akun_id_kredit,
+			'customer_id' => $customer_id,
+			'deskripsi' => $deskripsi,
+			'no_referensi' => $no_referensi,
+			'uang_muka' => $uang_muka,
+			'tanggal' => $tanggal,
+			'tanggal_tempo' => $tanggal_tempo,
+			'diskon' => $diskon,
+			'jumlah' => $jumlah,
+			'harga_satuan' => $harga_satuan,
+			'qty' => $qty,
+			'ppn' => $ppn,
+			'grand_total' => $grand_total,
+			'dibuat_tanggal' => $dibuat_tanggal,
+		);
+		$this->db->insert('acc_sales_performa', $data);
+		return $this->db->insert_id();
+	}
+
+	public function update(
+		$id,
+		$arrdata
+	) {
+		$id = (int)$id;
+		$lokasi_id = $arrdata['lokasi_id']['id'];
+		$sls_kontrak_id = $arrdata['sls_kontrak_id']['id'];
+		$jenis_performa = $arrdata['jenis_performa']['id'];
+		// $acc_akun_id_kredit = $arrdata['acc_akun_id_kredit']['id'];
+		// $acc_akun_id_debet = $arrdata['acc_akun_id_debet']['id'];
+		$customer_id = $arrdata['customer_id']['id'];
+		$user_ttd = $arrdata['user_ttd']['id'];
+		$no_performa  = $arrdata['no_performa'];
+		$deskripsi    =  $arrdata['deskripsi'];
+		$no_referensi    =  $arrdata['no_referensi'];
+		$tanggal    =  $arrdata['tanggal'];
+		$tanggal_tempo    =  $arrdata['tanggal_tempo'];
+		$jumlah    =  $arrdata['jumlah'];
+		$harga_satuan    =  $arrdata['harga_satuan'];
+		$diskon    =  $arrdata['diskon'];
+		$uang_muka    =  $arrdata['uang_muka'];
+		$ppn    =  $arrdata['ppn'];
+		$qty    =  $arrdata['qty'];
+		$grand_total    =  $arrdata['grand_total'];
+
+		$dibuat_tanggal    =  date('Y-m-d H:i:s');
+		$data = array(
+			'sls_kontrak_id' => $sls_kontrak_id,
+			'lokasi_id' => $lokasi_id,
+			'no_performa' => $no_performa,
+			'customer_id' => $customer_id,
+			'jenis_performa' => $jenis_performa,
+			'user_ttd' => $user_ttd,
+			// 'acc_akun_id_debet' => $acc_akun_id_debet,
+			// 'acc_akun_id_kredit' => $acc_akun_id_kredit,
+			'deskripsi' => $deskripsi,
+			'no_referensi' => $no_referensi,
+			'uang_muka' => $uang_muka,
+			'tanggal' => $tanggal,
+			'tanggal_tempo' => $tanggal_tempo,
+			'diskon' => $diskon,
+			'jumlah' => $jumlah,
+			'harga_satuan' => $harga_satuan,
+			'qty' => $qty,
+			'ppn' => $ppn,
+			'grand_total' => $grand_total,
+			'dibuat_tanggal' => $dibuat_tanggal,
+		);
+		$this->db->where('id', $id);
+		$this->db->update('acc_sales_performa', $data);
+		return true;
+	}
+	public function posting($id,	$input)
+	{
+		$id = (int)$id;
+		$data['is_posting'] = 1;
+		$data['diposting_tanggal'] = date('Y-m-d H:i:s');
+		$data['diposting_oleh'] = 1; // $input['user_posting]
+		$this->db->where('id', $id);
+		$this->db->update('acc_sales_performa', $data);
+
+
+		return true;
+	}
+	public function print_slip($id)
+	{
+		$id = (int)$id;
+
+		$query = "SELECT a.*,b.no_spk, c.nama_customer, c.alamat  from acc_sales_performa a 
+		left join sls_kontrak b on a.sls_kontrak_id=b.id
+		left join gbm_customer c on a.customer_id=c.id
+		left join gbm_organisasi d on a.lokasi_id=d.id
+		where a.id=" . $id . "";
+		$data = $this->db->query($query)->row_array($id);
+		return $data;
+	}
+}
