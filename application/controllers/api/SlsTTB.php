@@ -64,15 +64,15 @@ class SlsTTB extends BD_Controller
 		}
 
 		$data = $this->M_DatatablesModel->get_tables_query($query, $search, $where, $isWhere, $post);
-		if (count($data['data']) > 0) {
-			for ($i = 0; $i < (count($data['data'])); $i++) {
-				$so = $data['data'][$i];
-				$queryBayar = "SELECT sum(nilai)as bayar from sls_so_pembayaran 
-				where so_hd_id=" . $so['id'] . "";
-				$bayar = $this->db->query($queryBayar)->row_array();
-				$data['data'][$i]['bayar'] = $bayar ? $bayar['bayar'] : 0;
-			}
-		}
+		// if (count($data['data']) > 0) {
+		// 	for ($i = 0; $i < (count($data['data'])); $i++) {
+		// 		$so = $data['data'][$i];
+		// 		$queryBayar = "SELECT sum(nilai)as bayar from sls_so_pembayaran 
+		// 		where so_hd_id=" . $so['id'] . "";
+		// 		$bayar = $this->db->query($queryBayar)->row_array();
+		// 		$data['data'][$i]['bayar'] = $bayar ? $bayar['bayar'] : 0;
+		// 	}
+		// }
 
 
 		// var_dump($data['data']);
@@ -181,16 +181,16 @@ class SlsTTB extends BD_Controller
 		where a.proses_approval=1 and a.status not in ('REJECTED','RELEASE') and c.id=" . $this->user_id . "";
 
 		$data = $this->db->query($query)->result_array();
-		if (count($data['data']) > 0) {
-			for ($i = 0; $i < (count($data['data'])); $i++) {
-				$so = $data['data'][$i];
-				$queryPP = "SELECT DISTINCT  c.id AS pp_id, c.no_pp FROM sls_so_dt a INNER JOIN prc_pp_dt b 
-				ON a.pp_dt_id=b.id INNER JOIN prc_pp_ht c ON b.pp_hd_id=c.id
-				where a.so_hd_id=" . $so['id'] . "";
-				$pp = $this->db->query($queryPP)->result_array();
-				$data['data'][$i]['pp_detail'] = $pp;
-			}
-		}
+		// if (count($data['data']) > 0) {
+		// 	for ($i = 0; $i < (count($data['data'])); $i++) {
+		// 		$so = $data['data'][$i];
+		// 		$queryPP = "SELECT DISTINCT  c.id AS pp_id, c.no_pp FROM sls_so_dt a INNER JOIN prc_pp_dt b 
+		// 		ON a.pp_dt_id=b.id INNER JOIN prc_pp_ht c ON b.pp_hd_id=c.id
+		// 		where a.so_hd_id=" . $so['id'] . "";
+		// 		$pp = $this->db->query($queryPP)->result_array();
+		// 		$data['data'][$i]['pp_detail'] = $pp;
+		// 	}
+		// }
 		$this->set_response($data, REST_Controller::HTTP_OK);
 	}
 	public function countByUserApprove_post()

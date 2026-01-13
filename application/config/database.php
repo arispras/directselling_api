@@ -77,7 +77,6 @@ $db['default'] = array(
 	'dsn'	=> '',
 	'hostname' => 'localhost',
 	'username' => 'root',
-	//'password' => 'DPA@476c',
 	'password' => '',
 	'database' => 'directselling',
 	'dbdriver' => 'mysqli',
