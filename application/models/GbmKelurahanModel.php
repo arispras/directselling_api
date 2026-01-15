@@ -1,0 +1,79 @@
+<?php
+
+class GbmKelurahanModel extends CI_Model
+{
+
+	public function delete_foto($id)
+	{
+		$this->db->where('id', $id);
+		$this->db->update('gbm_kelurahan', array('foto' => null));
+		return true;
+	}
+
+	public function delete($id)
+	{
+		$id = (int)$id;
+		$this->db->where('id', $id);
+		$this->db->delete('gbm_kelurahan');
+		return true;
+	}
+
+
+	public function retrieve_by_id($id = null)
+	{
+
+		$id = (int)$id;
+		$this->db->where('id', $id);
+
+		$result = $this->db->get('gbm_kelurahan', 1);
+		return $result->row_array();
+	}
+
+
+
+	public function retrieve_all()
+	{
+
+		// $this->db->order_by('nama', 'ASC');
+		$this->db->select('*');
+		$this->db->from('kelurahan ');
+		$result = $this->db->get();
+		return $result->result_array();
+	}
+	public function retrieve_all_by_kecamatan_id($kecamatan_id)
+	{
+
+		// $this->db->order_by('nama', 'ASC');
+		$this->db->select('*');
+		$this->db->from('kelurahan ');
+		$this->db->where('kecamatan_id', $kecamatan_id);
+		$result = $this->db->get();
+		return $result->result_array();
+	}
+	public function update(
+		$id,
+		$input
+	) {
+		$id        = (int)$id;
+
+		$data = array(
+			'nama'          => $input['nama']	,
+			'kecamatan_id'=> $input['kecamatan_id']['id']
+		);
+		$this->db->where('id', $id);
+		$this->db->update('gbm_kelurahan', $data);
+		return true;
+	}
+
+	public function create(
+		$input	
+	) {
+		$data = array(
+			'nama'          => $input['nama']	,
+			'kecamatan_id'=> $input['kecamatan_id']['id']
+		);
+		$this->db->insert('gbm_kelurahan', $data);
+		return $this->db->insert_id();
+	}
+	
+}
