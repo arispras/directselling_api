@@ -36,20 +36,28 @@ class GbmKelurahanModel extends CI_Model
 
 		// $this->db->order_by('nama', 'ASC');
 		$this->db->select('*');
-		$this->db->from('kelurahan ');
+		$this->db->from('gbm_kelurahan ');
 		$result = $this->db->get();
 		return $result->result_array();
 	}
-	public function retrieve_all_by_kecamatan_id($kecamatan_id)
+	public function retrieve_all_by_kecamatan_id($id = null)
 	{
 
-		// $this->db->order_by('nama', 'ASC');
-		$this->db->select('*');
-		$this->db->from('kelurahan ');
-		$this->db->where('kecamatan_id', $kecamatan_id);
-		$result = $this->db->get();
+		$id = (int)$id;
+		$this->db->where('kecamatan_id', $id);
+		$result = $this->db->get('gbm_kelurahan');
 		return $result->result_array();
 	}
+	// public function retrieve_all_by_kecamatan_id($kecamatan_id)
+	// {
+
+	// 	// $this->db->order_by('nama', 'ASC');
+	// 	$this->db->select('*');
+	// 	$this->db->from('kelurahan ');
+	// 	$this->db->where('kecamatan_id', $kecamatan_id);
+	// 	$result = $this->db->get();
+	// 	return $result->result_array();
+	// }
 	public function update(
 		$id,
 		$input

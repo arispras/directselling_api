@@ -62,6 +62,18 @@ class GbmKabupaten extends BD_Controller
 			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
 		}
 	}
+
+	function getAllByProvinsiId_get($id = '')
+	{
+		$retrieve = array();
+		$retrieve = $this->GbmKabupatenModel->retrieve_all_by_provinsi_id($id);
+		
+		if (!empty($retrieve)) {
+			$this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
+		} else {
+			$this->set_response(array("status" => "NOT OK", "data" => []), REST_Controller::HTTP_OK);
+		}
+	}
 	
 	function index_get($id = '')
 	{

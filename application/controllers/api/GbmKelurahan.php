@@ -61,7 +61,17 @@ class GbmKelurahan extends BD_Controller
 			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
 		}
 	}
-	
+	function getAllByKecamatanId_get($id = '')
+	{
+		$retrieve = array();
+		$retrieve = $this->GbmKelurahanModel->retrieve_all_by_kecamatan_id($id);
+		
+		if (!empty($retrieve)) {
+			$this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
+		} else {
+			$this->set_response(array("status" => "NOT OK", "data" => []), REST_Controller::HTTP_OK);
+		}
+	}
 	function index_get($id = '')
 	{
 		$retrieve = array();
@@ -70,21 +80,21 @@ class GbmKelurahan extends BD_Controller
 		if (!empty($retrieve)) {
 			$this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
 		} else {
-			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
+			$this->set_response(array("status" => "NOT OK", "data" =>[]), REST_Controller::HTTP_Ok);
 		}
 	}
-	function getAllByKecamatanId_get($kecamatan_id = '')
-	{
-		$retrieve = array();
-		$retrieve = $this->GbmKelurahanModel->retrieve_all_by_kecamatan_id($kecamatan_id);
+	// function getAllByKecamatanId_get($kecamatan_id = '')
+	// {
+	// 	$retrieve = array();
+	// 	$retrieve = $this->GbmKelurahanModel->retrieve_all_by_kecamatan_id($kecamatan_id);
 
 		
-		if (!empty($retrieve)) {
-			$this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
-		} else {
-			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
-		}
-	}
+	// 	if (!empty($retrieve)) {
+	// 		$this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
+	// 	} else {
+	// 		$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
+	// 	}
+	// }
 	
 	function index_post()
 	{

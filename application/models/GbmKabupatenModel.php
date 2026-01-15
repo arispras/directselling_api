@@ -24,6 +24,16 @@ class GbmKabupatenModel extends CI_Model
 		return $result->row_array();
 	}
 
+	public function retrieve_all_by_provinsi_id($id = null)
+	{
+
+		$id = (int)$id;
+		$this->db->where('provinsi_id', $id);
+
+		$result = $this->db->get('gbm_kabupaten');
+		return $result->result_array();
+	}
+
 
 
 	public function retrieve_all()

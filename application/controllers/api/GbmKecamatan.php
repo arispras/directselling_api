@@ -22,17 +22,17 @@ class GbmKecamatan extends BD_Controller
 	public function list_post()
 	{
 		$post = $this->post();
-		
+
 		$query  = " SELECT a.*,b.nama as kabupaten 
 		from gbm_kecamatan a left join gbm_kabupaten b 
 		on a.kabupaten_id=b.id
 		";
-		$search = array('a.nama','b.nama');
+		$search = array('a.nama', 'b.nama');
 		$where  = null;
-		
+
 		$isWhere = null;
 		// $isWhere = 'artikel.deleted_at IS NULL';
-		
+
 		$data = $this->M_DatatablesModel->get_tables_query($query, $search, $where, $isWhere, $post);
 		$this->set_response($data, REST_Controller::HTTP_OK);
 	}
@@ -49,25 +49,35 @@ class GbmKecamatan extends BD_Controller
 		$data = $this->db->query($query)->result_array();
 		$this->set_response($data, REST_Controller::HTTP_OK);
 	}
-	
+
 	function getAll_get()
 	{
 		$retrieve = array();
 		$retrieve = $this->GbmKecamatanModel->retrieve_all();
-		
+
 		if (!empty($retrieve)) {
 			$this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
 		} else {
 			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
 		}
 	}
-	
+	function getAllByKabupatenId_get($id = '')
+	{
+		$retrieve = array();
+		$retrieve = $this->GbmKecamatanModel->retrieve_all_by_kabupaten_id($id);
+
+		if (!empty($retrieve)) {
+			$this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
+		} else {
+			$this->set_response(array("status" => "NOT OK", "data" => []), REST_Controller::HTTP_OK);
+		}
+	}
 	function index_get($id = '')
 	{
 		$retrieve = array();
 		$retrieve = $this->GbmKecamatanModel->retrieve_by_id($id);
 
-		
+
 		if (!empty($retrieve)) {
 			$this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
 		} else {
@@ -75,17 +85,17 @@ class GbmKecamatan extends BD_Controller
 		}
 	}
 
-	
+
 	function index_post()
 	{
 		$input = $this->post();
 		$input['dibuat_oleh'] = $this->user_id;
 		$input['diubah_oleh'] = $this->user_id;
 
-		
+
 		$res = $this->GbmKecamatanModel->create($input);
 		if (!empty($res)) {
-			$this->set_response(array("status" => "OK", "data" =>$res), REST_Controller::HTTP_CREATED);
+			$this->set_response(array("status" => "OK", "data" => $res), REST_Controller::HTTP_CREATED);
 		} else {
 			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
 		}
@@ -99,7 +109,7 @@ class GbmKecamatan extends BD_Controller
 
 		$res = $this->GbmKecamatanModel->update($id, $data);
 		if (!empty($res)) {
-				$this->set_response(array("status" => "OK", "data" => $res), REST_Controller::HTTP_CREATED);
+			$this->set_response(array("status" => "OK", "data" => $res), REST_Controller::HTTP_CREATED);
 		} else {
 			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
 		}
@@ -108,12 +118,12 @@ class GbmKecamatan extends BD_Controller
 	{
 		$res = $this->GbmKecamatanModel->delete($id);
 		if (!empty($res)) {
-				$this->set_response(array("status" => "OK", "data" => $res), REST_Controller::HTTP_CREATED);
+			$this->set_response(array("status" => "OK", "data" => $res), REST_Controller::HTTP_CREATED);
 		} else {
 			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
 		}
 	}
-	
+
 	public function UploadFoto_post()
 	{
 		// $postData = $this->post();
@@ -156,5 +166,4 @@ class GbmKecamatan extends BD_Controller
 			return  $_SERVER['DOCUMENT_ROOT'] . "/"  .  'directsales'  . '/userfiles/inspeksi/' . $nama_file . '_' . $size . '.' . $ext;
 		}
 	}
-	
 }

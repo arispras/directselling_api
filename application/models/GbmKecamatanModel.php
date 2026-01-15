@@ -3,7 +3,7 @@
 class GbmKecamatanModel extends CI_Model
 {
 
-	
+
 
 	public function delete($id)
 	{
@@ -22,6 +22,14 @@ class GbmKecamatanModel extends CI_Model
 
 		$result = $this->db->get('gbm_kecamatan', 1);
 		return $result->row_array();
+	}
+	public function retrieve_all_by_kabupaten_id($id = null)
+	{
+
+		$id = (int)$id;
+		$this->db->where('kabupaten_id', $id);
+		$result = $this->db->get('gbm_kecamatan');
+		return $result->result_array();
 	}
 
 
@@ -43,8 +51,8 @@ class GbmKecamatanModel extends CI_Model
 		$id        = (int)$id;
 
 		$data = array(
-			'nama'          => $input['nama']	,
-			'kabupaten_id'=>$input['kabupaten_id']['id']
+			'nama'          => $input['nama'],
+			'kabupaten_id' => $input['kabupaten_id']['id']
 		);
 		$this->db->where('id', $id);
 		$this->db->update('gbm_kecamatan', $data);
@@ -52,14 +60,13 @@ class GbmKecamatanModel extends CI_Model
 	}
 
 	public function create(
-		$input	
+		$input
 	) {
 		$data = array(
-			'nama'          => $input['nama']	,
-			'kabupaten_id'=>$input['kabupaten_id']['id']	
+			'nama'          => $input['nama'],
+			'kabupaten_id' => $input['kabupaten_id']['id']
 		);
 		$this->db->insert('gbm_kecamatan', $data);
 		return $this->db->insert_id();
 	}
-	
 }

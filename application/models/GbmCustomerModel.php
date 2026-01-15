@@ -54,10 +54,14 @@ class GbmCustomerModel extends CI_Model
 		$kode_customer  =  $arrdata['kode_customer'];
 		// $tipe_customer  =  $arrdata['tipe_customer'];
 		$nama_customer    =  $arrdata['nama_customer'];
-		// $no_npwp    =  $arrdata['no_npwp'];
-		// $alamat_npwp    =  $arrdata['alamat_npwp'];
-		// $alamat    =  $arrdata['alamat'];
+		$no_ktp    =  $arrdata['no_ktp'];
+		$koordinat    =  $arrdata['koordinat'];
+		$alamat    =  $arrdata['alamat'];
 		$no_telpon    =  $arrdata['no_telpon'];
+		$provinsi_id    =  $arrdata['provinsi_id']['id'];
+		$kabupaten_id    =  $arrdata['kabupaten_id']['id'];
+		$kecamatan_id    =  $arrdata['kecamatan_id']['id'];
+		$kelurahan_id    =  $arrdata['kelurahan_id']['id'];
 		// $contact_person    =  $arrdata['contact_person'];
 		// $no_hp    =  $arrdata['no_hp'];
 		// $tempo_pembayaran =$arrdata['tempo_pembayaran'];
@@ -67,18 +71,26 @@ class GbmCustomerModel extends CI_Model
 
 		$data = array(
 		
-			'kode_customer'    => $kode_customer,
-			// 'tipe_customer'  =>  $tipe_customer,
+			'kode_customer'    => $kode_customer,		
 			'nama_customer' => $nama_customer,
+			'alamat' => $alamat,
+			'no_telpon' => $no_telpon,
+			'no_ktp' => $no_ktp,
+			'provinsi_id'    => $provinsi_id,		
+			'kabupaten_id' => $kabupaten_id,
+			'kecamatan_id' => $kecamatan_id,
+			'kelurahan_id' => $kelurahan_id,
+			'koordinat' => $koordinat,
+			'dibuat_oleh' => $dibuat_oleh,
+			'dibuat_tanggal' => $dibuat_tanggal
+			// 'tipe_customer'  =>  $tipe_customer,
 			// 'no_npwp' => $no_npwp,
 			// 'alamat_npwp' => $alamat_npwp,
-			// 'alamat' => $alamat,
-			'no_telpon' => $no_telpon,
+			
 			// 'contact_person' => $contact_person,
 			// 'no_hp' => $no_hp,
 			// 'tempo_pembayaran' => $tempo_pembayaran,
-			'dibuat_oleh' => $dibuat_oleh,
-			'dibuat_tanggal' => $dibuat_tanggal
+			
 		);
 		$this->db->insert('gbm_customer', $data);
 		$id = $this->db->insert_id();
