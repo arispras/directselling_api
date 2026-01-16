@@ -42,7 +42,6 @@ class SlsTTBModel extends CI_Model
 	public function retrieve_all_so_release_by_customer($supp_id)
 	{
 		$this->db->where('customer_id', $supp_id);
-		// $this->db->where('status' , 'RELEASE');
 		$this->db->order_by('id', 'ASC');
 		$this->db->from('sls_ttb_ht a');
 		$this->db->select('a.*, b.nama_customer');
@@ -76,7 +75,7 @@ class SlsTTBModel extends CI_Model
 
 		$ht['no_ttb'] = $input['no_ttb'];
 		$ht['catatan'] = $input['catatan'];
-
+		$ht['jenis'] = $input['jenis'];
 		$ht['tenor'] = $input['tenor'];
 		$ht['sub_total'] = $input['sub_total'];
 		$ht['total_diskon'] = $input['total_diskon'];
@@ -147,7 +146,7 @@ class SlsTTBModel extends CI_Model
 		// $ht['status_so'] = $input['status_so']['id'];
 		$ht['no_ttb'] = $input['no_ttb'];
 		$ht['catatan'] = $input['catatan'];
-
+		$ht['jenis'] = $input['jenis'];
 		$ht['tenor'] = $input['tenor'];
 		$ht['sub_total'] = $input['sub_total'];
 		$ht['total_diskon'] = $input['total_diskon'];
@@ -283,7 +282,6 @@ class SlsTTBModel extends CI_Model
 
 	public function retrieve_detail($hdid)
 	{
-		// $this->db->select('est_spat_dt.*,gbm_organisasi.kode as kode_blok,gbm_organisasi.nama as nama_blok');
 		$this->db->select('sls_ttb_dt.*');
 		$this->db->from('sls_ttb_dt');
 		$this->db->where('ttb_hd_id', $hdid);

@@ -287,8 +287,6 @@ class KaryawanModel extends CI_Model
 		$is_jht,
 		$is_jp,
 		$is_jks,
-		$is_dokter,
-		$is_perawat,
 		$diubah_oleh=null
 
 	) {
@@ -331,8 +329,6 @@ class KaryawanModel extends CI_Model
 			'is_jht'   => $is_jht,
 			'is_jp'   => $is_jp,
 			'is_jks'   => $is_jks,
-			'is_dokter'   => $is_dokter,
-			'is_perawat'   => $is_perawat,
 			'diubah_oleh'=>$diubah_oleh,
 			'diubah_tanggal'=>date("Y-m-d H:i:s")
 
@@ -378,8 +374,6 @@ class KaryawanModel extends CI_Model
 		$is_jht,
 		$is_jp,
 		$is_jks,
-		$is_dokter,
-		$is_perawat,
 		$dibuat_oleh=null
 	) {
 		$status_id = (int)$status_id;
@@ -419,8 +413,6 @@ class KaryawanModel extends CI_Model
 			'is_jht'   => $is_jht,
 			'is_jp'   => $is_jp,
 			'is_jks'   => $is_jks,
-			'is_dokter'   => $is_dokter,
-			'is_perawat'   => $is_perawat,
 			'dibuat_oleh'=>$dibuat_oleh,
 			'dibuat_tanggal'=>date("Y-m-d H:i:s")
 		);

@@ -74,7 +74,7 @@ class SlsSoModel extends CI_Model
 		
 		$ht['no_so'] = $input['no_so'];
 		$ht['catatan'] = $input['catatan'];
-		
+		$ht['jenis'] = $input['jenis'];
 		$ht['tenor'] = $input['tenor'];
 		$ht['sub_total'] = $input['sub_total'];
 		$ht['total_diskon'] = $input['total_diskon'];
@@ -144,7 +144,7 @@ class SlsSoModel extends CI_Model
 		$ht['status_so'] = $input['status_so']['id'];
 		$ht['no_so'] = $input['no_so'];
 		$ht['catatan'] = $input['catatan'];
-		
+			$ht['jenis'] = $input['jenis'];
 		$ht['tenor'] = $input['tenor'];
 		$ht['sub_total'] = $input['sub_total'];
 		$ht['total_diskon'] = $input['total_diskon'];

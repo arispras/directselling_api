@@ -57,7 +57,6 @@ class SlsSo extends BD_Controller
 		$where  = null;
 
 		// $isWhere = null;
-		// $isWhere = 'artikel.deleted_at IS NULL';
 
 		$isWhere = " 1=1 ";
 		if ($param['tgl_mulai'] && $param['tgl_mulai']) {
@@ -65,6 +64,13 @@ class SlsSo extends BD_Controller
 		}
 		if (!empty($param['customer_id'])) {
 			$isWhere = $isWhere .  "  and a.customer_id=" . $param['customer_id'] . "";
+		}
+
+		if ($param['lokasi_id']) {
+			$isWhere = $isWhere . " and a.lokasi_id =" . $param['lokasi_id'] . "";
+		} else {
+			$isWhere = $isWhere . " and  a.lokasi_id in
+			(select location_id from fwk_users_location where user_id=" . $this->user_id . ")";
 		}
 
 		$data = $this->M_DatatablesModel->get_tables_query($query, $search, $where, $isWhere, $post);
@@ -77,6 +83,45 @@ class SlsSo extends BD_Controller
 		// 		$data['data'][$i]['bayar'] = $bayar?$bayar['bayar']:0;
 		// 	}
 		// }
+
+
+		// var_dump($data['data']);
+		$this->set_response($data, REST_Controller::HTTP_OK);
+	}
+	public function listLookup_post($lokasi_id)
+	{
+		$post = $this->post();
+		$param = $post['parameter'];
+
+		$query  = "SELECT a.*, b.nama AS lokasi,c.nama_customer as nama_customer from sls_so_ht a 
+		inner join gbm_organisasi b on a.lokasi_id=b.id
+		left join gbm_customer c on a.customer_id=c.id
+		left join sls_ttb_ht d on a.id=d.sls_so_id";
+		$search = array('no_so', 'a.tanggal', 'a.catatan', 'c.nama_customer');
+		$where  = null;
+
+		// $isWhere = null;
+
+		$isWhere = " status_so='OK' and d.id is null ";
+		$isWhere = $isWhere .  "  and a.lokasi_id=" . $lokasi_id . "";
+
+		// if ($param['tgl_mulai'] && $param['tgl_mulai']) {
+		// 	$isWhere = " a.tanggal between '" . $param['tgl_mulai'] . "' and '" . $param['tgl_akhir'] . "'";
+		// }
+		// if (!empty($param['customer_id'])) {
+		// 	$isWhere = $isWhere .  "  and a.customer_id=" . $param['customer_id'] . "";
+		// }
+
+		$data = $this->M_DatatablesModel->get_tables_query($query, $search, $where, $isWhere, $post);
+		if (count($data['data']) > 0) {
+			for ($i = 0; $i < (count($data['data'])); $i++) {
+				$so = $data['data'][$i];
+				$queryDetail = "SELECT *  from sls_so_dt
+				where so_hd_id=" . $so['id'] . "";
+				$detail = $this->db->query($queryDetail)->result_array();
+				$data['data'][$i]['detail'] =$detail;
+			}
+		}
 
 
 		// var_dump($data['data']);

@@ -49,11 +49,8 @@ class SlsTTB extends BD_Controller
 		left join gbm_organisasi b on a.lokasi_id=b.id
 		left join gbm_customer c on a.customer_id=c.id
 		left join sls_so_ht d on a.sls_so_id=d.id";
-		$search = array('no_ttb', 'a.tanggal', 'a.catatan', 'c.nama_customer');
+		$search = array('no_ttb', 'a.tanggal', 'a.catatan', 'c.nama_customer','d.no_so');
 		$where  = null;
-
-		// $isWhere = null;
-		// $isWhere = 'artikel.deleted_at IS NULL';
 
 		$isWhere = " 1=1 ";
 		if ($param['tgl_mulai'] && $param['tgl_mulai']) {
@@ -61,6 +58,12 @@ class SlsTTB extends BD_Controller
 		}
 		if (!empty($param['customer_id'])) {
 			$isWhere = $isWhere .  "  and a.customer_id=" . $param['customer_id'] . "";
+		}
+		if ($param['lokasi_id']) {
+			$isWhere = $isWhere . " and a.lokasi_id =" . $param['lokasi_id'] . "";
+		} else {
+			$isWhere = $isWhere . " and  a.lokasi_id in
+			(select location_id from fwk_users_location where user_id=" . $this->user_id . ")";
 		}
 
 		$data = $this->M_DatatablesModel->get_tables_query($query, $search, $where, $isWhere, $post);
