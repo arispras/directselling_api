@@ -357,12 +357,12 @@ class SlsTTB extends BD_Controller
 		// $this->set_response(array("status" => "OK", "data" => $input['no_ttb']), REST_Controller::HTTP_OK);
 		if (!empty($res)) {
 			/* start audit trail */
-			$audit = array('user_id' => $this->user_id, 'desc' => json_encode($this->post()), 'entity' => 'sls_so', 'action' => 'new', 'entity_id' => $res, 'key_text' => $input['no_ttb']);
+			$audit = array('user_id' => $this->user_id, 'desc' => json_encode($this->post()), 'entity' => 'sls_ttb_ht', 'action' => 'new', 'entity_id' => $res, 'key_text' => $input['no_ttb']);
 			$this->db->insert('fwk_user_audit', $audit);
 			/* end audit trail */
 			$this->set_response(array("status" => "OK", "data" => $input['no_ttb']), REST_Controller::HTTP_CREATED);
 		} else {
-			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
+			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_OK);
 		}
 	}
 	function simpan_pembayaran_post()
@@ -457,14 +457,14 @@ class SlsTTB extends BD_Controller
 		$id = (int)$segment_3;
 		$so = $this->SlsTTBModel->retrieve($id);
 		if (empty($so)) {
-			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
+			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_OK);
 		}
 
 		$res =   $this->SlsTTBModel->update($so['id'], $input);
 		// $this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
 		if (!empty($res)) {
 			/* start audit trail */
-			$audit = array('user_id' => $this->user_id, 'desc' => json_encode($this->put()), 'entity' => 'sls_so', 'action' => 'edit', 'entity_id' => $id, 'key_text' => $so['no_ttb']);
+			$audit = array('user_id' => $this->user_id, 'desc' => json_encode($this->put()), 'entity' => 'sls_ttb_ht', 'action' => 'edit', 'entity_id' => $id, 'key_text' => $so['no_ttb']);
 			$this->db->insert('fwk_user_audit', $audit);
 			/* end audit trail */
 			$this->set_response(array("status" => "OK", "data" => $res), REST_Controller::HTTP_CREATED);
@@ -614,14 +614,14 @@ class SlsTTB extends BD_Controller
 		$id = (int)$segment_3;
 		$so = $this->SlsTTBModel->retrieve($id);
 		if (empty($so)) {
-			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
+			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_OK);
 		}
 
 		$res =  $this->SlsTTBModel->delete($so['id']);
 		// $this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
 		if (!empty($res)) {
 			/* start audit trail */
-			$audit = array('user_id' => $this->user_id, 'desc' => json_encode(array('id' => $id)), 'entity' => 'sls_so', 'action' => 'delete', 'entity_id' => $id, 'key_text' => $so['no_ttb']);
+			$audit = array('user_id' => $this->user_id, 'desc' => json_encode(array('id' => $id)), 'entity' => 'sls_ttb_ht', 'action' => 'delete', 'entity_id' => $id, 'key_text' => $so['no_ttb']);
 			$this->db->insert('fwk_user_audit', $audit);
 			/* end audit trail */
 			$this->set_response(array("status" => "OK", "data" => $res), REST_Controller::HTTP_CREATED);
@@ -770,7 +770,7 @@ class SlsTTB extends BD_Controller
 		$data['diubah_oleh'] = $this->user_id;
 		$ttb = $this->SlsTTBModel->retrieve($id);
 		if (empty($ttb)) {
-			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
+			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_OK);
 		}
 		$tenor = $ttb['tenor'];
 		$lokasi_id = $ttb['lokasi_id'];
@@ -779,37 +779,53 @@ class SlsTTB extends BD_Controller
 		$collector_id = $ttb['collector_id'];
 		$customer_id = $ttb['customer_id'];
 		$nilai_angsuran = $ttb['total_nilai_angsuran'];
-		$tanggal_tempo=$ttb['tanggal'];
+		$tgl_tempo=$ttb['tanggal'];
+		$jenis=$ttb['jenis'];
+		$date = new DateTime($tgl_tempo); 
 		$this->db->where('ttb_id', $id);
-		$this->db->delete('col_kuitansi');
-		for ($i = 0; $i < $tenor; $i++) {
-			$date = new DateTime($tanggal_tempo); 
-			$date->modify('+1 month');
+		$this->db->delete('col_kuitansi_ht');
+		for ($i = 1; $i < ($tenor+1); $i++) {
+					
 			$tanggal_tempo =$date->format('Y-m-d');
-			$angsuran_ke = $i + 1;
-			$no_kuitansi=$no_ttb.".".sprintf("%02s", $angsuran_ke);
+			$angsuran_ke = $i ;
+			$no_kuitansi=$no_ttb.".".sprintf("%02s", $angsuran_ke);		
+			if ($angsuran_ke==1){
+				$nilai_angsuran=$ttb['total_dp'];
+			}else{
+				$nilai_angsuran=$ttb['total_nilai_angsuran'];
+			}
 
-			
-
-			$this->db->insert("col_kuitansi", array(
+			$this->db->insert("col_kuitansi_ht", array(
 				'ttb_id' => $id,
 				'lokasi_id' => $lokasi_id,
 				'no_kuitansi' => $no_kuitansi,
 				'angsuran_ke' => $angsuran_ke,
-				'nilai_kuitansi' => $nilai_angsuran,
-				'nilai_kuitansi_ori' => $nilai_angsuran,
+				'nilai_angsuran' => $nilai_angsuran,
+				'nilai_angsuran_ori' => $nilai_angsuran,
 				'collector_id' => $collector_id,
 				'customer_id' => $customer_id,
 				'tanggal_tempo' => $tanggal_tempo,
-				'keterangan' => '',
+				'keterangan' => 'Cicilan TTB No. ' . $no_ttb. ' Angsuran Ke-'.$angsuran_ke,
+				'dibuat_oleh' => $this->user_id,
+				'dibuat_tanggal' => date('Y-m-d H:i:s')
+
 
 			));
+			if ($jenis=='M'){ // MINGGUAN
+				$date->modify('+7 days');
+			}else if ($jenis=='M'){ // BULANAN
+				$date->modify('+1 month');
+
+			}else{
+				$date->modify('+7 days');
+
+			}
 		}
 
 		$res = $this->SlsTTBModel->posting($id, $data);
 		if (!empty($res)) {
 			/* start audit trail */
-			$audit = array('user_id' => $this->user_id, 'desc' => json_encode(array('id' => $id)), 'entity' => 'sls_so', 'action' => 'posting', 'entity_id' => $id, 'key_text' => $so['no_ttb']);
+			$audit = array('user_id' => $this->user_id, 'desc' => json_encode(array('id' => $id)), 'entity' => 'sls_ttb_ht', 'action' => 'posting', 'entity_id' => $id, 'key_text' => $so['no_ttb']);
 			$this->db->insert('fwk_user_audit', $audit);
 			/* end audit trail */
 			$this->set_response(array("status" => "OK", "data" => $res), REST_Controller::HTTP_CREATED);

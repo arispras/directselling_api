@@ -460,14 +460,12 @@ class SlsTTBModel extends CI_Model
 	public function posting($id,	$input)
 	{
 		$id = (int)$id;
-		$data['status'] = 'RELEASE';
-		$data['last_approve_position'] = NULL;
-		$data['last_approve_user'] = NULL;
+		$data['status_ttb'] = 'kuitansi';
 		$data['is_posting'] = 1;
 		$data['diposting_tanggal'] = date('Y-m-d H:i:s');
 		$data['diposting_oleh'] =  $input['diubah_oleh'];
-		$data['diubah_tanggal'] = date('Y-m-d H:i:s');
-		$data['diubah_oleh'] = $input['diubah_oleh'];
+		// $data['diubah_tanggal'] = date('Y-m-d H:i:s');
+		// $data['diubah_oleh'] = $input['diubah_oleh'];
 		$this->db->where('id', $id);
 		$this->db->update('sls_ttb_ht', $data);
 

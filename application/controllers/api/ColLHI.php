@@ -60,6 +60,12 @@ class ColLHI extends BD_Controller
 		// if (!empty($param['customer_id'])) {
 		// 	$isWhere = $isWhere .  "  and a.customer_id=" . $param['customer_id'] . "";
 		// }
+		if ($param['lokasi_id']) {
+			$isWhere = $isWhere . " and a.lokasi_id =" . $param['lokasi_id'] . "";
+		} else {
+			$isWhere = $isWhere . " and  a.lokasi_id in
+			(select location_id from fwk_users_location where user_id=" . $this->user_id . ")";
+		}
 
 		$data = $this->M_DatatablesModel->get_tables_query($query, $search, $where, $isWhere, $post);
 		// if (count($data['data']) > 0) {
@@ -316,16 +322,23 @@ class ColLHI extends BD_Controller
 		$tanggal_akhir =  $this->post('tanggal_akhir', true);
 		$lokasi_id =  $this->post('lokasi_id', true);
 
-		$sql = "SELECT a.*,b.kode_customer,b.nama_customer,nilai_kuitansi as sisa_angsuran  FROM col_kuitansi a INNER JOIN gbm_customer b 
-		ON a.customer_id=b.id where  lokasi_id=" . $lokasi_id . " and ((
+		$sql = "SELECT a.*,b.kode_customer,b.nama_customer,nilai_angsuran  ,ifnull(kuitansi.dibayar,0)AS dibayar,
+		(nilai_angsuran - ifnull(kuitansi.dibayar,0))AS sisa_akhir
+		 FROM col_kuitansi_ht a INNER JOIN gbm_customer b 
+		ON a.customer_id=b.id 
+				 left join (SELECT b.kuitansi_id,sum(b.dibayar)AS dibayar 
+				FROM col_lhi_ht a INNER JOIN col_lhi_dt b ON a.id=b.lhi_id
+				GROUP BY b.kuitansi_id) kuitansi ON a.id=kuitansi.kuitansi_id
+				WHERE  1=1 
+				and a.lokasi_id=" . $lokasi_id . " and ((
 		tanggal_tempo between '" . $tanggal_mulai . "' and '" . $tanggal_akhir . "')or 
 		(tanggal_janji between '" . $tanggal_mulai . "' and '" . $tanggal_akhir . "'))
-		and collector_id=" . $collector_id . "
+		and collector_id=" . $collector_id . " and (nilai_angsuran > ifnull(kuitansi.dibayar,0))
+		and a.angsuran_ke>1
 		order by a.no_kuitansi";
 		$retrieve =	$this->db->query($sql)->result_array();
 
 		if (!empty($retrieve)) {
-			// Cek PO msh ada outstanding atau Tidak //
 
 			$this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
 		} else {
@@ -768,7 +781,7 @@ class ColLHI extends BD_Controller
 		$nilai_angsuran = $ttb['total_nilai_angsuran'];
 
 		$this->db->where('ttb_id', $id);
-		$this->db->delete('col_kuitansi');
+		$this->db->delete('col_kuitansi_ht');
 		for ($i = 0; $i < $tenor; $i++) {
 			$date = new DateTime($tgl_ttb);
 			$date->modify('+1 month');
@@ -778,12 +791,12 @@ class ColLHI extends BD_Controller
 
 
 
-			$this->db->insert("col_kuitansi", array(
+			$this->db->insert("col_kuitansi_ht", array(
 				'ttb_id' => $id,
 				'no_kuitansi' => $no_kuitansi,
 				'angsuran_ke' => $angsuran_ke,
-				'nilai_kuitansi' => $nilai_angsuran,
-				'nilai_kuitansi_ori' => $nilai_angsuran,
+				'nilai_angsuran' => $nilai_angsuran,
+				'nilai_angsuran_ori' => $nilai_angsuran,
 				'collector_id' => $collector_id,
 				'customer_id' => $customer_id,
 				'tanggal_tempo' => $tanggal_tempo,

@@ -85,10 +85,10 @@ class ColLHIModel extends CI_Model
 			$this->db->insert("col_lhi_dt", array(
 				'lhi_id' => $id,
 				'kuitansi_id' => $value['kuitansi_id'],
-				'nilai_kuitansi' => $value['nilai_kuitansi'],
+				'nilai_angsuran' => $value['nilai_angsuran'],
 				'sisa_angsuran' => $value['sisa_angsuran'],
 				'lhi_lama' => $value['lhi_lama'],
-				'keterangan' => $value['keterangan'],
+				'ket' => $value['keterangan'],
 			));
 		}
 
@@ -119,13 +119,13 @@ class ColLHIModel extends CI_Model
 			$this->db->insert("col_lhi_dt", array(
 				'lhi_id' => $id,
 				'kuitansi_id' => $value['kuitansi_id'],
-				'nilai_kuitansi' => $value['nilai_kuitansi'],
+				'nilai_angsuran' => $value['nilai_angsuran'],
 				'sisa_angsuran' => $value['sisa_angsuran'],
 				'dibayar' => $value['dibayar'],
 				'sisa_akhir' => $value['sisa_akhir'],
 				'tanggal_janji' => $value['tanggal_janji'],
 				// 'lhi_lama' => $value['lhi_lama'],
-				'keterangan' => $value['keterangan'],
+				'ket' => $value['keterangan'],
 			));
 		}
 		return true;
@@ -153,7 +153,7 @@ class ColLHIModel extends CI_Model
 		// $this->db->select('est_spat_dt.*,gbm_organisasi.kode as kode_blok,gbm_organisasi.nama as nama_blok');
 		$this->db->select('a.*, b.no_kuitansi,b.tanggal_tempo,a.tanggal_janji as tanggal_janji ,c.nama_customer');
 		$this->db->from('col_lhi_dt a');
-		$this->db->join('col_kuitansi b', 'a.kuitansi_id = b.id', "left");
+		$this->db->join('col_kuitansi_ht b', 'a.kuitansi_id = b.id', "left");
 		$this->db->join('gbm_customer c', 'b.customer_id = c.id', "left");
 		$this->db->where('a.lhi_id', $hdid);
 		$res = $this->db->get();
