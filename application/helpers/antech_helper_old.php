@@ -2,7 +2,7 @@
 function get_company()
 {
 	$company = array();
-	$company['nama'] = "KLINIK ANNAJAH";
+	$company['nama'] = "PT SAHABAT";
 	$company['alamat'] = "Jl. Sukarno Hatta, Jawa Barat";
 	$company['telp'] = "(022) 66734567";
 	return $company;

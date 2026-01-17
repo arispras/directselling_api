@@ -1711,7 +1711,7 @@ function	curl_get_content($url){
 		$logo = base64_encode($logo); 
 		
 		$company['logo'] = $logo;
-		$company['nama'] = "CV. JAYA PRODUKSI MANDIRI";
+		$company['nama'] = "PT SAHABAT";
 		$company['alamat'] = "Bogor";
 		$company['telp'] = "-";
 		return $company;

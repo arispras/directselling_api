@@ -1,9 +1,23 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 require 'vendor/autoload.php';
 
+use Dompdf\Adapter\CPDF;
+use Dompdf\Dompdf;
+use Dompdf\Exception;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+
+use PhpOffice\PhpSpreadsheet\Shared\Date;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use Carbon\Carbon;
+use Dompdf\Positioner\NullPositioner;
 use Restserver\Libraries\REST_Controller;
 
-class ColLHI extends BD_Controller
+class ColKuitansi extends BD_Controller
 {
 	public $user_id;
 	public $theCredential;
@@ -12,14 +26,12 @@ class ColLHI extends BD_Controller
 	{
 		parent::__construct();
 		date_default_timezone_set("Asia/Jakarta");
-		$this->load->model('ColLHIModel');
-		$this->load->model('InvItemModel');
+		$this->load->model('ColKuitansiModel');
 		$this->load->model('M_DatatablesModel');
 		$this->load->library('pdfgenerator');
 		$this->load->library('email');
 		$this->load->library('image_lib');
 		$this->load->library('upload');
-		$this->load->model('PrcQuotationModel');
 
 		$this->auth();
 		$this->theCredential = $this->user_data;
@@ -31,21 +43,27 @@ class ColLHI extends BD_Controller
 		$post = $this->post();
 		$param = $post['parameter'];
 
-		$query  = "SELECT a.*,b.nama AS lokasi,c.nama as nama_collector from col_lhi_ht a 
-		left join gbm_organisasi b on a.lokasi_id=b.id
-		left join karyawan c on a.collector_id=c.id";
-		$search = array('no_lhi', 'a.tanggal',  'c.nama');
+		$query = "SELECT a.*,d.nama as lokasi, b.kode_customer,b.nama_customer,c.nama as collector ,ifnull(kuitansi.dibayar,0)AS dibayar,
+		(nilai_angsuran - ifnull(kuitansi.dibayar,0))AS nilai_sisa_angsuran
+		FROM col_kuitansi_ht a 
+		INNER join gbm_organisasi d on a.lokasi_id=d.id		 
+		INNER JOIN gbm_customer b 	ON a.customer_id=b.id 
+		LEFT join karyawan c on a.collector_id=c.id
+		LEFT join (SELECT b.kuitansi_id,sum(b.dibayar)AS dibayar 
+		FROM col_lhi_ht a INNER JOIN col_lhi_dt b ON a.id=b.lhi_id
+		GROUP BY b.kuitansi_id) kuitansi 
+		ON a.id=kuitansi.kuitansi_id ";
+
+		$search = array('a.no_kuitansi', 'a.tanggal_tempo', 'b.nama_customer', 'c.nama', 'd.nama');
 		$where  = null;
-
-
 
 		$isWhere = " 1=1 ";
 		if ($param['tgl_mulai'] && $param['tgl_mulai']) {
-			$isWhere = " a.tanggal between '" . $param['tgl_mulai'] . "' and '" . $param['tgl_akhir'] . "'";
+			$isWhere = " a.tanggal_tempo between '" . $param['tgl_mulai'] . "' and '" . $param['tgl_akhir'] . "'";
 		}
-		// if (!empty($param['customer_id'])) {
-		// 	$isWhere = $isWhere .  "  and a.customer_id=" . $param['customer_id'] . "";
-		// }
+		if (!empty($param['customer_id'])) {
+			$isWhere = $isWhere .  "  and a.customer_id=" . $param['customer_id'] . "";
+		}
 		if ($param['lokasi_id']) {
 			$isWhere = $isWhere . " and a.lokasi_id =" . $param['lokasi_id'] . "";
 		} else {
@@ -54,28 +72,26 @@ class ColLHI extends BD_Controller
 		}
 
 		$data = $this->M_DatatablesModel->get_tables_query($query, $search, $where, $isWhere, $post);
-		// if (count($data['data']) > 0) {
-		// 	for ($i = 0; $i < (count($data['data'])); $i++) {
-		// 		$so = $data['data'][$i];
-		// 		$queryBayar = "SELECT sum(nilai)as bayar from sls_so_pembayaran 
-		// 		where so_hd_id=" . $so['id'] . "";
-		// 		$bayar = $this->db->query($queryBayar)->row_array();
-		// 		$data['data'][$i]['bayar'] = $bayar ? $bayar['bayar'] : 0;
-		// 	}
-		// }
 
-
-		// var_dump($data['data']);
 		$this->set_response($data, REST_Controller::HTTP_OK);
 	}
-	
-	
-	
+
 	function index_get($segment_3 = '')
 	{
 		$id = $segment_3;
-		$retrieve = $this->ColLHIModel->retrieve($id);
-		$retrieve['detail'] = $this->ColLHIModel->retrieve_detail($id);
+		// $retrieve = $this->ColKuitansiModel->retrieve($id);
+		$query = "SELECT a.*,d.nama as lokasi, b.kode_customer,b.nama_customer,c.nama as collector ,ifnull(kuitansi.dibayar,0)AS dibayar,
+		(nilai_angsuran - ifnull(kuitansi.dibayar,0))AS nilai_sisa_angsuran
+		FROM col_kuitansi_ht a 
+		INNER join gbm_organisasi d on a.lokasi_id=d.id		 
+		INNER JOIN gbm_customer b 	ON a.customer_id=b.id 
+		LEFT join karyawan c on a.collector_id=c.id
+		LEFT join (SELECT b.kuitansi_id,sum(b.dibayar)AS dibayar 
+		FROM col_lhi_ht a INNER JOIN col_lhi_dt b ON a.id=b.lhi_id
+		GROUP BY b.kuitansi_id) kuitansi 
+		ON a.id=kuitansi.kuitansi_id where a.id=" . $id . ";";
+
+		$retrieve = $this->db->query($query)->row_array();
 
 		if (!empty($retrieve)) {
 			$this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
@@ -83,13 +99,11 @@ class ColLHI extends BD_Controller
 			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
 		}
 	}
-	
-	
-	
+
 	function getAll_get()
 	{
 
-		$retrieve = $this->ColLHIModel->retrieve_all_kategori();
+		$retrieve = $this->ColKuitansiModel->retrieve_all_kategori();
 
 		if (!empty($retrieve)) {
 			$this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
@@ -98,7 +112,7 @@ class ColLHI extends BD_Controller
 		}
 	}
 
-	
+
 	function getLHIKuitansiBlmLunas_post()
 	{
 		$collector_id = $this->post('collector_id');
@@ -136,7 +150,7 @@ class ColLHI extends BD_Controller
 		$input['dibuat_oleh'] = $this->user_id;
 		$this->load->library('Autonumber');
 		$input['no_lhi'] = $this->autonumber->lhi($input['lokasi_id']['id'], $input['tanggal']);
-		$res =  $this->ColLHIModel->create($input);
+		$res =  $this->ColKuitansiModel->create($input);
 		// $this->set_response(array("status" => "OK", "data" => $input['no_lhi']), REST_Controller::HTTP_OK);
 		if (!empty($res)) {
 			/* start audit trail */
@@ -148,38 +162,62 @@ class ColLHI extends BD_Controller
 			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
 		}
 	}
-	function simpan_pembayaran_post()
+
+	function updateCollectorTanggalJanji_put($segment_3 = '')
 	{
-		$input = $this->post();
+		$input = $this->put();
 		$input['diubah_oleh'] = $this->user_id;
-		$input['dibuat_oleh'] = $this->user_id;
-		$this->load->library('Autonumber');
-		$res =  $this->ColLHIModel->create_pembayaran($input);
-		// $this->set_response(array("status" => "OK", "data" => $input['no_ttb']), REST_Controller::HTTP_OK);
+		$id = (int)$segment_3;
+		$kuitansi = $this->ColKuitansiModel->retrieve($id);
+		if (empty($kuitansi)) {
+			$this->set_response(array("status" => "NOT OK", "data" => []), REST_Controller::HTTP_OK);
+		}
+
+		$res =   $this->ColKuitansiModel->updateCollectorTanggalJanji($kuitansi['id'], $input);
+		// $this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
 		if (!empty($res)) {
 			/* start audit trail */
-			$audit = array('user_id' => $this->user_id, 'desc' => json_encode($this->post()), 'entity' => 'sls_so_pembayaran', 'action' => 'new', 'entity_id' => $res, 'key_text' => $res['id']);
+			$audit = array('user_id' => $this->user_id, 'desc' => json_encode($this->put()), 'entity' => 'kuitansi_ht', 'action' => 'edit', 'entity_id' => $id, 'key_text' => $so['id']);
 			$this->db->insert('fwk_user_audit', $audit);
 			/* end audit trail */
-			$this->set_response(array("status" => "OK", "data" => $input['no_ttb']), REST_Controller::HTTP_CREATED);
+			$this->set_response(array("status" => "OK", "data" => $res), REST_Controller::HTTP_CREATED);
 		} else {
 			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
 		}
 	}
-	
-	
-	
+	function update_invoice_put($segment_3 = '')
+	{
+		$input = $this->put();
+		$input['diubah_oleh'] = $this->user_id;
+		$id = (int)$segment_3;
+		$so = $this->ColKuitansiModel->retrieve_invoice_by_id($id);
+		if (empty($so)) {
+			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
+		}
+
+		$res =   $this->ColKuitansiModel->update_invoice($so['id'], $input);
+		// $this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
+		if (!empty($res)) {
+			/* start audit trail */
+			$audit = array('user_id' => $this->user_id, 'desc' => json_encode($this->put()), 'entity' => 'sls_so_invoice', 'action' => 'edit', 'entity_id' => $id, 'key_text' => $so['id']);
+			$this->db->insert('fwk_user_audit', $audit);
+			/* end audit trail */
+			$this->set_response(array("status" => "OK", "data" => $res), REST_Controller::HTTP_CREATED);
+		} else {
+			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
+		}
+	}
 	function index_put($segment_3 = '')
 	{
 		$input = $this->put();
 		$input['diubah_oleh'] = $this->user_id;
 		$id = (int)$segment_3;
-		$so = $this->ColLHIModel->retrieve($id);
+		$so = $this->ColKuitansiModel->retrieve($id);
 		if (empty($so)) {
 			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
 		}
 
-		$res =   $this->ColLHIModel->update($so['id'], $input);
+		$res =   $this->ColKuitansiModel->update($so['id'], $input);
 		// $this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
 		if (!empty($res)) {
 			/* start audit trail */
@@ -196,12 +234,12 @@ class ColLHI extends BD_Controller
 		$input = $this->put();
 		$input['diubah_oleh'] = $this->user_id;
 		$id = (int)$segment_3;
-		$so = $this->ColLHIModel->retrieve($id);
+		$so = $this->ColKuitansiModel->retrieve($id);
 		if (empty($so)) {
 			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
 		}
 
-		$res =   $this->ColLHIModel->updateLhiBayar($so['id'], $input);
+		$res =   $this->ColKuitansiModel->updateLhiBayar($so['id'], $input);
 		// $this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
 		if (!empty($res)) {
 			/* start audit trail */
@@ -214,151 +252,18 @@ class ColLHI extends BD_Controller
 		}
 	}
 
-	function revisi_put($segment_3 = '')
-	{
-		$input = $this->put();
-		$input['diubah_oleh'] = $this->user_id;
-		$id = (int)$segment_3;
-		if (!$input['details']) {
-			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
-			return;
-		}
-		$so = $this->ColLHIModel->retrieve($id);
 
-		if (!empty($so)) {
-			$penerimaan = $this->db->query("SELECT b.so_id,a.* FROM sls_ttb_ht a
-			LEFT JOIN inv_pengiriman_so_ht b ON b.so_id=a.id
-			WHERE b.so_id=" . $so['id'] . "")->row_array();
-			if (empty($penerimaan)) {
-				$this->set_response(array("status" => "OK", "data" => "OK"), REST_Controller::HTTP_CREATED);
-			} else {
-				$this->set_response(array("status" => "INV_PO", "data" => "Sudah Ada Penerimaan"), REST_Controller::HTTP_CREATED);
-				return;
-			}
-			$this->set_response(array("status" => "OK", "data" => $so), REST_Controller::HTTP_CREATED);
-		}
-
-		$res =   $this->ColLHIModel->revisi($so['id'], $input);
-		if (!empty($res)) {
-			if ($so['is_revisi'] != 1) { // JIka Posisi blm di revisi maka kembalikan ke posisi terakhir 
-				/* Kembalikan ke status terkahir */
-				if ($so['status_approve5']) { // ($status == 'PO5') {
-					$ht['status'] = 'PO4';
-					$ht['status_approve5'] = NULL;
-					$ht['tgl_approve5'] = NULL;
-					$ht['note_approve5'] = NULL;
-					$ht['last_approve_position'] = 'PO5';
-					$ht['last_approve_user'] = $so['user_approve5'];
-					$karyawan_id = $ht['last_approve_user'];
-					$ht['proses_approval'] = 1;
-				} else if ($so['status_approve4']) { //($status == 'PO4') {
-					$ht['status'] = 'PO3';
-					$ht['status_approve4'] = NULL;
-					$ht['tgl_approve4'] = NULL;
-					$ht['note_approve4'] = NULL;
-					$ht['last_approve_position'] = 'PO4';
-					$ht['last_approve_user'] = $so['user_approve4'];
-					$karyawan_id = $ht['last_approve_user'];
-					$ht['proses_approval'] = 1;
-				} else if ($so['status_approve3']) { //($status == 'PO3') {
-					$ht['status'] = 'PO2';
-					$ht['status_approve3'] = NULL;
-					$ht['tgl_approve3'] = NULL;
-					$ht['note_approve3'] = NULL;
-					$ht['last_approve_position'] = 'PO3';
-					$ht['last_approve_user'] = $so['user_approve3'];
-					$karyawan_id = $ht['last_approve_user'];
-					$ht['proses_approval'] = 1;
-				} else if ($so['status_approve2']) { //($status == 'PO2') {
-					$ht['status'] = 'PO1';
-					$ht['status_approve2'] = NULL;
-					$ht['tgl_approve2'] = NULL;
-					$ht['note_approve2'] = NULL;
-					$ht['last_approve_position'] = 'PO2';
-					$ht['last_approve_user'] = $so['user_approve2'];
-					$karyawan_id = $ht['last_approve_user'];
-					$ht['proses_approval'] = 1;
-				} else if ($so['status_approve1']) { //($status == 'PO1') {
-					$ht['status'] = '';
-					$ht['status_approve1'] = NULL;
-					$ht['tgl_approve1'] = NULL;
-					$ht['note_approve1'] = NULL;
-					$ht['last_approve_position'] = 'PO1';
-					$ht['last_approve_user'] = $so['user_approve1'];
-					$karyawan_id = $ht['last_approve_user'];
-					$ht['proses_approval'] = 1;
-				} else {
-					$ht['status'] = '';
-					$ht['status_approve1'] = NULL;
-					$ht['tgl_approve1'] = NULL;
-					$ht['note_approve1'] = NULL;
-					$ht['last_approve_position'] = '';
-					$ht['last_approve_user'] = NULL;
-					$ht['proses_approval'] = 0;
-				}
-			}
-			$ht['is_revisi'] = 1;
-			$this->db->where('id', $id);
-			$this->db->update('sls_ttb_ht', $ht);
-			if ($so['is_revisi'] != 1) {
-				if ($karyawan_id) {
-					$karyawan = $this->db->query("select email,nama from karyawan where id=" . $karyawan_id)->row_array();
-					if ($karyawan['email'] || $karyawan['email'] != '') {
-						$email_subject = 'Info Notifikasi Approval Revisi PO';
-						$email_body    = 'Hallo, Bpk/Ibu. ' . $karyawan['nama'] . '! <br>
-					<br>
-					No PO : ' .	$so['no_ttb'] . ' direvisi dan diajukan ulang kepada Anda.<br> 
-					Silakan melakukan approve pada Aplikasi Antech Sistem melalui   <a href="http://erp.dpaplant.com" target="_blank">AnTech Plantation - DPA</a>. 
-					<br> <br> Salam 
-					 <br> (Antech Sistem)';
-						$this->email->set_newline("\r\n");
-						$this->email->to($karyawan['email']);
-						$this->email->from("support@antech-indonesia.com");
-						$this->email->subject($email_subject);
-						$this->email->message($email_body);
-						if (!$this->email->send()) {
-							//show_error($this->email->print_debugger());
-						} else {
-							//echo "email sent";
-						}
-					}
-				}
-			}
-			/* start audit trail */
-			$audit = array('user_id' => $this->user_id, 'desc' => json_encode($this->put()), 'entity' => 'sls_so', 'action' => 'revisi', 'entity_id' => $id);
-			$this->db->insert('fwk_user_audit', $audit);
-			/* end audit trail */
-			$this->set_response(array("status" => "OK", "data" => $res), REST_Controller::HTTP_CREATED);
-		} else {
-			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
-		}
-	}
-
-	function closing_post($segment_3 = '')
-	{
-		$input = $this->post();
-		$id = (int)$segment_3;
-
-		$input['status'] = "CLOSED";
-		$input['diubah_tanggal'] = date('Y-m-d H:i:s');
-		$input['diubah_oleh'] = $this->user_id;
-
-		// $retrieve = $this->PrcPpModel->closing($id['id'], $input);
-		$this->db->query("UPDATE sls_ttb_ht  SET `status`='" . $input['status'] . "', `diubah_tanggal`='" . $input['diubah_tanggal'] . "', `diubah_oleh`=" . $input['diubah_oleh'] . " WHERE id=" . $id);
-
-		// $this->set_response(array("status" => "OK", "data" => true), REST_Controller::HTTP_OK);
-	}
 
 	function index_delete($segment_3 = '')
 	{
 
 		$id = (int)$segment_3;
-		$so = $this->ColLHIModel->retrieve($id);
+		$so = $this->ColKuitansiModel->retrieve($id);
 		if (empty($so)) {
 			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
 		}
 
-		$res =  $this->ColLHIModel->delete($so['id']);
+		$res =  $this->ColKuitansiModel->delete($so['id']);
 		// $this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
 		if (!empty($res)) {
 			/* start audit trail */
@@ -370,254 +275,10 @@ class ColLHI extends BD_Controller
 			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
 		}
 	}
-	function hapus_pembayaran_delete($segment_3 = '')
-	{
-
-		$id = (int)$segment_3;
-		$so = $this->ColLHIModel->retrieve_pembayaran_by_id($id);
-		if (empty($so)) {
-			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
-		}
-
-		$res =  $this->ColLHIModel->delete_pembayaran($so['id']);
-		if (!empty($res)) {
-			/* start audit trail */
-			$audit = array('user_id' => $this->user_id, 'desc' => json_encode(array('id' => $id)), 'entity' => 'sls_so_pembayaran', 'action' => 'delete', 'entity_id' => $id, 'key_text' => $so['id']);
-			$this->db->insert('fwk_user_audit', $audit);
-			/* end audit trail */
-			$this->set_response(array("status" => "OK", "data" => $res), REST_Controller::HTTP_CREATED);
-		} else {
-			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
-		}
-	}
-	function hapus_invoice_delete($segment_3 = '')
-	{
-
-		$id = (int)$segment_3;
-		$so = $this->ColLHIModel->retrieve_invoice_by_id($id);
-		if (empty($so)) {
-			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
-		}
-
-		$res =  $this->ColLHIModel->delete_invoice($so['id']);
-		if (!empty($res)) {
-			/* start audit trail */
-			$audit = array('user_id' => $this->user_id, 'desc' => json_encode(array('id' => $id)), 'entity' => 'sls_so_invoice', 'action' => 'delete', 'entity_id' => $id, 'key_text' => $so['id']);
-			$this->db->insert('fwk_user_audit', $audit);
-			/* end audit trail */
-			$this->set_response(array("status" => "OK", "data" => $res), REST_Controller::HTTP_CREATED);
-		} else {
-			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
-		}
-	}
-	function approval_post($segment_3 = '')
-	{
-		$input = $this->post();
-		$input['diubah_oleh'] = $this->user_id;
-		$id = (int)$segment_3;
-		$so = $this->ColLHIModel->retrieve($id);
-		if (empty($so)) {
-			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
-			return;
-		}
-
-		$retrieve =   $this->ColLHIModel->approval($so['id'], $input);
-		if ($retrieve) {
-			if ($input['karyawan_id']['id']) {
-				$karyawan = $this->db->query("select email,nama from karyawan where id=" . $input['karyawan_id']['id'])->row_array();
-				if ($karyawan['email'] || $karyawan['email'] != '') {
-					$email_subject = 'Info Notifikasi Approval PO';
-					$email_body    = 'Hallo, Bpk/Ibu. ' . $karyawan['nama'] . '! <br>
-					<br>
-					No PO : ' .	$so['no_ttb'] . ' diajukan kepada Anda.<br> 
-					Silakan melakukan approve pada Aplikasi Antech Sistem melalui   <a href="http://erp.dpaplant.com" target="_blank">AnTech Plantation - DPA</a>. 
-					<br> <br> Salam 
-					 <br> (Antech Sistem)';
-					$this->email->set_newline("\r\n");
-					$this->email->to($karyawan['email']);
-					$this->email->from("support@antech-indonesia.com");
-					$this->email->subject($email_subject);
-					$this->email->message($email_body);
-					if (!$this->email->send()) {
-						//show_error($this->email->print_debugger());
-					} else {
-						//echo "email sent";
-					}
-				}
-				$usr = $this->db->query("select * from fwk_users where employee_id=" . $input['karyawan_id']['id'] . "")->row_array();
-				if ($usr['fcm_token']) {
-					$title = "Approval PO";
-					$message = "Hallo, Bpk/Ibu. " . $karyawan['nama'] . "!. No PO : " .	$so['no_ttb'] . " diajukan kepada Anda.";
-					$this->sendNotification($usr['fcm_token'], $title, $message, '');
-				}
-			} else {
-			}
-
-			$so = $this->ColLHIModel->retrieve($id);
-			if ($so['status'] == 'RELEASE') {
-				$query_email = "SELECT a.new_, a.user_id,b.user_name,d.nama,d.email  FROM fwk_users_acces a INNER JOIN fwk_users b ON a.user_id=b.id
-				INNER JOIN fwk_menu c ON a.menu_id=c.id
-				INNER JOIN karyawan d ON  b.employee_id=d.id
-				WHERE NAME='sls_so' and a.new_=1 ";
-				$res_email = $this->db->query($query_email)->result_array();
-				if ($res_email) {
-					foreach ($res_email as $key => $value) {
-						if ($value['email']) {
-							$email_subject = 'Info Notifikasi Approval PO';
-							$email_body    = 'Hallo, Bpk/Ibu. ' . $value['nama'] . '! <br>
-					<br>
-					No PO : ' .	$so['no_ttb'] . ' Sudah Di-Release.<br> 
-					Silakan melakukan pemeriksaan pada Aplikasi Antech Sistem melalui   <a href="http://erp.dpaplant.com" target="_blank">AnTech Plantation - DPA</a>. 
-					<br> <br> Salam 
-					 <br> (Antech Sistem)';
-							$this->email->set_newline("\r\n");
-							$this->email->to($value['email']);
-							$this->email->from("support@antech-indonesia.com");
-							$this->email->subject($email_subject);
-							$this->email->message($email_body);
-							if (!$this->email->send()) {
-								//show_error($this->email->print_debugger());
-							} else {
-								//echo "email sent";
-							}
-						}
-					}
-				}
-			}
-
-			$this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
-		} else {
-			$this->set_response(array("status" => "NOT OK", "data" => []), REST_Controller::HTTP_OK);
-		}
-	}
-	function reject_post($segment_3 = '')
-	{
-		$input = $this->post();
-		$input['diubah_oleh'] = $this->user_id;
-		$id = (int)$segment_3;
-		$so = $this->ColLHIModel->retrieve($id);
-		if (empty($pp)) {
-			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
-		}
-
-		$retrieve =   $this->ColLHIModel->reject($so['id'], $input);
-		$this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
-	}
-
-	function posting_post($segment_3 = null)
-	{
-		$id = (int)$segment_3;
-		$data = $this->post();
-		$data['diubah_oleh'] = $this->user_id;
-		$ttb = $this->ColLHIModel->retrieve($id);
-		if (empty($ttb)) {
-			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
-		}
-		$tenor = $ttb['tenor'];
-		$no_ttb = $ttb['no_ttb'];
-		$tgl_ttb = $ttb['tanggal'];
-		$collector_id = $ttb['collector_id'];
-		$customer_id = $ttb['customer_id'];
-		$nilai_angsuran = $ttb['total_nilai_angsuran'];
-
-		$this->db->where('ttb_id', $id);
-		$this->db->delete('col_kuitansi_ht');
-		for ($i = 0; $i < $tenor; $i++) {
-			$date = new DateTime($tgl_ttb);
-			$date->modify('+1 month');
-			$tanggal_tempo = $date->format('Y-m-d');
-			$angsuran_ke = $i + 1;
-			$no_kuitansi = $no_ttb . "." . sprintf("%02s", $angsuran_ke);
 
 
 
-			$this->db->insert("col_kuitansi_ht", array(
-				'ttb_id' => $id,
-				'no_kuitansi' => $no_kuitansi,
-				'angsuran_ke' => $angsuran_ke,
-				'nilai_angsuran' => $nilai_angsuran,
-				'nilai_angsuran_ori' => $nilai_angsuran,
-				'collector_id' => $collector_id,
-				'customer_id' => $customer_id,
-				'tanggal_tempo' => $tanggal_tempo,
-				'keterangan' => '',
-
-			));
-		}
-
-		$res = $this->ColLHIModel->posting($id, $data);
-		if (!empty($res)) {
-			/* start audit trail */
-			$audit = array('user_id' => $this->user_id, 'desc' => json_encode(array('id' => $id)), 'entity' => 'sls_so', 'action' => 'posting', 'entity_id' => $id, 'key_text' => $so['no_ttb']);
-			$this->db->insert('fwk_user_audit', $audit);
-			/* end audit trail */
-			$this->set_response(array("status" => "OK", "data" => $res), REST_Controller::HTTP_CREATED);
-		} else {
-			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
-		}
-	}
-	function getAllDetail_get($so_id)
-	{
-		$retrieve = array();
-		$dtl = $this->ColLHIModel->retrieve_so_dtl($so_id);
-		$retrieve['dtl'] = $dtl;
-		$retrieve['AKUN_PPN'] = $this->db->query("select * from acc_auto_jurnal where kode='PPN_KELUARAN'")->row_array()['acc_akun_id'];
-		$retrieve['AKUN_PENGIRIMAN_BARANG_SO'] = $this->db->query("select * from acc_auto_jurnal where kode='PENGIRIMAN_BARANG_SO'")->row_array()['acc_akun_id'];
-		$retrieve['AKUN_DISKON'] = $this->db->query("select * from acc_auto_jurnal where kode='DISKON_PENJUALAN'")->row_array()['acc_akun_id'];
-		$retrieve['AKUN_PPH'] = $this->db->query("select * from acc_auto_jurnal where kode='PPH_PENJUALAN'")->row_array()['acc_akun_id'];
-		$retrieve['AKUN_PPBKB'] = $this->db->query("select * from acc_auto_jurnal where kode='PPBKB_PENJUALAN'")->row_array()['acc_akun_id'];
-		$retrieve['AKUN_BIAYA_KIRIM'] = $this->db->query("select * from acc_auto_jurnal where kode='BIAYA_KIRIM_SO'")->row_array()['acc_akun_id'];
-		$retrieve['AKUN_BIAYA_LAIN'] = $this->db->query("select * from acc_auto_jurnal where kode='BIAYA_LAIN_SO'")->row_array()['acc_akun_id'];
-
-		// $retrieve['AKUN_PPN'] = $this->db->query("select * from acc_auto_jurnal where kode='PPN_MASUKAN'")->row_array()['acc_akun_id'];
-		// $retrieve['AKUN_PENGIRIMAN_BARANG_SO'] = $this->db->query("select * from acc_auto_jurnal where kode='PENERIMAAN_BARANG_PO'")->row_array()['acc_akun_id'];
-		// $retrieve['AKUN_DISKON'] = $this->db->query("select * from acc_auto_jurnal where kode='DISKON_PEMBELIAN'")->row_array()['acc_akun_id'];
-		// $retrieve['AKUN_PPH'] = $this->db->query("select * from acc_auto_jurnal where kode='PPH_PEMBELIAN'")->row_array()['acc_akun_id'];
-		// $retrieve['AKUN_PPBKB'] = $this->db->query("select * from acc_auto_jurnal where kode='PPBKB_PEMBELIAN'")->row_array()['acc_akun_id'];
-		// $retrieve['AKUN_BIAYA_KIRIM'] = $this->db->query("select * from acc_auto_jurnal where kode='BIAYA_KIRIM_PO'")->row_array()['acc_akun_id'];
-		// $retrieve['AKUN_BIAYA_LAIN'] = $this->db->query("select * from acc_auto_jurnal where kode='BIAYA_LAIN_PO'")->row_array()['acc_akun_id'];
-		$ret_so_ht = $this->db->query("select * from sls_ttb_ht where id= " . $so_id)->row_array();
-		$retrieve['SO_HT'] =	$ret_so_ht;
-		if (!empty($retrieve)) {
-			$this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
-		} else {
-			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
-		}
-	}
-	function getAllDetailBlmTerkirim_get($so_id)
-	{
-		$retrieve = $this->ColLHIModel->retrieve_so_dtl_blm_terkirim($so_id);
-
-		if (!empty($retrieve)) {
-			$this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
-		} else {
-			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
-		}
-	}
-	function getAllDetailSdhTerkirim_get($so_id)
-	{
-		$retrieve = array();
-		$dtl = $this->ColLHIModel->retrieve_so_dtl_sdh_terkirim($so_id);
-		$retrieve['dtl'] = $dtl;
-		$retrieve['AKUN_PPN'] = $this->db->query("select * from acc_auto_jurnal where kode='PPN_KELUARAN'")->row_array()['acc_akun_id'];
-		$retrieve['AKUN_PENGIRIMAN_BARANG_SO'] = $this->db->query("select * from acc_auto_jurnal where kode='AKUN_PENGIRIMAN_BARANG_SO'")->row_array()['acc_akun_id'];
-		$retrieve['AKUN_DISKON'] = $this->db->query("select * from acc_auto_jurnal where kode='DISKON_PENJUALAN'")->row_array()['acc_akun_id'];
-		$retrieve['AKUN_PPH'] = $this->db->query("select * from acc_auto_jurnal where kode='PPH_PENJUALAN'")->row_array()['acc_akun_id'];
-		$retrieve['AKUN_PPBKB'] = $this->db->query("select * from acc_auto_jurnal where kode='PPBKB_PENJUALAN'")->row_array()['acc_akun_id'];
-		$retrieve['AKUN_BIAYA_KIRIM'] = $this->db->query("select * from acc_auto_jurnal where kode='BIAYA_KIRIM_SO'")->row_array()['acc_akun_id'];
-		$retrieve['AKUN_BIAYA_LAIN'] = $this->db->query("select * from acc_auto_jurnal where kode='BIAYA_LAIN_SO'")->row_array()['acc_akun_id'];
-
-		$ret_so_ht = $this->db->query("select * from sls_ttb_ht where id= " . $so_id)->row_array();
-		$retrieve['SO_HT'] =	$ret_so_ht;
-		if (!empty($retrieve)) {
-			$this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
-		} else {
-			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
-		}
-	}
-
-
-	function print_slip_so_get($segment_3 = '')
+	function print_slip_kuitansi_get($segment_3 = '')
 	{
 
 		$id = (int)$segment_3;
@@ -673,272 +334,7 @@ class ColLHI extends BD_Controller
 		$this->pdfgenerator->generate($html, $filename, true, 'A4', 'portrait');
 		// echo $html;
 	}
-	function print_slip_invoice_get($segment_3 = '')
-	{
 
-		$id = (int)$segment_3;
-		$data = [];
-		// $queryInv = "SELECT * from sls_so_invoice
-		// WHERE id=" . $id . "";
-		// $dataInv = $this->db->query($queryInv)->row_array();
-
-
-		$queryHeader = "SELECT a.*,
-		f.nama_customer,
-		a.alamat_pengiriman as alamat_customer,
-		a.telp_pengiriman as no_telepon_customer,
-		a.contact_pengiriman as contact_person_customer,
-		g.jenis as jenis_bayar,
-		g.ket as ket_bayar
-		FROM sls_ttb_ht a 
-		INNER JOIN gbm_organisasi e ON a.lokasi_id=e.id
-		INNER JOIN gbm_customer f ON a.customer_id=f.id
-		INNER JOIN prc_syarat_bayar g ON a.syarat_bayar_id=g.id
-		WHERE a.id=" . $id . "";
-		$dataHeader = $this->db->query($queryHeader)->row_array();
-
-		$queryDetail = "	SELECT a.*,
-		b.kode as kode_barang,
-		b.nama as nama_barang,
-		c.nama as uom
-		FROM sls_so_dt a 
-		LEFT join inv_item b on a.item_id=b.id 
-		LEFT join gbm_uom c on b.uom_id=c.id 
-
-		WHERE  a.so_hd_id = " . $id . "";
-		$dataDetail = $this->db->query($queryDetail)->result_array();
-
-		$this->load->helper("terbilangv2");
-
-		$terbilang = terbilang($dataHeader['grand_total']);
-		$data['header'] = 	$dataHeader;
-		$data['detail'] = 	$dataDetail;
-		$data['invoice'] = [];
-		$data['terbilang'] = 	$terbilang;
-
-
-		$data['database'] = $this->db;
-
-		$html = $this->load->view('SlsTTBSlipInvoice', $data, true);
-
-		$filename = 'report_invoice_' . time();
-		$this->pdfgenerator->generate($html, $filename, true, 'A4', 'portrait');
-		// echo $html;
-	}
-	function print_slip_html_get($segment_3 = '')
-	{
-
-		$id = (int)$segment_3;
-		$data = [];
-
-		$queryHeader = "SELECT a.*,
-
-		f.nama_customer as nama_customer,
-		f.alamat as alamat_customer,
-		f.no_telpon as no_telepon_customer,
-		f.nama_bank as nama_bank,
-		f.no_rekening as no_rekening,
-		f.atas_nama as atas_nama,
-		f.contact_person as contact_person_customer,
-		f.no_hp as no_hp_customer,
-
-		g.jenis as jenis_bayar,
-		g.ket as ket_bayar,
-
-		h.nama as nama_franco,
-		h.alamat as alamat_franco,
-		h.contact as contact_franco,
-		h.telp as telp_franco,
-
-		i.kode as mata_uang_kode,
-		i.simbol as mata_uang_simbol,
-		i.nama as mata_uang_nama,
-
-		z.nama as user_approve1,
-		x.nama as user_approve_jabatan1,
-		zz.nama as user_approve2,
-		xx.nama as user_approve_jabatan2,
-		zzz.nama as user_approve3,
-		xxx.nama as user_approve_jabatan3,
-		zzzz.nama as user_approve4,
-		xxxx.nama as user_approve_jabatan4,
-		zzzzz.nama as user_approve5,
-		xxxxx.nama as user_approve_jabatan5,
-
-		e.nama as lokasi
-		FROM sls_ttb_ht a 
-		INNER JOIN gbm_organisasi e ON a.lokasi_id=e.id
-		INNER JOIN gbm_customer f ON a.customer_id=f.id
-		INNER JOIN prc_syarat_bayar g ON a.syarat_bayar_id=g.id
-		INNER JOIN prc_franco h ON a.franco_id=h.id
-		LEFT JOIN karyawan z ON a.user_approve1=z.id
-		LEFT JOIN payroll_jabatan x ON z.jabatan_id=x.id
-		LEFT JOIN karyawan zz ON a.user_approve2=zz.id
-		LEFT JOIN payroll_jabatan xx ON zz.jabatan_id=xx.id
-		LEFT JOIN karyawan zzz ON a.user_approve3=zzz.id
-		LEFT JOIN payroll_jabatan xxx ON zzz.jabatan_id=xxx.id
-		LEFT JOIN karyawan zzzz ON a.user_approve4=zzzz.id
-		LEFT JOIN payroll_jabatan xxxx ON zzzz.jabatan_id=xxxx.id
-		LEFT JOIN karyawan zzzzz ON a.user_approve5=zzzzz.id
-		LEFT JOIN payroll_jabatan xxxxx ON zzzzz.jabatan_id=xxxxx.id
-		LEFT JOIN acc_mata_uang i ON a.mata_uang_id=i.id
-		LEFT JOIN karyawan j ON a.dibuat_oleh=j.id
-		WHERE a.id=" . $id . "";
-		$dataHeader = $this->db->query($queryHeader)->row_array();
-
-		$queryDetail = "SELECT a.*,
-		b.kode as kode_barang,
-		b.nama as nama_barang,
-		f.nama as uom,
-		d.lokasi_id as lokasi_pp_id
-		FROM sls_so_dt a 
-		INNER JOIN prc_pp_dt c on a.pp_dt_id=c.id
-		inner join prc_pp_ht d on c.pp_hd_id=d.id
-		LEFT join inv_item b on a.item_id=b.id 
-		LEFT join gbm_uom f on b.uom_id=f.id 
-		WHERE  a.so_hd_id = " . $id . "";
-		$dataDetail = $this->db->query($queryDetail)->result_array();
-
-		foreach ($dataDetail as $key => $value) {
-			$stok = $this->InvItemModel->cek_stok_lokasi_get($value['lokasi_pp_id'], $value['item_id'], $dataHeader['tanggal']);
-			$dataDetail[$key]['stok'] = $stok;
-		}
-
-		$queryUser = "SELECT a.*, b.nama as peminta FROM fwk_users a LEFT JOIN karyawan b ON a.employee_id=b.id WHERE a.id=" . $dataHeader['dibuat_oleh'];
-		$dataUser = $this->db->query($queryUser)->row_array();
-
-		$data['header'] = 	$dataHeader;
-		$data['detail'] = 	$dataDetail;
-		$data['user'] = $dataUser;
-
-
-		$data['database'] = $this->db;
-
-		$html = $this->load->view('SlsTTB_laporan', $data, true);
-
-		echo $html;
-	}
-	function print_slip_cek_harga_get($segment_3 = '')
-	{
-
-		$id = (int)$segment_3;
-		$data = [];
-
-		$queryHeader = "SELECT a.*,
-		-- d.nama as gudang,
-		f.nama_customer as nama_customer,
-		f.alamat as alamat_customer,
-		f.no_telpon as no_telepon_customer,
-		f.nama_bank as nama_bank,
-		f.no_rekening as no_rekening,
-		f.atas_nama as atas_nama,
-		f.contact_person as contact_person_customer,
-		f.no_hp as no_hp_customer,
-
-		g.jenis as jenis_bayar,
-		g.ket as ket_bayar,
-
-		h.nama as nama_franco,
-		h.alamat as alamat_franco,
-		h.contact as contact_franco,
-		h.telp as telp_franco,
-
-		i.kode as mata_uang_kode,
-		i.simbol as mata_uang_simbol,
-		i.nama as mata_uang_nama,
-
-		z.nama as user_approve1,
-		x.nama as user_approve_jabatan1,
-		zz.nama as user_approve2,
-		xx.nama as user_approve_jabatan2,
-		zzz.nama as user_approve3,
-		xxx.nama as user_approve_jabatan3,
-		zzzz.nama as user_approve4,
-		xxxx.nama as user_approve_jabatan4,
-		zzzzz.nama as user_approve5,
-		xxxxx.nama as user_approve_jabatan5,
-
-		e.nama as lokasi
-		FROM sls_ttb_ht a 
-		-- INNER JOIN gbm_organisasi d ON a.gudang_id=d.id
-		INNER JOIN gbm_organisasi e ON a.lokasi_id=e.id
-		INNER JOIN gbm_customer f ON a.customer_id=f.id
-		INNER JOIN prc_syarat_bayar g ON a.syarat_bayar_id=g.id
-		INNER JOIN prc_franco h ON a.franco_id=h.id
-
-		LEFT JOIN karyawan z ON a.user_approve1=z.id
-		LEFT JOIN payroll_jabatan x ON z.jabatan_id=x.id
-		LEFT JOIN karyawan zz ON a.user_approve2=zz.id
-		LEFT JOIN payroll_jabatan xx ON zz.jabatan_id=xx.id
-		LEFT JOIN karyawan zzz ON a.user_approve3=zzz.id
-		LEFT JOIN payroll_jabatan xxx ON zzz.jabatan_id=xxx.id
-		LEFT JOIN karyawan zzzz ON a.user_approve4=zzzz.id
-		LEFT JOIN payroll_jabatan xxxx ON zzzz.jabatan_id=xxxx.id
-		LEFT JOIN karyawan zzzzz ON a.user_approve5=zzzzz.id
-		LEFT JOIN payroll_jabatan xxxxx ON zzzzz.jabatan_id=xxxxx.id
-		
-		LEFT JOIN acc_mata_uang i ON a.mata_uang_id=i.id
-		LEFT JOIN karyawan j ON a.dibuat_oleh=j.id
-		WHERE a.id=" . $id . "";
-		$dataHeader = $this->db->query($queryHeader)->row_array();
-
-		$queryDetail = "SELECT a.*,
-		b.kode as kode_barang,
-		b.nama as nama_barang,
-		f.nama as uom,
-		d.lokasi_id as lokasi_pp_id
-		FROM sls_so_dt a 
-		INNER JOIN prc_pp_dt c on a.pp_dt_id=c.id
-		inner join prc_pp_ht d on c.pp_hd_id=d.id
-		LEFT join inv_item b on a.item_id=b.id 
-		LEFT join gbm_uom f on b.uom_id=f.id 
-		WHERE  a.so_hd_id = " . $id . "";
-		$dataDetail = $this->db->query($queryDetail)->result_array();
-
-		foreach ($dataDetail as $key => $value) {
-			$stok = $this->InvItemModel->cek_stok_lokasi_get($value['lokasi_pp_id'], $value['item_id'], $dataHeader['tanggal']);
-			$dataDetail[$key]['stok'] = $stok;
-
-			$queryLastPO = "select a.no_ttb,a.tanggal,c.nama_customer ,b.harga from sls_ttb_ht a 
-			inner join sls_so_dt b on a.id=b.so_hd_id 
-			inner join gbm_customer c on a.customer_id=c.id
-			where b.item_id='" . $value['item_id'] . "'
-			and a.tanggal <'" . ($dataHeader['tanggal']) . "'
-			order by a.tanggal desc limit 1 ";
-			$last_po = $this->db->query($queryLastPO)->row_array();
-			if ($last_po) {
-				$dataDetail[$key]['last_no_ttb'] = $last_po['no_ttb'];
-				$dataDetail[$key]['last_harga_po'] = $last_po['harga'];
-				$dataDetail[$key]['last_tanggal_po'] = $last_po['tanggal'];
-				$dataDetail[$key]['last_customer'] = $last_po['nama_customer'];
-			} else {
-				$dataDetail[$key]['last_no_ttb'] = '';
-				$dataDetail[$key]['last_harga_po'] = 0;
-				$dataDetail[$key]['last_tanggal_po'] = '';
-				$dataDetail[$key]['last_customer'] = '';
-			}
-		}
-
-		$queryUser = "SELECT a.*, b.nama as peminta FROM fwk_users a LEFT JOIN karyawan b ON a.employee_id=b.id WHERE a.id=" . $dataHeader['dibuat_oleh'];
-		$dataUser = $this->db->query($queryUser)->row_array();
-
-		// var_dump($dataUser); die;
-
-
-		// $perminta = $this->InvPermintaanBarangModel->print_slip($id);
-		$data['header'] = 	$dataHeader;
-		$data['detail'] = 	$dataDetail;
-		$data['user'] = $dataUser;
-
-
-		$data['database'] = $this->db;
-
-		$html = $this->load->view('SlsTTB_laporan_cek_harga', $data, true);
-
-		$filename = 'report_prcpo_' . time();
-		$this->pdfgenerator->generate($html, $filename, true, 'A4', 'landscape');
-		// echo $html;
-	}
 	function print_slip_get($segment_3 = '')
 	// 490
 	{
@@ -1014,148 +410,319 @@ class ColLHI extends BD_Controller
 		// $filename = 'report_prcpo_' . time();
 		// $this->pdfgenerator->generate($html, $filename, true, 'A4', 'portrait');
 	}
-	function print_slip_ttd_get($segment_3 = '')
-	// 490
+
+	// ================= TERBILANG =================
+	function terbilang($angka)
 	{
-		$this->load->helper("terbilangv2");
-		$id = (int)$segment_3;
-		$data = [];
-
-		$queryHeader = "SELECT a.*,
-		f.nama_customer as nama_customer,
-		f.alamat as alamat_customer,
-		f.no_telpon as no_telepon_customer,
-		f.nama_bank as nama_bank,
-		f.no_rekening as no_rekening,
-		f.atas_nama as atas_nama,
-		f.contact_person as contact_person_customer,
-		f.no_hp as no_hp_customer,
-
-		g.jenis as jenis_bayar,
-		g.ket as ket_bayar,
-
-		h.nama as nama_franco,
-		h.alamat as alamat_franco,
-		h.contact as contact_franco,
-		h.telp as telp_franco,
-
-		i.kode as mata_uang_kode,
-		i.simbol as mata_uang_simbol,
-		i.nama as mata_uang_nama,
-		j.user_full_name AS dibuat,
-		k.no_quotation AS qoutation,
-
-		z.nama as user_approve1,
-		x.nama as user_approve_jabatan1,
-		zz.nama as user_approve2,
-		xx.nama as user_approve_jabatan2,
-		zzz.nama as user_approve3,
-		xxx.nama as user_approve_jabatan3,
-		zzzz.nama as user_approve4,
-		xxxx.nama as user_approve_jabatan4,
-		zzzzz.nama as user_approve5,
-		xxxxx.nama as user_approve_jabatan5,
-		d.no_pp AS no_pp,
-		e.nama as lokasi
-		FROM sls_ttb_ht a 
-		INNER JOIN sls_so_dt b ON a.id=b.so_hd_id
-		INNER JOIN prc_pp_dt c ON b.pp_dt_id=c.id
-		INNER JOIN prc_pp_ht d ON c.pp_hd_id=d.id
-
-		INNER JOIN gbm_organisasi e ON a.lokasi_id=e.id
-		INNER JOIN gbm_customer f ON a.customer_id=f.id
-		INNER JOIN prc_syarat_bayar g ON a.syarat_bayar_id=g.id
-		INNER JOIN prc_franco h ON a.franco_id=h.id
-		LEFT JOIN acc_mata_uang i ON a.mata_uang_id=i.id
-		LEFT JOIN  fwk_users j ON a.dibuat_oleh=j.id
-		LEFT JOIN prc_quotation k ON a.quotation_id
-
-		LEFT JOIN karyawan z ON a.user_approve1=z.id
-		LEFT JOIN payroll_jabatan x ON z.jabatan_id=x.id
-		LEFT JOIN karyawan zz ON a.user_approve2=zz.id
-		LEFT JOIN payroll_jabatan xx ON zz.jabatan_id=xx.id
-		LEFT JOIN karyawan zzz ON a.user_approve3=zzz.id
-		LEFT JOIN payroll_jabatan xxx ON zzz.jabatan_id=xxx.id
-		LEFT JOIN karyawan zzzz ON a.user_approve4=zzzz.id
-		LEFT JOIN payroll_jabatan xxxx ON zzzz.jabatan_id=xxxx.id
-		LEFT JOIN karyawan zzzzz ON a.user_approve5=zzzzz.id
-		LEFT JOIN payroll_jabatan xxxxx ON zzzzz.jabatan_id=xxxxx.id
-		
-		
-		WHERE a.id=" . $id . "";
-		$dataHeader = $this->db->query($queryHeader)->row_array();
-
-		$queryDetail = "SELECT a.*,
-		b.kode as kode_barang,
-		b.nama as nama_barang,
-		b.no_plat AS no_plat,
-		f.nama as uom,
-		d.lokasi_id as lokasi_pp_id
-		FROM sls_so_dt a 
-		INNER JOIN prc_pp_dt c on a.pp_dt_id=c.id
-		inner join prc_pp_ht d on c.pp_hd_id=d.id
-		LEFT join inv_item b on a.item_id=b.id 
-		LEFT join gbm_uom f on b.uom_id=f.id 
-		WHERE  a.so_hd_id = " . $id . "";
-
-
-
-
-		$dataDetail = $this->db->query($queryDetail)->result_array();
-
-		$queryUser = "SELECT a.*, b.nama as peminta FROM fwk_users a LEFT JOIN karyawan b ON a.employee_id=b.id WHERE a.id=" . $dataHeader['dibuat_oleh'];
-		$dataUser = $this->db->query($queryUser)->row_array();
-
-		// var_dump($dataUser); die;
-
-
-		// $perminta = $this->InvPermintaanBarangModel->print_slip($id);
-		$data['header'] = 	$dataHeader;
-		$data['detail'] = 	$dataDetail;
-		$data['user'] = $dataUser;
-		//echo ((curl_get_content(('./logo_perusahaan.png'))));exit();
-
-
-		$data['database'] = $this->db;
-
-		// echo (base64_encode(file_get_contents(('./logo_perusahaan.png'))));
-		//exit();
-		$html = $this->load->view('Prc_slip_so_v3_kbv_ttd', $data, true);
-		// $html;exit();
-		// $filename = 'report_prcpo_' . time();
-		// $this->pdfgenerator->generate($html, $filename, true, 'A4', 'portrait');
-		$dompdf = new DOMPDF;
-		$dompdf->loadHtml($html);
-		$dompdf->setPaper('A4', 'portrait');
-		$dompdf->render();
-		$filename = 'report_' . time();
-		$x          = 545;
-		$y          = 30;
-		$text       = "{PAGE_NUM} / {PAGE_COUNT}";
-		$font       = null; // $dompdf->getFontMetrics()->get_font('Helvetica', 'normal');
-		$size       = 8;
-		$color      = array(0, 0, 0);
-		$word_space = 0.0;
-		$char_space = 0.0;
-		$angle      = 0.0;
-
-		$dompdf->getCanvas()->page_text(
-			$x,
-			$y,
-			$text,
-			$font,
-			$size,
-			$color,
-			$word_space,
-			$char_space,
-			$angle
-		);
-		$dompdf->stream($filename . ".pdf", array("Attachment" => 0));
+		$angka = abs($angka);
+		$baca = ["", "Satu", "Dua", "Tiga", "Empat", "Lima", "Enam", "Tujuh", "Delapan", "Sembilan", "Sepuluh", "Sebelas"];
+		if ($angka < 12) return " " . $baca[$angka];
+		elseif ($angka < 20) return terbilang($angka - 10) . " Belas";
+		elseif ($angka < 100) return terbilang($angka / 10) . " Puluh" . terbilang($angka % 10);
+		elseif ($angka < 1000) return terbilang($angka / 100) . " Ratus" . terbilang($angka % 100);
+		elseif ($angka < 1000000) return terbilang($angka / 1000) . " Ribu" . terbilang($angka % 1000);
 	}
+	function getLaporanCetakKuitansi3_post()
+{
+   
+	
+	$format_laporan = $this->post('format_laporan', true);
+    $tanggal_awal = $this->post('tgl_mulai', true);
+    $tanggal_akhir = $this->post('tgl_akhir', true);
+    $lokasi_id = $this->post('lokasi_id');
 
-	function laporan_Detail_So_post()
+    $query = "SELECT * from col_kuitansi_vw 
+              where tanggal_tempo between '" . $tanggal_awal . "' and '" . $tanggal_akhir . "'    
+              and lokasi_id=" . $lokasi_id . " 
+              order by tanggal_tempo, no_kuitansi";
+
+    $kuitansi = $this->db->query($query)->result_array();
+
+    $data = [
+        'no_kuitansi' => 'KWT-2026-001',
+        'terima_dari' => 'PT MAJU JAYA ABADI',
+        'untuk'       => 'Pembayaran Jasa Maintenance',
+        'nilai'       => 1500000,
+        'tanggal'     => date('d-m-Y'),
+        'petugas'     => 'ADMIN'
+    ];
+
+
+    // ================= HTML =================
+    $html = '
+<style>
+@page {
+    size: A4 portrait;
+    margin: 5mm;
+}
+
+body {
+    font-family: "Times New Roman", serif;
+    font-size: 10px;
+    margin: 0;
+    padding: 0;
+    width: 210mm; /* Lebar A4 */
+    height: 297mm; /* Tinggi A4 */
+}
+
+* {
+    box-sizing: border-box;
+}
+
+/* Container menggunakan table untuk kompatibilitas DOMPDF */
+.table-container {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.kuitansi-row {
+    page-break-inside: avoid;
+}
+
+.kuitansi-cell {
+    width: 50%;
+    height: 62mm;
+    padding: 0;
+    vertical-align: top;
+    page-break-inside: avoid;
+}
+
+.kuitansi {
+    border: 1px solid #000;
+    padding: 3mm;
+    height: 100%;
+    position: relative;
+    margin: 0 2mm;
+    page-break-inside: avoid;
+}
+
+.header {
+    text-align: center;
+    font-weight: bold;
+    font-size: 12px;
+    margin-bottom: 2mm;
+    line-height: 1.2;
+}
+
+.isi {
+    line-height: 1.4;
+    margin-bottom: 2mm;
+    min-height: 20mm;
+}
+
+.nominal {
+    font-size: 12px;
+    font-weight: bold;
+    margin: 3mm 0;
+    text-align: center;
+}
+
+.footer {
+    position: absolute;
+    bottom: 3mm;
+    left: 3mm;
+    right: 3mm;
+}
+
+.footer-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+}
+
+.footer-left {
+    text-align: left;
+    width: 40%;
+}
+
+.footer-right {
+    text-align: right;
+    width: 50%;
+}
+
+/* Clear float untuk baris baru */
+.clearfix::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
+/* Untuk mencegah page break */
+.no-break {
+    page-break-inside: avoid;
+}
+
+/* Media print */
+@media print {
+    body {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 210mm !important;
+        height: 297mm !important;
+    }
+    
+    .kuitansi {
+        border: 1px solid #000 !important;
+        page-break-inside: avoid !important;
+    }
+}
+</style>';
+
+    $html .= '<table class="table-container">';
+    
+    // Baris pertama (kuitansi 1 & 2)
+    $html .= '<tr class="kuitansi-row">';
+    
+    for ($i = 1; $i <= 2; $i++) {
+        $html .= '
+        <td class="kuitansi-cell">
+            <div class="kuitansi">
+                <div class="header">KUITANSI</div>
+                
+                <div class="isi">
+                    Sudah terima dari <b>' . $data['terima_dari'] . '</b><br>
+                    Uang sejumlah <b>' . $terbilang . '</b><br>
+                    Untuk pembayaran <b>' . $data['untuk'] . '</b>
+                </div>
+                
+                <div class="nominal">
+                    Rp ' . number_format($data['nilai'], 0, ',', '.') . '
+                </div>
+                
+                <div class="footer">
+                    <div class="footer-content">
+                        <div class="footer-left">
+                            No: KWT-2026-00' . $i . '
+                        </div>
+                        <div class="footer-right">
+                            Jakarta, ' . date('d-m-Y') . '<br><br>
+                            <u>ADMIN</u>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </td>';
+    }
+    
+    $html .= '</tr>';
+    
+    // Baris kedua (kuitansi 3 & 4)
+    $html .= '<tr class="kuitansi-row">';
+    
+    for ($i = 3; $i <= 4; $i++) {
+        $html .= '
+        <td class="kuitansi-cell">
+            <div class="kuitansi">
+                <div class="header">KUITANSI</div>
+                
+                <div class="isi">
+                    Sudah terima dari <b>' . $data['terima_dari'] . '</b><br>
+                    Uang sejumlah <b>' . $terbilang . '</b><br>
+                    Untuk pembayaran <b>' . $data['untuk'] . '</b>
+                </div>
+                
+                <div class="nominal">
+                    Rp ' . number_format($data['nilai'], 0, ',', '.') . '
+                </div>
+                
+                <div class="footer">
+                    <div class="footer-content">
+                        <div class="footer-left">
+                            No: KWT-2026-00' . $i . '
+                        </div>
+                        <div class="footer-right">
+                            Jakarta, ' . date('d-m-Y') . '<br><br>
+                            <u>ADMIN</u>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </td>';
+    }
+    
+    $html .= '</tr>';
+    $html .= '</table>';
+
+    // ================= GENERATE PDF =================
+    $dompdf = new Dompdf();
+    
+    // Atur options DOMPDF
+    $options = $dompdf->getOptions();
+    $options->set(array(
+        'isHtml5ParserEnabled' => true,
+        'isRemoteEnabled' => true,
+        'isPhpEnabled' => true,
+        'defaultPaperSize' => 'A4',
+        'defaultPaperOrientation' => 'portrait',
+        'dpi' => 150,
+        'isFontSubsettingEnabled' => true
+    ));
+    $dompdf->setOptions($options);
+    
+    $dompdf->setPaper('A4', 'portrait');
+    $dompdf->loadHtml($html);
+    
+    try {
+        $dompdf->render();
+        
+        // Output
+        if ($format_laporan == 'view' || $format_laporan == 'pdf') {
+            $dompdf->stream("kuitansi_1_halaman.pdf", array("Attachment" => 0));
+        } else {
+            echo $html;
+        }
+    } catch (Exception $e) {
+        // Fallback: versi sederhana jika masih error
+        // echo $this->generateSimpleKuitansi($data, $terbilang);
+    }
+    
+    exit();
+}
+
+// Fungsi fallback versi sederhana
+private function generateSimpleKuitansi($data, $terbilang)
+{
+    $html = '<style>
+    body { font-family: "Times New Roman"; font-size: 10px; }
+    .kuitansi { 
+        border: 1px solid #000; 
+        padding: 5mm; 
+        margin-bottom: 5mm;
+        width: 90mm;
+        height: 62mm;
+        float: left;
+        margin-right: 5mm;
+    }
+    .header { text-align: center; font-weight: bold; font-size: 12px; }
+    .clear { clear: both; }
+    </style>';
+    
+    for ($i = 1; $i <= 4; $i++) {
+        $html .= '
+        <div class="kuitansi">
+            <div class="header">KUITANSI</div>
+            <div>Sudah terima dari <b>' . $data['terima_dari'] . '</b></div>
+            <div>Uang sejumlah <b>' . $terbilang . '</b></div>
+            <div>Untuk pembayaran <b>' . $data['untuk'] . '</b></div>
+            <div style="text-align: center; font-weight: bold; margin: 5mm 0;">
+                Rp ' . number_format($data['nilai'], 0, ',', '.') . '
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+                <div>No: KWT-2026-00' . $i . '</div>
+                <div>Jakarta, ' . date('d-m-Y') . '<br><u>ADMIN</u></div>
+            </div>
+        </div>';
+        
+        if ($i == 2) {
+            $html .= '<div class="clear"></div>';
+        }
+    }
+    
+    return $html;
+}
+	function getLaporanCetakKuitansi_post()
 	{
-		/* A.02 Sales ORDER (DETAIL) */
+
 		$format_laporan =  $this->post('format_laporan', true);
 
 		// $id = (int)$segment_3;
@@ -1169,80 +736,230 @@ class ColLHI extends BD_Controller
 			'format_laporan' => 'view',
 		];
 
-		// var_dump($this->post());
-		// exit();
-		// $lokasi_id = $this->post('lokasi_id', true);
-		$periode =  $this->post('periode', true);
-		// $tanggal_awal = $this->post('tgl_mulai', true);
-		// $tanggal_akhir = $this->post('tgl_akhir', true);
 
-		// $lokasi_id = $input['lokasi_id'];
-		// $periode = $input['periode'];
-		// $tanggal_awal = $input['tgl_mulai'];
-		// $tanggal_akhir = $input['tgl_akhir'];
-		// $format_laporan = $input['format_laporan'];
+		$tanggal_awal = $this->post('tgl_mulai', true);
+		$tanggal_akhir = $this->post('tgl_akhir', true);
 
-		$date = new DateTime($periode . '-01');
-		$date->modify('last day of this month');
-		$last_day_this_month = $date->format('Y-m-d');
-		(int)$jumhari = date('d', strtotime($last_day_this_month));
-		$tgl_mulai = $periode . '-01';
-		$tgl_akhir = $periode . '-' . sprintf("%02d", $jumhari);
+		$lokasi_id = $this->post('lokasi_id');
 
-		$queryhead = "SELECT 
-		c.no_ttb AS no_ttb, 
-		c.id as id FROM sls_so_dt a
-		INNER JOIN sls_ttb_ht c ON a.so_hd_id=c.id
-		INNER JOIN gbm_customer b ON c.customer_id=b.id
-		where c.tanggal between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
-		and c.status='RELEASE'
-		GROUP BY c.id,c.no_ttb 
-		";
+		$query = " SELECT *
+		from col_kuitansi_vw where tanggal_tempo between  '" . $tanggal_awal . "' and  '" . $tanggal_akhir . "'	
+		and lokasi_id=" . $lokasi_id .	" order by tanggal_tempo,no_kuitansi";
+		// 	
 
-		$ressult = array();
+		$kuitansi = $this->db->query($query)->result_array();
 
-		$dataBkm = $this->db->query($queryhead)->result_array();
 
-		foreach ($dataBkm as $key => $hd) {
-			$querydetail = "SELECT a.*,
-			b.no_ttb as no_ttb,
-			b.id AS id_so,
-			d.no_pp as no_pp,
-			b.tanggal as tanggal,
-			e.nama_customer as nama_customer,
-			f.kode as kode_item,
-			f.nama as nama_item,
-			g.nama AS gudang,
-			b.id as id,
-			b.status
-			FROM sls_so_dt a
-			INNER JOIN sls_ttb_ht b ON a.so_hd_id=b.id
-			LEFT JOIN prc_pp_dt c ON a.pp_dt_id=c.id
-			LEFT JOIN prc_pp_ht d ON c.pp_hd_id=d.id
-			LEFT JOIN gbm_customer e ON b.customer_id=e.id
-			LEFT JOIN inv_item f ON a.item_id=f.id
-			LEFT JOIN gbm_organisasi g ON b.lokasi_id=g.id 
-			WHERE b.tanggal between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'
-			AND b.no_ttb='" . $hd['no_ttb'] . "'
-			";
-			$dataDtl = $this->db->query($querydetail)->result_array();
-			// var_dump($dataDtl)	;exit;
-			$hd['detail'] = $dataDtl;
-			$result[] = $hd;
-		}
-
-		$data['so'] = 	$result;
+		// var_dump($kuitansi);exit();
+		$data['kuitansi'] = 	$kuitansi;
 
 		// $data['filter_lokasi'] = 	$filter_lokasi;
-		$data['filter_tgl_awal'] = 	$tgl_mulai;
-		$data['filter_tgl_akhir'] = $tgl_akhir;
+		$data['filter_tgl_awal'] = 	$tanggal_awal;
+		$data['filter_tgl_akhir'] = $tanggal_akhir;
 		$data['format_laporan'] = $format_laporan;
 
-		$html = $this->load->view('Sls_So_Laporan_Detail', $data, true);
 
-		// $filename = 'report_' . time();
-		// $this->pdfgenerator->generate($html, $filename, true, 'A4', 'landscape');
-		// echo $html;
+
+		// ================= DATA =================
+		$data = [
+			'no_kuitansi' => 'KWT-2026-001',
+			'terima_dari' => 'PT MAJU JAYA ABADI',
+			'untuk'       => 'Pembayaran Jasa Maintenance',
+			'nilai'       => 1500000,
+			'tanggal'     => date('d-m-Y'),
+			'petugas'     => 'ADMIN'
+		];
+
+
+		$terbilang = trim(terbilang($data['nilai'])) . " Rupiah";
+    
+		// ================= HTML =================
+		$html = '
+<style>
+@page {
+    size: A4 portrait;
+    margin: 8mm;
+}
+
+body {
+    font-family: "Times New Roman", serif;
+    font-size: 11px;
+}
+
+* {
+    box-sizing: border-box; /* KUNCI */
+}
+
+.kuitansi {
+    height: 62mm;                 /* FIX */
+    border: 1px solid #000;
+    padding: 4mm;
+}
+
+.cut-line {
+    border-top: 1px dashed #000;
+    margin: 1mm 0;
+}
+
+.header {
+    text-align: center;
+    font-weight: bold;
+    font-size: 13px;
+    margin-bottom: 2mm;
+}
+
+.isi {
+    line-height: 1.4;
+}
+
+.nominal {
+    font-size: 13px;
+    font-weight: bold;
+    margin-top: 2mm;
+}
+
+.footer {
+    margin-top: 4mm;
+    display: table;
+    width: 100%;
+}
+
+.footer .left {
+    display: table-cell;
+    width: 60%;
+}
+
+.footer .right {
+    display: table-cell;
+    text-align: right;
+}
+
+
+</style>';
+
+		for ($i = 1; $i <= 4; $i++) {
+
+			$html .= "
+    <div class='kuitansi'>
+        <div class='header'>KUITANSI</div>
+
+        <div class='isi'>
+            Sudah terima dari <b>{$data['terima_dari']}</b><br>
+            Uang sejumlah <b>{$terbilang}</b><br>
+            Untuk pembayaran <b>{$data['untuk']}</b>
+        </div>
+
+        <div class='nominal'>
+            Rp " . number_format($data['nilai'], 0, ',', '.') . "
+        </div>
+
+        <div class='footer'>
+			<div class='left'>
+				No: KWT-2026-001
+			</div>
+			<div class='right'>
+				Jakarta, 20-01-2026<br><br>
+				<u>ADMIN</u>
+    	</div>
+		</div>
+
+    </div>";
+
+			// ===== GARIS POTONG (kecuali terakhir)
+			if ($i < 4) {
+				$html .= "<div class='cut-line'></div>";
+			}
+		}
+
+		// ================= GENERATE PDF =================
+		$dompdf = new Dompdf();
+		$dompdf->setPaper('A4', 'portrait');
+		$dompdf->loadHtml($html);
+		$dompdf->render();
+		$dompdf->stream("kuitansi_4_horizontal_cutline.pdf", ["Attachment" => false]);
+
+		exit();
+
+		// $html = $this->load->view('ColKuitansiCetakRekap', $data, true);
+
+
+		if ($format_laporan == 'xls') {
+			echo $html;
+		} else if ($format_laporan == 'view') {
+			echo $html;
+		} else {
+			$filename = 'report_' . time();
+			// $this->pdfgenerator->generate($html, $filename, true, 'A4', 'landscape');
+			$dompdf = new DOMPDF;
+			$dompdf->loadHtml($html);
+			$dompdf->setPaper('A4', 'landscape');
+			$dompdf->render();
+			$filename = 'report_' . time();
+			$x          = 400;
+			$y          = 570;
+			$text       = "{PAGE_NUM} of {PAGE_COUNT}";
+			$font       = null; // $dompdf->getFontMetrics()->get_font('Helvetica', 'normal');
+			$size       = 10;
+			$color      = array(0, 0, 0);
+			$word_space = 0.0;
+			$char_space = 0.0;
+			$angle      = 0.0;
+
+			$dompdf->getCanvas()->page_text(
+				$x,
+				$y,
+				$text,
+				$font,
+				$size,
+				$color,
+				$word_space,
+				$char_space,
+				$angle
+			);
+			$dompdf->stream($filename . ".pdf", array("Attachment" => 0));
+		}
+	}
+	function getLaporanRekapKuitansi_post()
+	{
+
+		$format_laporan =  $this->post('format_laporan', true);
+
+		// $id = (int)$segment_3;
+		$data = [];
+
+		$input = [
+			// 'lokasi_id' => 252,
+			'periode' => '2022-08',
+			// 'tgl_mulai' => '2022-09-01',
+			// 'tgl_akhir' => '2022-09-01',
+			'format_laporan' => 'view',
+		];
+
+
+		$tanggal_awal = $this->post('tgl_mulai', true);
+		$tanggal_akhir = $this->post('tgl_akhir', true);
+
+		$lokasi_id = $this->post('lokasi_id');
+
+		$query = " SELECT *
+		from col_kuitansi_vw where tanggal_tempo between  '" . $tanggal_awal . "' and  '" . $tanggal_akhir . "'	
+		and lokasi_id=" . $lokasi_id .	" order by tanggal_tempo,no_kuitansi";
+		// 	
+
+		$kuitansi = $this->db->query($query)->result_array();
+
+
+		// var_dump($kuitansi);exit();
+		$data['kuitansi'] = 	$kuitansi;
+
+		// $data['filter_lokasi'] = 	$filter_lokasi;
+		$data['filter_tgl_awal'] = 	$tanggal_awal;
+		$data['filter_tgl_akhir'] = $tanggal_akhir;
+		$data['format_laporan'] = $format_laporan;
+
+		$html = $this->load->view('ColKuitansiCetakRekap', $data, true);
+
+
 		if ($format_laporan == 'xls') {
 			echo $html;
 		} else if ($format_laporan == 'view') {

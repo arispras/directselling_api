@@ -1,28 +1,14 @@
 <?php
 
-class ColLHIModel extends CI_Model
+class ColKuitansiModel extends CI_Model
 {
 
-	public function retrieve_all(
-		$no_of_records = 10,
-		$page_no       = 1
-	) {
-		$no_of_records = (int)$no_of_records;
-		$page_no       = (int)$page_no;
-
-		$where = array();
-
-		$data = $this->pager->set('col_lhi_ht', $no_of_records, $page_no, $where);
-
-		return $data;
-	}
 
 
-	public function retrieve_all_kategori()
+	public function retrieve_all()
 	{
-		// $this->db->where('aktif' , 1);
 		$this->db->order_by('id', 'ASC');
-		$this->db->from('col_lhi_ht a');
+		$this->db->from('col_kuitansi_ht a');
 		$this->db->select('a.*, b.nama_customer');
 		$this->db->join('gbm_customer b', 'a.customer_id = b.id');
 		$result = $this->db->get();
@@ -33,31 +19,19 @@ class ColLHIModel extends CI_Model
 	{
 		$this->db->where('customer_id', $supp_id);
 		$this->db->order_by('id', 'ASC');
-		$this->db->from('col_lhi_ht a');
+		$this->db->from('col_kuitansi_ht a');
 		$this->db->select('a.*, b.nama_customer');
 		$this->db->join('gbm_customer b', 'a.customer_id = b.id');
 		$result = $this->db->get();
 		return $result->result_array();
 	}
-	public function retrieve_all_so_release_by_customer($supp_id)
-	{
-		$this->db->where('customer_id', $supp_id);
-		// $this->db->where('status' , 'RELEASE');
-		$this->db->order_by('id', 'ASC');
-		$this->db->from('col_lhi_ht a');
-		$this->db->select('a.*, b.nama_customer');
-		$this->db->join('gbm_customer b', 'a.customer_id = b.id');
-		$result = $this->db->get();
-		return $result->result_array();
-	}
+	
 
 	public function delete($id)
 	{
 		$id = (int)$id;
-		$this->db->where('lhi_id', $id);
-		$this->db->delete('col_lhi_dt');
 		$this->db->where('id', $id);
-		$this->db->delete('col_lhi_ht');
+		$this->db->delete('col_kuitansi_ht');
 		return true;
 	}
 
@@ -67,126 +41,61 @@ class ColLHIModel extends CI_Model
 
 		$ht['lokasi_id'] = $input['lokasi_id']['id'];
 		$ht['collector_id'] = $input['collector_id']['id'];
-		$ht['no_lhi'] = $input['no_lhi'];
+		$ht['no_kuitansi'] = $input['no_kuitansi'];
 		$ht['keterangan'] = $input['catatan'];
-		$ht['tanggal'] = $input['tanggal'];
-		$ht['tanggal_mulai'] = $input['tanggal_mulai'];
-		$ht['tanggal_akhir'] = $input['tanggal_akhir'];
-		$ht['is_bayar'] = 0;
 		$ht['dibuat_tanggal'] = date('Y-m-d H:i:s');
 		$ht['dibuat_oleh'] = $input['dibuat_oleh'];
 
 
-		$this->db->insert('col_lhi_ht', $ht);
+		$this->db->insert('col_kuitansi_ht', $ht);
 		$id = $this->db->insert_id();
 
-		$details = $input['details'];
-		foreach ($details as $key => $value) {
-			$this->db->insert("col_lhi_dt", array(
-				'lhi_id' => $id,
-				'kuitansi_id' => $value['kuitansi_id'],
-				'nilai_angsuran' => $value['nilai_angsuran'],
-				'sisa_angsuran' => $value['sisa_angsuran'],
-				'lhi_lama' => $value['lhi_lama'],
-				'ket' => $value['ket'],
-			));
-		}
+		
 
 		return $id;
 	}
 	public function update($id, $input)
 	{
 
-		/* HANYA KETERANGAN YANG BISA DIUBAH SETELAH LHI DIBUAT */
-
+	
 		// $ht['lokasi_id'] = $input['lokasi_id']['id'];
-		// $ht['collector_id'] = $input['collector_id']['id'];
+		$ht['collector_id'] = $input['collector_id']['id'];
 		// $ht['no_lhi'] = $input['no_lhi'];
 		$ht['keterangan'] = $input['catatan'];
-		$ht['is_bayar'] = 0;
-		// $ht['tanggal'] = $input['tanggal'];
-		// $ht['tanggal_mulai'] = $input['tanggal_mulai'];
-		// $ht['tanggal_akhir'] = $input['tanggal_akhir'];
 
 		$ht['diubah_tanggal'] = date('Y-m-d H:i:s');
 		$ht['diubah_oleh'] = $input['diubah_oleh'];
 
 		$this->db->where('id', $id);
-		$this->db->update('col_lhi_ht', $ht);
+		$this->db->update('col_kuitansi_ht', $ht);
 
-		// hapus  detail
-		$this->db->where('lhi_id', $id);
-		$this->db->delete('col_lhi_dt');
-
-		$details = $input['details'];
-		foreach ($details as $key => $value) {
-			$this->db->insert("col_lhi_dt", array(
-				'lhi_id' => $id,
-				'kuitansi_id' => $value['kuitansi_id'],
-				'nilai_angsuran' => $value['nilai_angsuran'],
-				'sisa_angsuran' => $value['sisa_angsuran'],
-				/* HANYA BBRP FILED YANG BISA DIUBAH SETELAH LHI DIBUAT */
-
-				// 'dibayar' => $value['dibayar'],
-				// 'sisa_akhir' => $value['sisa_akhir'],
-				// 'tanggal_janji' => $value['tanggal_janji'],
-				'lhi_lama' => $value['lhi_lama'],
-				'ket' => $value['ket'],
-			));
-		}
+		
 		return true;
 	}
 
 
-	public function updateLhiBayar($id, $input)
+	public function updateCollectorTanggalJanji($id, $input)
 	{
 
-		/* HANYA KETERANGAN YANG BISA DIUBAH SETELAH LHI DIBUAT */
 
-		// $ht['lokasi_id'] = $input['lokasi_id']['id'];
-		// $ht['collector_id'] = $input['collector_id']['id'];
-		// $ht['no_lhi'] = $input['no_lhi'];
-		$ht['keterangan'] = $input['catatan'];
-		$ht['is_bayar'] = 1;
-		// $ht['tanggal'] = $input['tanggal'];
-		// $ht['tanggal_mulai'] = $input['tanggal_mulai'];
-		// $ht['tanggal_akhir'] = $input['tanggal_akhir'];
-
+		$ht['tanggal_janji'] = $input['tanggal_janji'];
+		$ht['collector_id'] = $input['collector_id']['id'];
+		
 		$ht['diubah_tanggal'] = date('Y-m-d H:i:s');
 		$ht['diubah_oleh'] = $input['diubah_oleh'];
 
 		$this->db->where('id', $id);
-		$this->db->update('col_lhi_ht', $ht);
+		$this->db->update('col_kuitansi_ht', $ht);
 
-		// hapus  detail
-		$this->db->where('lhi_id', $id);
-		$this->db->delete('col_lhi_dt');
-
-		$details = $input['details'];
-		foreach ($details as $key => $value) {
-			$this->db->insert("col_lhi_dt", array(
-				'lhi_id' => $id,
-				'kuitansi_id' => $value['kuitansi_id'],
-				'nilai_angsuran' => $value['nilai_angsuran'],
-				'sisa_angsuran' => $value['sisa_angsuran'],
-				'dibayar' => $value['dibayar'],
-				'sisa_akhir' => $value['sisa_akhir'],
-				'tanggal_janji' => $value['tanggal_janji'],
-				'lhi_lama' => $value['lhi_lama'],
-				'ket' => $value['ket'],
-			));
-		}
+		
 		return true;
 	}
 
 	public function retrieve($id)
 	{
 		$id = (int)$id;
-
-
-
-		$this->db->select('a.*, b.nama as nama_collector,');
-		$this->db->from('col_lhi_ht a');
+		$this->db->select('a.*, b.nama as nama_collector ');
+		$this->db->from('col_kuitansi_ht a');
 		$this->db->join('karyawan b', 'a.collector_id = b.id', "left");
 		$this->db->where('a.id', $id);
 		$result = $this->db->get();
@@ -271,7 +180,7 @@ class ColLHIModel extends CI_Model
 		$ht['diubah_tanggal'] = date('Y-m-d H:i:s');
 		$ht['diubah_oleh'] = $input['diubah_oleh'];
 		$this->db->where('id', $id);
-		$this->db->update('col_lhi_ht', $ht);
+		$this->db->update('col_kuitansi_ht', $ht);
 
 		return true;
 	}
@@ -287,7 +196,7 @@ class ColLHIModel extends CI_Model
 		$data['diubah_tanggal'] = date('Y-m-d H:i:s');
 		$data['diubah_oleh'] = $input['diubah_oleh'];
 		$this->db->where('id', $id);
-		$this->db->update('col_lhi_ht', $data);
+		$this->db->update('col_kuitansi_ht', $data);
 
 
 		return true;
@@ -296,7 +205,7 @@ class ColLHIModel extends CI_Model
 	{
 		$sql = "Select f.nama as lokasi, a.tanggal,a.no_ttb,a.catatan,b.id, b.item_id,c.kode as kode_item,c.nama as nama_item,d.kode as uom, b.qty,IFNULL(e.qty_terkirim, 0)as qty_sudah_terima,
 		b.qty-IFNULL(e.qty_terkirim, 0)as qty_belum_terima ,  b.harga,b.diskon 
-			from col_lhi_ht a INNER JOIN col_lhi_dt b ON a.id=b.lhi_id
+			from col_kuitansi_ht a INNER JOIN col_lhi_dt b ON a.id=b.lhi_id
 			INNER JOIN inv_item c on b.item_id=c.id 
 			INNER join gbm_uom d on c.uom_id=d.id
 			LEFT join (
@@ -315,7 +224,7 @@ class ColLHIModel extends CI_Model
 	{
 		$sql = "Select f.nama as lokasi, a.tanggal,a.no_ttb,a.catatan,b.id, b.item_id,c.kode as kode_item,c.nama as nama_item,d.kode as uom, b.qty,IFNULL(e.qty_terkirim, 0)as qty_sudah_terima,
 		b.qty-IFNULL(e.qty_terkirim, 0)as qty_belum_terima ,  b.harga,b.diskon 
-			from col_lhi_ht a INNER JOIN col_lhi_dt b ON a.id=b.lhi_id
+			from col_kuitansi_ht a INNER JOIN col_lhi_dt b ON a.id=b.lhi_id
 			INNER JOIN inv_item c on b.item_id=c.id 
 			INNER join gbm_uom d on c.uom_id=d.id
 			LEFT join (
@@ -333,7 +242,7 @@ class ColLHIModel extends CI_Model
 	{
 		$sql = "Select f.nama as lokasi, a.tanggal,a.no_ttb,a.catatan,b.id, b.item_id,c.kode as kode_item,c.nama as nama_item,d.kode as uom, 
 		b.qty,IFNULL(e.qty_terkirim, 0)as qty_sudah_terima,b.qty-IFNULL(e.qty_terkirim, 0)as qty_belum_terima, b.harga ,b.diskon 
-			from col_lhi_ht a INNER JOIN col_lhi_dt b ON a.id=b.lhi_id
+			from col_kuitansi_ht a INNER JOIN col_lhi_dt b ON a.id=b.lhi_id
 			INNER JOIN inv_item c on b.item_id=c.id 
 			INNER join gbm_uom d on c.uom_id=d.id
 			LEFT join (
@@ -350,7 +259,7 @@ class ColLHIModel extends CI_Model
 	{
 		$sql = "Select f.nama as lokasi, a.tanggal,a.no_ttb,a.catatan,b.id, b.item_id,c.kode as kode_item,c.nama as nama_item,d.kode as uom, 
 		b.qty,IFNULL(e.qty_terkirim, 0)as qty_sudah_terima,b.qty-IFNULL(e.qty_terkirim, 0)as qty_belum_terima, b.harga ,b.diskon 
-			from col_lhi_ht a INNER JOIN col_lhi_dt b ON a.id=b.lhi_id
+			from col_kuitansi_ht a INNER JOIN col_lhi_dt b ON a.id=b.lhi_id
 			INNER JOIN inv_item c on b.item_id=c.id 
 			INNER join gbm_uom d on c.uom_id=d.id
 			LEFT join (
@@ -374,7 +283,7 @@ class ColLHIModel extends CI_Model
             -- c.kode,
             -- c.nama,
             -- c.satuan
-		FROM col_lhi_ht a 
+		FROM col_kuitansi_ht a 
         inner join pks_tanki b on a.tanki_id = b.id
         inner join inv_item c on a.produk_id = c.id
 	    -- inner join inv_item c on b.item=c.id
