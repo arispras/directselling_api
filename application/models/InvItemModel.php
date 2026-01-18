@@ -16,53 +16,6 @@ class InvItemModel extends CI_Model
 	}
 
 
-	public function retrieve_all(
-		$no_of_records = 10,
-		$page_no       = 1,
-		$nama   = '',
-		$kode = '',
-		$inv_kategori_id = array(),
-		$pagination    = true
-	) {
-		$no_of_records = (int)$no_of_records;
-		$page_no       = (int)$page_no;
-
-		$where    = array();
-		$group_by = array();
-
-		$where['inv_kategori'] = array('inv_item.inv_kategori_id = inv_kategori.id', 'join', 'left');
-		if (!empty($inv_kategori_id)) {
-			$where['inv_item.inv_kategori_id'] = array($inv_kategori_id, 'where_in');
-		}
-
-		$like = 0;
-		if (!empty($nama)) {
-			$where['inv_item.nama'] = array($nama, 'like');
-			$like = 1;
-		}
-		if (!empty($kode)) {
-			if ($like) {
-				$value = array($kode, 'or_like');
-			} else {
-				$value = array($kode, 'like');
-			}
-			$where['inv_item.kode'] = $value;
-		}
-		$orderby = array(
-			'inv_item.id' => 'DESC'
-		);
-
-		if ($pagination) {
-			$data = $this->pager->set('inv_item', $no_of_records, $page_no, $where, $orderby, 'inv_item.*', $group_by);
-		} else {
-			# cari jumlah semua pengajar
-			$no_of_records = $this->db->count_all('inv_item');
-			$search_all    = $this->pager->set('inv_item', $no_of_records, $page_no, $where, $orderby, 'inv_item.*', $group_by);
-			$data          = $search_all['results'];
-		}
-
-		return $data;
-	}
 
 	public function retrieve($id)
 	{
@@ -126,6 +79,8 @@ class InvItemModel extends CI_Model
 		$min_stok    =  $arrdata['min_stok'];
 		$harga_jual1    =  $arrdata['harga_jual1'];
 		$harga_jual2    =  $arrdata['harga_jual2'];
+		$komisi_sales    =  $arrdata['komisi_sales'];
+		$bonus_sales    =  $arrdata['bonus_sales'];
 		$jenis_item    =  $arrdata['jenis_item'];
 		$aktif    =  $arrdata['aktif'];
 
@@ -136,6 +91,8 @@ class InvItemModel extends CI_Model
 			'uom_id'    => $uom_id,
 			'harga_jual1' => $harga_jual1,
 			'harga_jual2' => $harga_jual2,
+			'komisi_sales' => $komisi_sales,
+			'bonus_sales' => $bonus_sales,
 			'min_stok' => $min_stok,
 			'jenis_item' => $jenis_item,
 			'aktif' => $aktif
@@ -158,6 +115,8 @@ class InvItemModel extends CI_Model
 		$min_stok    =  $arrdata['min_stok'];
 		$harga_jual1    =  $arrdata['harga_jual1'];
 		$harga_jual2    =  $arrdata['harga_jual2'];
+		$komisi_sales    =  $arrdata['komisi_sales'];
+		$bonus_sales    =  $arrdata['bonus_sales'];
 		$jenis_item    =  $arrdata['jenis_item'];
 		$aktif    =  $arrdata['aktif'];
 
@@ -169,6 +128,8 @@ class InvItemModel extends CI_Model
 			'min_stok' => $min_stok,
 			'harga_jual1' => $harga_jual1,
 			'harga_jual2' => $harga_jual2,
+			'komisi_sales' => $komisi_sales,
+			'bonus_sales' => $bonus_sales,
 			'jenis_item' => $jenis_item,
 			'aktif' => $aktif
 		);
