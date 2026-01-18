@@ -1217,217 +1217,47 @@ class SlsTTB extends BD_Controller
 		// echo $html;
 	}
 	function print_slip_get($segment_3 = '')
-	// 490
 	{
-		$this->load->helper("terbilangv2");
+
 		$id = (int)$segment_3;
 		$data = [];
 
-		$queryHeader = "SELECT a.*,
-		f.nama_customer,
-		a.alamat_pengiriman as alamat_customer,
-		a.telp_pengiriman as no_telepon_customer,
-		a.contact_pengiriman as contact_person_customer,
-		g.jenis as jenis_bayar,
-		g.ket as ket_bayar
-		FROM sls_ttb_ht a 
-		INNER JOIN gbm_organisasi e ON a.lokasi_id=e.id
-		INNER JOIN gbm_customer f ON a.customer_id=f.id
-		INNER JOIN prc_syarat_bayar g ON a.syarat_bayar_id=g.id
+		$queryHeader = "SELECT a.*,b.nama as lokasi, i.nama AS surveyor,
+		h.nama AS sales,so.no_so,so.tanggal AS tanggal_so,
+		c.kode_customer,c.nama_customer,c.alamat,c.no_telpon,c.no_ktp,d.nama AS provinsi,
+		e.nama AS kabupaten,f.nama as kecamatan,g.nama AS kelurahan
+		from  	sls_ttb_ht a 
+		inner JOIN sls_so_ht so ON a.sls_so_id=so.id 
+		INNER JOIN gbm_organisasi b ON a.lokasi_id=b.id
+		INNER JOIN gbm_customer c ON a.customer_id=c.id
+		LEFT JOIN gbm_provinsi d ON c.provinsi_id=d.id
+		LEFT JOIN gbm_kabupaten e ON c.kabupaten_id=e.id
+		LEFT JOIN gbm_kecamatan f ON c.provinsi_id=f.id
+		LEFT JOIN gbm_kelurahan g ON c.kelurahan_id=g.id
+		LEFT JOIN karyawan h ON a.sales_id=h.id
+		LEFT JOIN karyawan i ON a.surveyor_id=i.id	
 		WHERE a.id=" . $id . "";
+
 		$dataHeader = $this->db->query($queryHeader)->row_array();
 
-		$queryDetail = "SELECT a.*,
-		b.kode as kode_barang,
-		b.nama as nama_barang,
-		f.nama as uom
-		FROM sls_so_dt a 
-		LEFT join inv_item b on a.item_id=b.id 
-		LEFT join gbm_uom f on b.uom_id=f.id 
-		WHERE  a.so_hd_id = " . $id . "";
-
-
+		$queryDetail = "SELECT a.*,b.kode as kode_barang,b.nama as nama_barang,c.kode AS uom FROM sls_ttb_dt a
+		 left JOIN inv_item b 
+		ON a.item_id=b.id left JOIN gbm_uom c ON b.uom_id=c.id
+		WHERE  a.ttb_hd_id = " . $id . "";
 		$dataDetail = $this->db->query($queryDetail)->result_array();
-
 
 		$data['header'] = 	$dataHeader;
 		$data['detail'] = 	$dataDetail;
-
+		// $data['user'] = $dataUser;
 
 
 		$data['database'] = $this->db;
 
-		// echo (base64_encode(file_get_contents(('./logo_perusahaan.png'))));
-		//exit();
-		$html = $this->load->view('Sls_slip_so_v3', $data, true);
-		$dompdf = new DOMPDF;
-		$dompdf->loadHtml($html);
-		$dompdf->setPaper('A4', 'portrait');
-		$dompdf->render();
-		$filename = 'report_' . time();
-		$x          = 545;
-		$y          = 30;
-		$text       = "{PAGE_NUM} / {PAGE_COUNT}";
-		$font       = null; // $dompdf->getFontMetrics()->get_font('Helvetica', 'normal');
-		$size       = 8;
-		$color      = array(0, 0, 0);
-		$word_space = 0.0;
-		$char_space = 0.0;
-		$angle      = 0.0;
+		$html = $this->load->view('SlsTTB_Slip', $data, true);
 
-		$dompdf->getCanvas()->page_text(
-			$x,
-			$y,
-			$text,
-			$font,
-			$size,
-			$color,
-			$word_space,
-			$char_space,
-			$angle
-		);
-		$dompdf->stream($filename . ".pdf", array("Attachment" => 0));
-		// $html;exit();
-		// $filename = 'report_prcpo_' . time();
-		// $this->pdfgenerator->generate($html, $filename, true, 'A4', 'portrait');
-	}
-	function print_slip_ttd_get($segment_3 = '')
-	// 490
-	{
-		$this->load->helper("terbilangv2");
-		$id = (int)$segment_3;
-		$data = [];
-
-		$queryHeader = "SELECT a.*,
-		f.nama_customer as nama_customer,
-		f.alamat as alamat_customer,
-		f.no_telpon as no_telepon_customer,
-		f.nama_bank as nama_bank,
-		f.no_rekening as no_rekening,
-		f.atas_nama as atas_nama,
-		f.contact_person as contact_person_customer,
-		f.no_hp as no_hp_customer,
-
-		g.jenis as jenis_bayar,
-		g.ket as ket_bayar,
-
-		h.nama as nama_franco,
-		h.alamat as alamat_franco,
-		h.contact as contact_franco,
-		h.telp as telp_franco,
-
-		i.kode as mata_uang_kode,
-		i.simbol as mata_uang_simbol,
-		i.nama as mata_uang_nama,
-		j.user_full_name AS dibuat,
-		k.no_quotation AS qoutation,
-
-		z.nama as user_approve1,
-		x.nama as user_approve_jabatan1,
-		zz.nama as user_approve2,
-		xx.nama as user_approve_jabatan2,
-		zzz.nama as user_approve3,
-		xxx.nama as user_approve_jabatan3,
-		zzzz.nama as user_approve4,
-		xxxx.nama as user_approve_jabatan4,
-		zzzzz.nama as user_approve5,
-		xxxxx.nama as user_approve_jabatan5,
-		d.no_pp AS no_pp,
-		e.nama as lokasi
-		FROM sls_ttb_ht a 
-		INNER JOIN sls_so_dt b ON a.id=b.so_hd_id
-		INNER JOIN prc_pp_dt c ON b.pp_dt_id=c.id
-		INNER JOIN prc_pp_ht d ON c.pp_hd_id=d.id
-
-		INNER JOIN gbm_organisasi e ON a.lokasi_id=e.id
-		INNER JOIN gbm_customer f ON a.customer_id=f.id
-		INNER JOIN prc_syarat_bayar g ON a.syarat_bayar_id=g.id
-		INNER JOIN prc_franco h ON a.franco_id=h.id
-		LEFT JOIN acc_mata_uang i ON a.mata_uang_id=i.id
-		LEFT JOIN  fwk_users j ON a.dibuat_oleh=j.id
-		LEFT JOIN prc_quotation k ON a.quotation_id
-
-		LEFT JOIN karyawan z ON a.user_approve1=z.id
-		LEFT JOIN payroll_jabatan x ON z.jabatan_id=x.id
-		LEFT JOIN karyawan zz ON a.user_approve2=zz.id
-		LEFT JOIN payroll_jabatan xx ON zz.jabatan_id=xx.id
-		LEFT JOIN karyawan zzz ON a.user_approve3=zzz.id
-		LEFT JOIN payroll_jabatan xxx ON zzz.jabatan_id=xxx.id
-		LEFT JOIN karyawan zzzz ON a.user_approve4=zzzz.id
-		LEFT JOIN payroll_jabatan xxxx ON zzzz.jabatan_id=xxxx.id
-		LEFT JOIN karyawan zzzzz ON a.user_approve5=zzzzz.id
-		LEFT JOIN payroll_jabatan xxxxx ON zzzzz.jabatan_id=xxxxx.id
-		
-		
-		WHERE a.id=" . $id . "";
-		$dataHeader = $this->db->query($queryHeader)->row_array();
-
-		$queryDetail = "SELECT a.*,
-		b.kode as kode_barang,
-		b.nama as nama_barang,
-		b.no_plat AS no_plat,
-		f.nama as uom,
-		d.lokasi_id as lokasi_pp_id
-		FROM sls_so_dt a 
-		INNER JOIN prc_pp_dt c on a.pp_dt_id=c.id
-		inner join prc_pp_ht d on c.pp_hd_id=d.id
-		LEFT join inv_item b on a.item_id=b.id 
-		LEFT join gbm_uom f on b.uom_id=f.id 
-		WHERE  a.so_hd_id = " . $id . "";
-
-
-
-
-		$dataDetail = $this->db->query($queryDetail)->result_array();
-
-		$queryUser = "SELECT a.*, b.nama as peminta FROM fwk_users a LEFT JOIN karyawan b ON a.employee_id=b.id WHERE a.id=" . $dataHeader['dibuat_oleh'];
-		$dataUser = $this->db->query($queryUser)->row_array();
-
-		// var_dump($dataUser); die;
-
-
-		// $perminta = $this->InvPermintaanBarangModel->print_slip($id);
-		$data['header'] = 	$dataHeader;
-		$data['detail'] = 	$dataDetail;
-		$data['user'] = $dataUser;
-		//echo ((curl_get_content(('./logo_perusahaan.png'))));exit();
-
-
-		$data['database'] = $this->db;
-
-		// echo (base64_encode(file_get_contents(('./logo_perusahaan.png'))));
-		//exit();
-		$html = $this->load->view('Prc_slip_so_v3_kbv_ttd', $data, true);
-		// $html;exit();
-		// $filename = 'report_prcpo_' . time();
-		// $this->pdfgenerator->generate($html, $filename, true, 'A4', 'portrait');
-		$dompdf = new DOMPDF;
-		$dompdf->loadHtml($html);
-		$dompdf->setPaper('A4', 'portrait');
-		$dompdf->render();
-		$filename = 'report_' . time();
-		$x          = 545;
-		$y          = 30;
-		$text       = "{PAGE_NUM} / {PAGE_COUNT}";
-		$font       = null; // $dompdf->getFontMetrics()->get_font('Helvetica', 'normal');
-		$size       = 8;
-		$color      = array(0, 0, 0);
-		$word_space = 0.0;
-		$char_space = 0.0;
-		$angle      = 0.0;
-
-		$dompdf->getCanvas()->page_text(
-			$x,
-			$y,
-			$text,
-			$font,
-			$size,
-			$color,
-			$word_space,
-			$char_space,
-			$angle
-		);
-		$dompdf->stream($filename . ".pdf", array("Attachment" => 0));
+		$filename = 'slipso_' . time();
+		$this->pdfgenerator->generate($html, $filename, true, 'A4', 'portrait');
+		// echo $html;
 	}
 
 	function laporan_Detail_So_post()
