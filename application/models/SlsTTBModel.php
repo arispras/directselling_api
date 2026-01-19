@@ -66,11 +66,11 @@ class SlsTTBModel extends CI_Model
 
 		$ht['lokasi_id'] = $input['lokasi_id']['id'];
 		$ht['sls_so_id'] = $input['so_id'];
-		// $ht['status_so'] = $input['status_so']['id'];
-
 		$ht['customer_id'] = $input['customer_id'];
 		$ht['sales_id'] = $input['sales_id']['id'];
 		$ht['surveyor_id'] = $input['surveyor_id']['id'];
+		$ht['sales_supervisor_id'] = $input['sales_supervisor_id']['id'];
+		$ht['demo_booker_id'] = $input['demo_booker_id']['id'];
 		$ht['collector_id'] = $input['collector_id']['id'];
 
 		$ht['no_ttb'] = $input['no_ttb'];
@@ -85,31 +85,7 @@ class SlsTTBModel extends CI_Model
 		$ht['tanggal'] = $input['tanggal'];
 		$ht['dibuat_tanggal'] = date('Y-m-d H:i:s');
 		$ht['dibuat_oleh'] = $input['dibuat_oleh'];
-		// $ht['syarat_bayar_id'] = $input['syarat_bayar_id']['id'];
-		// $ht['franco_id'] = $input['franco_id']['id'];
-		// $ht['ket_indent'] = $input['ket_indent'];
-		// $ht['info_pengiriman'] = $input['info_pengiriman'];
-		// $ht['tempo_bayar'] = $input['tempo_bayar'];
-		// $ht['ket'] = $input['ket'];
-		// $ht['mata_uang_id'] = $input['mata_uang_id']['id'];
-		// $ht['quotation_id'] = $input['quotation_id'];
-
-		// $ht['jenis_penjualan'] = $input['jenis_penjualan']['id'];
-		// $ht['alamat_id'] = $input['alamat_id']['id'];
-		// $ht['contact_pengiriman'] = $input['nama_pengiriman'];
-		// $ht['telp_pengiriman'] = $input['telp_pengiriman'];
-		// $ht['alamat_pengiriman'] = $input['alamat_pengiriman'];
-		// $ht['koordinat_pengiriman'] = $input['koordinat_pengiriman'];
-		// $ht['disc'] = $input['disc'];
-		// $ht['diskon'] = $input['diskon'];
-		// $ht['ppn'] = $input['ppn'];
-		// $ht['pph'] = $input['pph'];
-		// $ht['ppbkb'] = $input['ppbkb'];
-		// $ht['biaya_kirim'] = $input['biaya_kirim'];
-		// $ht['grand_total'] = $input['grand_total'];
-		// $ht['biaya_lain'] = $input['biaya_lain'];
-		// $ht['pph_nilai'] = $input['pph_nilai'];
-
+		
 
 		$this->db->insert('sls_ttb_ht', $ht);
 		$id = $this->db->insert_id();
@@ -141,9 +117,9 @@ class SlsTTBModel extends CI_Model
 		$ht['customer_id'] = $input['customer_id'];
 		$ht['sales_id'] = $input['sales_id']['id'];
 		$ht['surveyor_id'] = $input['surveyor_id']['id'];
+		$ht['sales_supervisor_id'] = $input['sales_supervisor_id']['id'];
+		$ht['demo_booker_id'] = $input['demo_booker_id']['id'];
 		$ht['collector_id'] = $input['collector_id']['id'];
-
-		// $ht['status_so'] = $input['status_so']['id'];
 		$ht['no_ttb'] = $input['no_ttb'];
 		$ht['catatan'] = $input['catatan'];
 		$ht['jenis'] = $input['jenis'];
@@ -158,29 +134,7 @@ class SlsTTBModel extends CI_Model
 		$input['diubah_tanggal'] = date('Y-m-d H:i:s');
 		$this->db->where('id', $id);
 		$this->db->update('sls_ttb_ht', $ht);
-		// $ht['ket_indent'] = $input['ket_indent'];
-		// $ht['info_pengiriman'] = $input['info_pengiriman'];
-		// $ht['tempo_bayar'] = $input['tempo_bayar'];
-		// $ht['jenis_penjualan'] = $input['jenis_penjualan']['id'];
-		// $ht['syarat_bayar_id'] = $input['syarat_bayar_id']['id'];
-		// $ht['franco_id'] = $input['franco_id']['id'];
-		// $ht['mata_uang_id'] = $input['mata_uang_id']['id'];
-		// $ht['quotation_id'] = $input['quotation_id'];
-		// $ht['alamat_id'] = $input['alamat_id']['id'];
-		// $ht['contact_pengiriman'] = $input['nama_pengiriman'];
-		// $ht['telp_pengiriman'] = $input['telp_pengiriman'];
-		// $ht['alamat_pengiriman'] = $input['alamat_pengiriman'];
-		// $ht['koordinat_pengiriman'] = $input['koordinat_pengiriman'];
-		// $ht['disc'] = $input['disc'];
-		// $ht['diskon'] = $input['diskon'];
-		// $ht['ppn'] = $input['ppn'];
-		// $ht['pph'] = $input['pph'];
-		// $ht['ppbkb'] = $input['ppbkb'];
-		// $ht['biaya_kirim'] = $input['biaya_kirim'];
-		// $ht['grand_total'] = $input['grand_total'];
-		// $ht['biaya_lain'] = $input['biaya_lain'];
-		// $ht['pph_nilai'] = $input['pph_nilai'];
-
+		
 
 		// hapus  detail
 		$this->db->where('ttb_hd_id', $id);

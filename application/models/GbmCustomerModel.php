@@ -47,12 +47,8 @@ class GbmCustomerModel extends CI_Model
 	public function create(
 		$arrdata
 	) {
-
-
-		// $acc_akun_id  = (int) $arrdata['acc_akun_id'];
-		// $tipe_pajak  =  $arrdata['tipe_pajak'];
+	
 		$kode_customer  =  $arrdata['kode_customer'];
-		// $tipe_customer  =  $arrdata['tipe_customer'];
 		$nama_customer    =  $arrdata['nama_customer'];
 		$no_ktp    =  $arrdata['no_ktp'];
 		$koordinat    =  $arrdata['koordinat'];
@@ -62,15 +58,13 @@ class GbmCustomerModel extends CI_Model
 		$kabupaten_id    =  $arrdata['kabupaten_id']['id'];
 		$kecamatan_id    =  $arrdata['kecamatan_id']['id'];
 		$kelurahan_id    =  $arrdata['kelurahan_id']['id'];
-		// $contact_person    =  $arrdata['contact_person'];
-		// $no_hp    =  $arrdata['no_hp'];
-		// $tempo_pembayaran =$arrdata['tempo_pembayaran'];
+		$lokasi_id    =  $arrdata['lokasi_id']['id'];
 		$dibuat_oleh    =  $arrdata['dibuat_oleh'];
 		$dibuat_tanggal    =  date('Y-m-d H:i:s');
 
 
 		$data = array(
-		
+			'lokasi_id' => $lokasi_id,
 			'kode_customer'    => $kode_customer,		
 			'nama_customer' => $nama_customer,
 			'alamat' => $alamat,
@@ -83,14 +77,7 @@ class GbmCustomerModel extends CI_Model
 			'koordinat' => $koordinat,
 			'dibuat_oleh' => $dibuat_oleh,
 			'dibuat_tanggal' => $dibuat_tanggal
-			// 'tipe_customer'  =>  $tipe_customer,
-			// 'no_npwp' => $no_npwp,
-			// 'alamat_npwp' => $alamat_npwp,
-			
-			// 'contact_person' => $contact_person,
-			// 'no_hp' => $no_hp,
-			// 'tempo_pembayaran' => $tempo_pembayaran,
-			
+
 		);
 		$this->db->insert('gbm_customer', $data);
 		$id = $this->db->insert_id();
@@ -117,38 +104,32 @@ class GbmCustomerModel extends CI_Model
 		$arrdata
 	) {
 
-		// $acc_akun_id  = (int) $arrdata['acc_akun_id'];
-		// $tipe_pajak  =  $arrdata['tipe_pajak'];
-		// $kelompok_id  = (int) $arrdata['kelompok_id'];
-		$kode_customer  =$arrdata['kode_customer'];
-		// $tipe_customer  =  $arrdata['tipe_customer'];
+		$kode_customer  =  $arrdata['kode_customer'];
 		$nama_customer    =  $arrdata['nama_customer'];
-		// $no_npwp    =  $arrdata['no_npwp'];
-		// $alamat_npwp    =  $arrdata['alamat_npwp'];
-		// $alamat    =  $arrdata['alamat'];
+		$no_ktp    =  $arrdata['no_ktp'];
+		$koordinat    =  $arrdata['koordinat'];
+		$alamat    =  $arrdata['alamat'];
 		$no_telpon    =  $arrdata['no_telpon'];
-		// $contact_person    =  $arrdata['contact_person'];
-		// $no_hp    =  $arrdata['no_hp'];
-		// $tempo_pembayaran =$arrdata['tempo_pembayaran'];
+		$provinsi_id    =  $arrdata['provinsi_id']['id'];
+		$kabupaten_id    =  $arrdata['kabupaten_id']['id'];
+		$kecamatan_id    =  $arrdata['kecamatan_id']['id'];
+		$kelurahan_id    =  $arrdata['kelurahan_id']['id'];
+		$lokasi_id    =  $arrdata['lokasi_id']['id'];
 		$diubah_oleh    =  $arrdata['diubah_oleh'];
 		$diubah_tanggal    =  date('Y-m-d H:i:s');
 
-
-		$data = array(
-		
-			// 'kelompok_id'    => $kelompok_id,
-			// 'acc_akun_id'    => $acc_akun_id,
-			// 'tipe_pajak'  =>  $tipe_pajak,
-			'kode_customer'    => $kode_customer,
-			// 'tipe_customer'  =>  $tipe_customer,
+		$data = array(		
+			'lokasi_id' => $lokasi_id,
+			'kode_customer'    => $kode_customer,		
 			'nama_customer' => $nama_customer,
-			// 'no_npwp' => $no_npwp,
-			// 'alamat_npwp' => $alamat_npwp,
-			// 'alamat' => $alamat,
+			'alamat' => $alamat,
 			'no_telpon' => $no_telpon,
-			// 'contact_person' => $contact_person,
-			// 'no_hp' => $no_hp,
-			// 'tempo_pembayaran' => $tempo_pembayaran,
+			'no_ktp' => $no_ktp,
+			'provinsi_id'    => $provinsi_id,		
+			'kabupaten_id' => $kabupaten_id,
+			'kecamatan_id' => $kecamatan_id,
+			'kelurahan_id' => $kelurahan_id,
+			'koordinat' => $koordinat,
 			'diubah_oleh' => $diubah_oleh,
 			'diubah_tanggal' => $diubah_tanggal
 		);

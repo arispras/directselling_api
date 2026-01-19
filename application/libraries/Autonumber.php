@@ -222,7 +222,7 @@ class Autonumber
 		$kode_menu = "C";
 
 		$CI =   &get_instance();
-		$lastnumber = $CI->db->query("select  max(right(kode_customer,4))as last from gbm_customer
+		$lastnumber = $CI->db->query("select  max(right(kode_customer,6))as last from gbm_customer
 		 ")->row_array();
 		if (!empty($lastnumber['last'])) {
 			// $str = (substr($lastnumber['last'], -6));
@@ -231,7 +231,7 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		$strnumber = sprintf("%04s", $snumber);
+		$strnumber = sprintf("%06s", $snumber);
 		$ret_format_number = $kode_menu . $strnumber;
 		return $ret_format_number;
 	}
