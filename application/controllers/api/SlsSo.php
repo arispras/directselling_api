@@ -505,7 +505,14 @@ class SlsSo extends BD_Controller
 		$id = (int)$segment_3;
 		$so = $this->SlsSoModel->retrieve($id);
 		if (empty($so)) {
-			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
+			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_OK);
+		}
+		if (($so['id'])) {
+			$adaTTb=$this->db->query("SELECT * FROM sls_ttb_ht where dls_so_id=" . $so['id'])->row_array();
+			if (count($adaTTb)>0){
+				$this->set_response(array("status" => "NOT OK", "data" => "Sudah Ada TTB, Tidak Bisa di ubah"), REST_Controller::HTTP_OK);
+			}
+			
 		}
 
 		$res =   $this->SlsSoModel->update($so['id'], $input);
@@ -662,7 +669,17 @@ class SlsSo extends BD_Controller
 		$id = (int)$segment_3;
 		$so = $this->SlsSoModel->retrieve($id);
 		if (empty($so)) {
-			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
+			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_OK);
+		}
+		if (empty($so)) {
+			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_OK);
+		}
+		if (($so['id'])) {
+			$adaTTb=$this->db->query("SELECT * FROM sls_ttb_ht where dls_so_id=" . $so['id'])->row_array();
+			if (count($adaTTb)>0){
+				$this->set_response(array("status" => "NOT OK", "data" => "Sudah Ada TTB, Tidak Bisa di ubah"), REST_Controller::HTTP_OK);
+			}
+			
 		}
 
 		$res =  $this->SlsSoModel->delete($so['id']);

@@ -422,305 +422,10 @@ class ColKuitansi extends BD_Controller
 		elseif ($angka < 1000) return terbilang($angka / 100) . " Ratus" . terbilang($angka % 100);
 		elseif ($angka < 1000000) return terbilang($angka / 1000) . " Ribu" . terbilang($angka % 1000);
 	}
-	function getLaporanCetakKuitansi3_post()
-{
-   
-	
-	$format_laporan = $this->post('format_laporan', true);
-    $tanggal_awal = $this->post('tgl_mulai', true);
-    $tanggal_akhir = $this->post('tgl_akhir', true);
-    $lokasi_id = $this->post('lokasi_id');
-
-    $query = "SELECT * from col_kuitansi_vw 
-              where tanggal_tempo between '" . $tanggal_awal . "' and '" . $tanggal_akhir . "'    
-              and lokasi_id=" . $lokasi_id . " 
-              order by tanggal_tempo, no_kuitansi";
-
-    $kuitansi = $this->db->query($query)->result_array();
-
-    $data = [
-        'no_kuitansi' => 'KWT-2026-001',
-        'terima_dari' => 'PT MAJU JAYA ABADI',
-        'untuk'       => 'Pembayaran Jasa Maintenance',
-        'nilai'       => 1500000,
-        'tanggal'     => date('d-m-Y'),
-        'petugas'     => 'ADMIN'
-    ];
 
 
-    // ================= HTML =================
-    $html = '
-<style>
-@page {
-    size: A4 portrait;
-    margin: 5mm;
-}
 
-body {
-    font-family: "Times New Roman", serif;
-    font-size: 10px;
-    margin: 0;
-    padding: 0;
-    width: 210mm; /* Lebar A4 */
-    height: 297mm; /* Tinggi A4 */
-}
-
-* {
-    box-sizing: border-box;
-}
-
-/* Container menggunakan table untuk kompatibilitas DOMPDF */
-.table-container {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.kuitansi-row {
-    page-break-inside: avoid;
-}
-
-.kuitansi-cell {
-    width: 50%;
-    height: 62mm;
-    padding: 0;
-    vertical-align: top;
-    page-break-inside: avoid;
-}
-
-.kuitansi {
-    border: 1px solid #000;
-    padding: 3mm;
-    height: 100%;
-    position: relative;
-    margin: 0 2mm;
-    page-break-inside: avoid;
-}
-
-.header {
-    text-align: center;
-    font-weight: bold;
-    font-size: 12px;
-    margin-bottom: 2mm;
-    line-height: 1.2;
-}
-
-.isi {
-    line-height: 1.4;
-    margin-bottom: 2mm;
-    min-height: 20mm;
-}
-
-.nominal {
-    font-size: 12px;
-    font-weight: bold;
-    margin: 3mm 0;
-    text-align: center;
-}
-
-.footer {
-    position: absolute;
-    bottom: 3mm;
-    left: 3mm;
-    right: 3mm;
-}
-
-.footer-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
-}
-
-.footer-left {
-    text-align: left;
-    width: 40%;
-}
-
-.footer-right {
-    text-align: right;
-    width: 50%;
-}
-
-/* Clear float untuk baris baru */
-.clearfix::after {
-    content: "";
-    clear: both;
-    display: table;
-}
-
-/* Untuk mencegah page break */
-.no-break {
-    page-break-inside: avoid;
-}
-
-/* Media print */
-@media print {
-    body {
-        margin: 0 !important;
-        padding: 0 !important;
-        width: 210mm !important;
-        height: 297mm !important;
-    }
-    
-    .kuitansi {
-        border: 1px solid #000 !important;
-        page-break-inside: avoid !important;
-    }
-}
-</style>';
-
-    $html .= '<table class="table-container">';
-    
-    // Baris pertama (kuitansi 1 & 2)
-    $html .= '<tr class="kuitansi-row">';
-    
-    for ($i = 1; $i <= 2; $i++) {
-        $html .= '
-        <td class="kuitansi-cell">
-            <div class="kuitansi">
-                <div class="header">KUITANSI</div>
-                
-                <div class="isi">
-                    Sudah terima dari <b>' . $data['terima_dari'] . '</b><br>
-                    Uang sejumlah <b>' . $terbilang . '</b><br>
-                    Untuk pembayaran <b>' . $data['untuk'] . '</b>
-                </div>
-                
-                <div class="nominal">
-                    Rp ' . number_format($data['nilai'], 0, ',', '.') . '
-                </div>
-                
-                <div class="footer">
-                    <div class="footer-content">
-                        <div class="footer-left">
-                            No: KWT-2026-00' . $i . '
-                        </div>
-                        <div class="footer-right">
-                            Jakarta, ' . date('d-m-Y') . '<br><br>
-                            <u>ADMIN</u>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </td>';
-    }
-    
-    $html .= '</tr>';
-    
-    // Baris kedua (kuitansi 3 & 4)
-    $html .= '<tr class="kuitansi-row">';
-    
-    for ($i = 3; $i <= 4; $i++) {
-        $html .= '
-        <td class="kuitansi-cell">
-            <div class="kuitansi">
-                <div class="header">KUITANSI</div>
-                
-                <div class="isi">
-                    Sudah terima dari <b>' . $data['terima_dari'] . '</b><br>
-                    Uang sejumlah <b>' . $terbilang . '</b><br>
-                    Untuk pembayaran <b>' . $data['untuk'] . '</b>
-                </div>
-                
-                <div class="nominal">
-                    Rp ' . number_format($data['nilai'], 0, ',', '.') . '
-                </div>
-                
-                <div class="footer">
-                    <div class="footer-content">
-                        <div class="footer-left">
-                            No: KWT-2026-00' . $i . '
-                        </div>
-                        <div class="footer-right">
-                            Jakarta, ' . date('d-m-Y') . '<br><br>
-                            <u>ADMIN</u>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </td>';
-    }
-    
-    $html .= '</tr>';
-    $html .= '</table>';
-
-    // ================= GENERATE PDF =================
-    $dompdf = new Dompdf();
-    
-    // Atur options DOMPDF
-    $options = $dompdf->getOptions();
-    $options->set(array(
-        'isHtml5ParserEnabled' => true,
-        'isRemoteEnabled' => true,
-        'isPhpEnabled' => true,
-        'defaultPaperSize' => 'A4',
-        'defaultPaperOrientation' => 'portrait',
-        'dpi' => 150,
-        'isFontSubsettingEnabled' => true
-    ));
-    $dompdf->setOptions($options);
-    
-    $dompdf->setPaper('A4', 'portrait');
-    $dompdf->loadHtml($html);
-    
-    try {
-        $dompdf->render();
-        
-        // Output
-        if ($format_laporan == 'view' || $format_laporan == 'pdf') {
-            $dompdf->stream("kuitansi_1_halaman.pdf", array("Attachment" => 0));
-        } else {
-            echo $html;
-        }
-    } catch (Exception $e) {
-        // Fallback: versi sederhana jika masih error
-        // echo $this->generateSimpleKuitansi($data, $terbilang);
-    }
-    
-    exit();
-}
-
-// Fungsi fallback versi sederhana
-private function generateSimpleKuitansi($data, $terbilang)
-{
-    $html = '<style>
-    body { font-family: "Times New Roman"; font-size: 10px; }
-    .kuitansi { 
-        border: 1px solid #000; 
-        padding: 5mm; 
-        margin-bottom: 5mm;
-        width: 90mm;
-        height: 62mm;
-        float: left;
-        margin-right: 5mm;
-    }
-    .header { text-align: center; font-weight: bold; font-size: 12px; }
-    .clear { clear: both; }
-    </style>';
-    
-    for ($i = 1; $i <= 4; $i++) {
-        $html .= '
-        <div class="kuitansi">
-            <div class="header">KUITANSI</div>
-            <div>Sudah terima dari <b>' . $data['terima_dari'] . '</b></div>
-            <div>Uang sejumlah <b>' . $terbilang . '</b></div>
-            <div>Untuk pembayaran <b>' . $data['untuk'] . '</b></div>
-            <div style="text-align: center; font-weight: bold; margin: 5mm 0;">
-                Rp ' . number_format($data['nilai'], 0, ',', '.') . '
-            </div>
-            <div style="display: flex; justify-content: space-between;">
-                <div>No: KWT-2026-00' . $i . '</div>
-                <div>Jakarta, ' . date('d-m-Y') . '<br><u>ADMIN</u></div>
-            </div>
-        </div>';
-        
-        if ($i == 2) {
-            $html .= '<div class="clear"></div>';
-        }
-    }
-    
-    return $html;
-}
-	function getLaporanCetakKuitansi_post()
+	function getLaporanCetakKuitansi_old_post()
 	{
 
 		$format_laporan =  $this->post('format_laporan', true);
@@ -772,7 +477,7 @@ private function generateSimpleKuitansi($data, $terbilang)
 
 
 		// $terbilang = trim(terbilang($data['nilai'])) . " Rupiah";
-    
+
 		// ================= HTML =================
 		$html = '
 		<style>
@@ -836,12 +541,12 @@ private function generateSimpleKuitansi($data, $terbilang)
 		</style>';
 		$counter = 0;
 		foreach ($kuitansi as $key => $k) {
-			
-			for ($i=1; $i <= 2; $i++) { 
+
+			for ($i = 1; $i <= 2; $i++) {
 				$counter++;
-			$terbilag=terbilang($k['nilai_angsuran']);
-			$tgl_tempo=tgl_indo($k['tanggal_tempo']);
-			$html .= "
+				$terbilag = terbilang($k['nilai_angsuran']);
+				$tgl_tempo = tgl_indo($k['tanggal_tempo']);
+				$html .= "
 			<div class='kuitansi'>
 				<div class='header'>KUITANSI</div>
 
@@ -868,17 +573,16 @@ private function generateSimpleKuitansi($data, $terbilang)
 				</div>
 
 			</div>";
-				
 
-					// ===== GARIS POTONG (kecuali terakhir)
-					if ($counter % 4 != 0 || $counter < 4) {
-						$html .= "<div class='cut-line'></div>";
-					}
+
+				// ===== GARIS POTONG (kecuali terakhir)
+				if ($counter % 4 != 0 || $counter < 4) {
+					$html .= "<div class='cut-line'></div>";
+				}
 			}
-				
 		}
 
-		
+
 
 		// exit();
 
@@ -893,12 +597,12 @@ private function generateSimpleKuitansi($data, $terbilang)
 		} else {
 			$filename = 'report_' . time();
 			// ================= GENERATE PDF =================
-		$dompdf = new Dompdf();
-		$dompdf->setPaper('A4', 'portrait');
-		$dompdf->loadHtml($html);
-		$dompdf->render();
-		$dompdf->stream("kuitansi_{$filename}.pdf", ["Attachment" => false]);
-		// exit
+			$dompdf = new Dompdf();
+			$dompdf->setPaper('A4', 'portrait');
+			$dompdf->loadHtml($html);
+			$dompdf->render();
+			$dompdf->stream("kuitansi_{$filename}.pdf", ["Attachment" => false]);
+			// exit
 			// $dompdf = new DOMPDF;
 			// $dompdf->loadHtml($html);
 			// $dompdf->setPaper('A4', 'portrait');
@@ -927,6 +631,437 @@ private function generateSimpleKuitansi($data, $terbilang)
 			// );
 			// $dompdf->stream($filename . ".pdf", array("Attachment" => 0));
 		}
+	}
+	function getLaporanCetakKuitansi_post()
+	{
+
+		$format_laporan =  $this->post('format_laporan', true);
+
+		// $id = (int)$segment_3;
+		$data = [];
+
+		$input = [
+			// 'lokasi_id' => 252,
+			'periode' => '2022-08',
+			// 'tgl_mulai' => '2022-09-01',
+			// 'tgl_akhir' => '2022-09-01',
+			'format_laporan' => 'view',
+		];
+
+
+		$tanggal_awal = $this->post('tgl_mulai', true);
+		$tanggal_akhir = $this->post('tgl_akhir', true);
+
+		$lokasi_id = $this->post('lokasi_id');
+
+		$query = " SELECT *
+		from col_kuitansi_vw where tanggal_tempo between  '" . $tanggal_awal . "' and  '" . $tanggal_akhir . "'	
+		and lokasi_id=" . $lokasi_id .	" order by tanggal_tempo,no_kuitansi";
+		// 	
+
+		$data_kuitansi = $this->db->query($query)->result_array();
+
+		// Data banyak kuitansi (contoh 20 data)
+		// $data_kuitansi = [];
+		// for ($i = 1; $i <= 20; $i++) {
+		// 	$nilai = rand(1000000, 10000000);
+		// 	$data_kuitansi[] = [
+		// 		'no' => $i,
+		// 		'no_kuitansi' => 'KUI-' . date('Ymd') . '-' . str_pad($i, 4, '0', STR_PAD_LEFT),
+		// 		'tanggal' => date('d/m/Y'),
+		// 		'customer' => 'PT. CUSTOMER CONTOH ' . $i,
+		// 		'nilai' => $nilai,
+		// 		'terbilang' => terbilang($nilai)
+		// 	];
+		// }
+
+		$html = '<!DOCTYPE html>
+			<html>
+			<head>
+			<meta charset="UTF-8">
+			<style>
+				/* OPTIMIZED FOR DOT MATRIX PRINTER */
+				/* SIMPLE LAYOUT, MONOSPACE FONT, NO SHADOWS, NO GRADIENTS */
+				
+				* {
+					margin: 0;
+					padding: 0;
+					box-sizing: border-box;
+				}
+				
+				/* DRAFT QUALITY FOR FASTER PRINTING */
+				body {
+					width: 297mm;
+					height: 210mm;
+					margin: 5mm; /* MINIMAL MARGIN FOR DOT MATRIX */
+					padding: 0;
+					font-family: "Courier New", monospace; /* MONOSPACE FOR DOT MATRIX */
+					font-size: 11pt; /* STANDARD DOT MATRIX SIZE */
+					line-height: 1.1; /* TIGHT LINE HEIGHT */
+					background: white;
+				}
+				
+				/* HALAMAN DENGAN SIMPLE LAYOUT */
+				.halaman {
+					width: 287mm; /* 297mm - 10mm margin */
+					height: 200mm; /* 210mm - 10mm margin */
+					position: relative;
+					page-break-after: always;
+				}
+				
+				/* KOLOM KIRI - SIMPLE POSITIONING */
+				.kolom-kiri {
+					position: absolute;
+					left: 0;
+					top: 0;
+					width: 141mm; /* (287mm - 5mm gap) / 2 */
+					height: 200mm;
+					padding: 3mm;
+				}
+				
+				/* KOLOM KANAN - SIMPLE POSITIONING */
+				.kolom-kanan {
+					position: absolute;
+					right: 0;
+					top: 0;
+					width: 141mm; /* SAME AS LEFT */
+					height: 200mm;
+					padding: 3mm;
+				}
+				
+				/* GARIS PEMISAH ANTAR KOLOM (DASHED FOR DOT MATRIX) */
+				.garis-pemisah {
+					position: absolute;
+					top: 5mm;
+					bottom: 46mm;
+					left: 47%;
+					width: 0;
+					border-left: 1px dotted #000;
+				}
+				
+				/* KUITANSI - SIMPLE BORDER */
+				.kuitansi {
+					width: 80%;
+					height: 80%;
+					border: 1px solid #000; 
+					padding: 5mm;
+					position: relative;
+					background: white;
+				}
+				
+				/* HEADER - SIMPLE CENTERED */
+				.header {
+					text-align: center;
+					border-bottom: 1px solid #000; /* SINGLE LINE */
+					padding-bottom: 2mm;
+					margin-bottom: 3mm;
+				}
+				
+				.nama-perusahaan {
+					font-weight: bold;
+					font-size: 12pt;
+					margin-bottom: 1mm;
+					text-transform: uppercase;
+				}
+				
+				.alamat-perusahaan {
+					font-size: 9pt;
+					line-height: 1;
+				}
+				
+				/* JUDUL - SIMPLE */
+				.judul-kuitansi {
+					text-align: center;
+					font-weight: bold;
+					font-size: 14pt;
+					margin: 4mm 0 5mm 0;
+					text-decoration: none; /* NO UNDERLINE FOR DOT MATRIX */
+				}
+				
+				/* DETAIL - SIMPLE TABLE */
+				.detail-table {
+					width: 100%;
+					border-collapse: collapse;
+					margin-bottom: 4mm;
+					font-size: 10pt;
+				}
+				
+				.detail-table td {
+					padding: 1mm 0;
+					vertical-align: top;
+				}
+				
+				.label {
+					width: 35mm;
+					font-weight: bold;
+					white-space: nowrap;
+				}
+				
+				/* NILAI - SIMPLE BOX */
+				.nilai-section {
+					text-align: center;
+					margin: 5mm 0;
+					padding: 3mm;
+					border: 1px solid #000; /* SIMPLE BORDER */
+					background: white; /* NO BACKGROUND FOR DOT MATRIX */
+				}
+				
+				.nilai-label {
+					font-size: 10pt;
+					margin-bottom: 1mm;
+				}
+				
+				.nilai-uang {
+					font-weight: bold;
+					font-size: 16pt;
+					margin: 2mm 0;
+					color: #000;
+				}
+				
+				.terbilang {
+					font-size: 9pt;
+					font-style: normal; /* NO ITALIC FOR DOT MATRIX */
+					margin-top: 1mm;
+				}
+				
+				/* TANDA TANGAN - SIMPLE */
+				.tanda-tangan {
+					position: absolute;
+					bottom: 50mm;
+					left: 5mm;
+					right: 5mm;
+				}
+				
+				.ttd-table {
+					width: 100%;
+					border-collapse: collapse;
+					font-size: 9pt;
+				}
+				
+				.ttd-table td {
+					text-align: center;
+					width: 33.33%;
+					vertical-align: top;
+				}
+				
+				.garis-ttd {
+					margin-top: 20mm;
+					padding-top: 0;
+					border-top: 1px solid #000;
+					font-weight: bold;
+					font-size: 10pt;
+				}
+				
+				/* NOMOR URUT - SIMPLE */
+				.nomor-urut {
+					position: absolute;
+					top: 1mm;
+					right: 5mm;
+					font-size: 9pt;
+					color: #000; /* BLACK FOR DOT MATRIX */
+					font-weight: bold;
+				}
+				
+				/* LINES FOR DOT MATRIX - DASHED/DOTTED */
+				.dashed-line {
+					border-top: 1px dashed #000;
+					margin: 2mm 0;
+				}
+				
+				.dotted-line {
+					border-top: 1px dotted #000;
+					margin: 2mm 0;
+				}
+				
+				/* CHARACTER MODE STYLING (LIKE OLD DOT MATRIX) */
+				.char-mode {
+					letter-spacing: 0;
+					word-spacing: 0;
+				}
+				
+				/* CONDENSED TEXT FOR DOT MATRIX */
+				.condensed {
+					font-family: "Courier New", monospace;
+					letter-spacing: -0.5px;
+				}
+				
+				/* PAGE INFO */
+				.page-info {
+					position: absolute;
+					bottom: 1mm;
+					left: 0;
+					right: 0;
+					text-align: center;
+					font-size: 8pt;
+					color: #000;
+				}
+				.page-info-cetak {
+					
+					left: 0;
+					right: 0;
+					text-align: center;
+					font-size: 8pt;
+					color: #000;
+				}
+			</style>
+			</head>
+			<body class="char-mode">';
+
+		// **PROSES BANYAK DATA: 2 KUITANSI PER HALAMAN**
+		$total_data = count($data_kuitansi);
+		$per_halaman = 2;
+
+		for ($halaman = 0; $halaman < ceil($total_data / $per_halaman); $halaman++) {	
+			if ($halaman > 0) {
+				$html .= '<div style="page-break-before: always;"></div>';
+			}
+
+			$html .= '<div class="halaman">';
+			$html .= '<div class="garis-pemisah"></div>';
+
+			// KOLOM KIRI
+			$idx_kiri = $halaman * 2;
+			if (isset($data_kuitansi[$idx_kiri])) {
+				$html .= '<div class="kolom-kiri condensed">';
+				$html .= $this->generateKuitansiDotMatrix($data_kuitansi[$idx_kiri],$idx_kiri);
+				$html .= '</div>';
+			}
+
+			// KOLOM KANAN
+			$idx_kanan = $idx_kiri + 1;
+			if (isset($data_kuitansi[$idx_kanan])) {
+				$html .= '<div class="kolom-kanan condensed">';
+				$html .=  $this->generateKuitansiDotMatrix($data_kuitansi[$idx_kanan],$idx_kanan);
+				$html .= '</div>';
+			}
+
+			// PAGE INFO
+			$html .= '<div class="page-info">Hal: ' . ($halaman + 1) . '/' . ceil($total_data / $per_halaman) . ' | ' . date('d/m/Y H:i') . '</div>';
+
+			$html .= '</div>'; // .halaman
+		}
+
+		$html .= '</body></html>';
+
+
+
+
+
+		$dompdf = new Dompdf();
+
+		// **PENTING: Gunakan font Courier untuk dot matrix**
+		$dompdf->set_option('defaultFont', 'Courier');
+
+		// **PENTING: Set DPI rendah untuk dot matrix (cepat print)**
+		$dompdf->set_option('dpi', 72);
+
+		// **PENTING: Disable font subsetting untuk monospace**
+		$dompdf->set_option('isFontSubsettingEnabled', false);
+
+		// **PENTING: Enable HTML5 parser**
+		$dompdf->set_option('isHtml5ParserEnabled', true);
+
+		// **PENTING: Disable remote untuk kecepatan**
+		$dompdf->set_option('isRemoteEnabled', false);
+
+		// **PENTING: Margin minimal untuk dot matrix**
+		$dompdf->set_option('margin_top', 5);
+		$dompdf->set_option('margin_right', 5);
+		$dompdf->set_option('margin_bottom', 5);
+		$dompdf->set_option('margin_left', 5);
+
+		// Set paper A4 Landscape
+		$dompdf->setPaper('A4', 'landscape');
+
+		// Load HTML
+		$dompdf->loadHtml($html);
+
+		// **PENTING: Render dengan quality rendah untuk kecepatan**
+		$dompdf->render();
+
+		// Output
+		$filename = 'kuitansi-dotmatrix-' . date('Ymd-His') . '.pdf';
+		$dompdf->stream($filename, ['Attachment' => false]);
+	}
+
+		function generateKuitansiDotMatrix($data,$idx)
+		{
+		$rupiah = 'Rp ' . number_format($data['nilai_angsuran'], 0, ',', '.');
+
+		return '
+    <div class="kuitansi">
+        <div class="nomor-urut">#' . str_pad(($idx+1), 3, '0', STR_PAD_LEFT) .  '</div>
+        
+        <div class="header">
+            <div class="nama-perusahaan">PT. SAHABAT</div>
+            <div class="alamat-perusahaan">Jl. Kedung badak. 123, BOGOR</div>
+            <div class="alamat-perusahaan">Telp: (021) 1234-5678</div>
+            <div class="dashed-line"></div>
+        </div>
+        
+        <div class="judul-kuitansi">KUITANSI</div>
+        
+        <table class="detail-table">
+            <tr>
+                <td class="label">No. Kuitansi</td>
+                <td>: ' . $data['no_kuitansi'] . '</td>
+            </tr>
+            <tr>
+                <td class="label">Tanggal</td>
+                <td>: ' . tgl_indo($data['tanggal_tempo']) . '</td>
+            </tr>
+			 <tr>
+                <td class="label">Angsuran Ke</td>
+                <td>: ' . $data['angsuran_ke'] . '/' . $data['tenor'] . '</td>
+            </tr>
+            <tr>
+                <td class="label">Customer</td>
+                <td>: ' . $data['nama_customer'] . '</td>
+            </tr>
+            <tr>
+                <td class="label">Alamat</td>
+                <td>: ' . $data['alamat'] . ' kelurahan: '. $data['kelurahan'] . ' '. $data['kecamatan'] . ' '. $data['kabupaten'] . '</td>
+            </tr>
+        </table>
+        
+        <div class="dotted-line"></div>
+        
+        <div class="nilai-section">
+            <div class="nilai-label">Telah diterima uang sejumlah:</div>
+            <div class="nilai-uang">' . $rupiah  . '</div>
+            <div class="terbilang">' . terbilang($data['nilai_angsuran']) . ' Rupiah</div>
+        </div>
+        
+        <div class="dotted-line"></div>
+        
+        <div class="tanda-tangan">
+            <table class="ttd-table">
+                <tr>
+                    <td>ADMIN</td>
+                    <td>COLLECTOR</td>
+                    <td>CUSTOMER</td>
+                </tr>
+				<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+				<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+				<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+				<tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
+                <tr>
+
+                    <td><div class="">(__________)</div></td>
+                    <td><div class="">(__________)</div></td>
+                    <td><div class="">(__________)</div></td>
+                </tr>
+            </table>
+			<p>&nbsp;</p>
+			<p>&nbsp;</p>
+			<div class="page-info-cetak">Dicetak pada: ' .  date('d/m/Y H:i') .  '</div>
+			
+		</div>
+		
+		
+			
+      
+    </div>';
 	}
 	function getLaporanRekapKuitansi_post()
 	{
