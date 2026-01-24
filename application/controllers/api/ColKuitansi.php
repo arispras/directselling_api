@@ -58,12 +58,12 @@ class ColKuitansi extends BD_Controller
 		$where  = null;
 
 		$isWhere = " 1=1 ";
-		if (($param['tampil_angsuran_1'] != true) ) {
+		if (($param['tampil_angsuran_1'] != true)) {
 			$isWhere = $isWhere .  "  and a.angsuran_ke>1 ";
 		}
 
 		if ($param['tgl_mulai'] && $param['tgl_mulai']) {
-			$isWhere = $isWhere ." and  (a.tanggal_tempo between '" . $param['tgl_mulai'] . "' and '" . $param['tgl_akhir'] . "')";
+			$isWhere = $isWhere . " and  (a.tanggal_tempo between '" . $param['tgl_mulai'] . "' and '" . $param['tgl_akhir'] . "')";
 		}
 		if (!empty($param['customer_id'])) {
 			$isWhere = $isWhere .  "  and a.customer_id=" . $param['customer_id'] . "";
@@ -657,12 +657,29 @@ class ColKuitansi extends BD_Controller
 		$tanggal_akhir = $this->post('tgl_akhir', true);
 
 		$lokasi_id = $this->post('lokasi_id');
+		$customer_id = $this->post('customer_id');
+		$mulai_angsuran_ke = $this->post('mulai_angsuran_ke');
+		$sd_angsuran_ke = $this->post('sd_angsuran_ke');
+
+
 
 		$query = " SELECT *
 		from col_kuitansi_vw where tanggal_tempo between  '" . $tanggal_awal . "' and  '" . $tanggal_akhir . "'	
-		and lokasi_id=" . $lokasi_id .	" order by tanggal_tempo,no_kuitansi";
-		// 	
+		and lokasi_id=" . $lokasi_id .	"";
 
+		if ($mulai_angsuran_ke) {
+			$query = $query . " and angsuran_ke >= " . $mulai_angsuran_ke . " ";
+		}
+		if ($sd_angsuran_ke) {
+			$query = $query . " and angsuran_ke <= " . $sd_angsuran_ke . " ";
+		}
+
+		if ($customer_id) {
+			$query = $query . " and customer_id=" . $customer_id . " ";
+		}
+
+		// 	
+		$query = $query . " order by customer_id,tanggal_tempo,no_kuitansi";
 		$data_kuitansi = $this->db->query($query)->result_array();
 
 		// Data banyak kuitansi (contoh 20 data)
@@ -915,7 +932,7 @@ class ColKuitansi extends BD_Controller
 		$total_data = count($data_kuitansi);
 		$per_halaman = 2;
 
-		for ($halaman = 0; $halaman < ceil($total_data / $per_halaman); $halaman++) {	
+		for ($halaman = 0; $halaman < ceil($total_data / $per_halaman); $halaman++) {
 			if ($halaman > 0) {
 				$html .= '<div style="page-break-before: always;"></div>';
 			}
@@ -927,7 +944,7 @@ class ColKuitansi extends BD_Controller
 			$idx_kiri = $halaman * 2;
 			if (isset($data_kuitansi[$idx_kiri])) {
 				$html .= '<div class="kolom-kiri condensed">';
-				$html .= $this->generateKuitansiDotMatrix($data_kuitansi[$idx_kiri],$idx_kiri);
+				$html .= $this->generateKuitansiDotMatrix($data_kuitansi[$idx_kiri], $idx_kiri);
 				$html .= '</div>';
 			}
 
@@ -935,7 +952,7 @@ class ColKuitansi extends BD_Controller
 			$idx_kanan = $idx_kiri + 1;
 			if (isset($data_kuitansi[$idx_kanan])) {
 				$html .= '<div class="kolom-kanan condensed">';
-				$html .=  $this->generateKuitansiDotMatrix($data_kuitansi[$idx_kanan],$idx_kanan);
+				$html .=  $this->generateKuitansiDotMatrix($data_kuitansi[$idx_kanan], $idx_kanan);
 				$html .= '</div>';
 			}
 
@@ -988,13 +1005,13 @@ class ColKuitansi extends BD_Controller
 		$dompdf->stream($filename, ['Attachment' => false]);
 	}
 
-		function generateKuitansiDotMatrix($data,$idx)
-		{
+	function generateKuitansiDotMatrix($data, $idx)
+	{
 		$rupiah = 'Rp ' . number_format($data['nilai_angsuran'], 0, ',', '.');
 
 		return '
     <div class="kuitansi">
-        <div class="nomor-urut">#' . str_pad(($idx+1), 3, '0', STR_PAD_LEFT) .  '</div>
+        <div class="nomor-urut">#' . str_pad(($idx + 1), 3, '0', STR_PAD_LEFT) .  '</div>
         
         <div class="header">
             <div class="nama-perusahaan">PT. SAHABAT</div>
@@ -1024,7 +1041,7 @@ class ColKuitansi extends BD_Controller
             </tr>
             <tr>
                 <td class="label">Alamat</td>
-                <td>: ' . $data['alamat'] . ' kelurahan: '. $data['kelurahan'] . ' '. $data['kecamatan'] . ' '. $data['kabupaten'] . '</td>
+                <td>: ' . $data['alamat'] . ' kelurahan: ' . $data['kelurahan'] . ' ' . $data['kecamatan'] . ' ' . $data['kabupaten'] . '</td>
             </tr>
         </table>
         
@@ -1088,13 +1105,34 @@ class ColKuitansi extends BD_Controller
 		$tanggal_akhir = $this->post('tgl_akhir', true);
 
 		$lokasi_id = $this->post('lokasi_id');
-
+		$customer_id = $this->post('customer_id');
+		$mulai_angsuran_ke = $this->post('mulai_angsuran_ke');
+		$sd_angsuran_ke = $this->post('sd_angsuran_ke');
 		$query = " SELECT *
 		from col_kuitansi_vw where tanggal_tempo between  '" . $tanggal_awal . "' and  '" . $tanggal_akhir . "'	
-		and lokasi_id=" . $lokasi_id .	" order by tanggal_tempo,no_kuitansi";
-		// 	
+		and lokasi_id=" . $lokasi_id .	"";
 
+		if ($mulai_angsuran_ke) {
+			$query = $query . " and angsuran_ke >= " . $mulai_angsuran_ke . " ";
+		}
+		if ($sd_angsuran_ke) {
+			$query = $query . " and angsuran_ke <= " . $sd_angsuran_ke . " ";
+		}
+
+		if ($customer_id) {
+			$query = $query . " and customer_id=" . $customer_id . " ";
+		}
+
+		// 	
+		$query = $query . " order by customer_id,tanggal_tempo,no_kuitansi";
 		$kuitansi = $this->db->query($query)->result_array();
+
+		// $query = " SELECT *
+		// from col_kuitansi_vw where tanggal_tempo between  '" . $tanggal_awal . "' and  '" . $tanggal_akhir . "'	
+		// and lokasi_id=" . $lokasi_id .	" order by tanggal_tempo,no_kuitansi";
+		// // 	
+
+		// $kuitansi = $this->db->query($query)->result_array();
 
 
 		// var_dump($kuitansi);exit();

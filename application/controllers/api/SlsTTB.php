@@ -53,7 +53,7 @@ class SlsTTB extends BD_Controller
 		left join karyawan f on a.sales_id=f.id
 		left join karyawan g on a.demo_booker_id=g.id
 		left join karyawan h on a.sales_supervisor_id=h.id";
-		$search = array('no_ttb', 'a.tanggal', 'a.catatan', 'c.nama_customer','d.no_so');
+		$search = array('no_ttb', 'a.tanggal', 'a.catatan', 'c.nama_customer', 'd.no_so');
 		$where  = null;
 
 		$isWhere = " 1=1 ";
@@ -783,20 +783,20 @@ class SlsTTB extends BD_Controller
 		$collector_id = $ttb['collector_id'];
 		$customer_id = $ttb['customer_id'];
 		$nilai_angsuran = $ttb['total_nilai_angsuran'];
-		$tgl_tempo=$ttb['tanggal'];
-		$jenis=$ttb['jenis'];
-		$date = new DateTime($tgl_tempo); 
+		$tgl_tempo = $ttb['tanggal'];
+		$jenis = $ttb['jenis'];
+		$date = new DateTime($tgl_tempo);
 		$this->db->where('ttb_id', $id);
 		$this->db->delete('col_kuitansi_ht');
-		for ($i = 1; $i < ($tenor+1); $i++) {
-					
-			$tanggal_tempo =$date->format('Y-m-d');
-			$angsuran_ke = $i ;
-			$no_kuitansi=$no_ttb.".".sprintf("%02s", $angsuran_ke);		
-			if ($angsuran_ke==1){
-				$nilai_angsuran=$ttb['total_dp'];
-			}else{
-				$nilai_angsuran=$ttb['total_nilai_angsuran'];
+		for ($i = 1; $i < ($tenor + 1); $i++) {
+
+			$tanggal_tempo = $date->format('Y-m-d');
+			$angsuran_ke = $i;
+			$no_kuitansi = $no_ttb . "." . sprintf("%02s", $angsuran_ke);
+			if ($angsuran_ke == 1) {
+				$nilai_angsuran = $ttb['total_dp'];
+			} else {
+				$nilai_angsuran = $ttb['total_nilai_angsuran'];
 			}
 
 			$this->db->insert("col_kuitansi_ht", array(
@@ -809,20 +809,18 @@ class SlsTTB extends BD_Controller
 				'collector_id' => $collector_id,
 				'customer_id' => $customer_id,
 				'tanggal_tempo' => $tanggal_tempo,
-				'keterangan' => 'Cicilan TTB No. ' . $no_ttb. ' Angsuran Ke-'.$angsuran_ke,
+				'keterangan' => 'Cicilan TTB No. ' . $no_ttb . ' Angsuran Ke-' . $angsuran_ke,
 				'dibuat_oleh' => $this->user_id,
 				'dibuat_tanggal' => date('Y-m-d H:i:s')
 
 
 			));
-			if ($jenis=='M'){ // MINGGUAN
+			if ($jenis == 'M') { // MINGGUAN
 				$date->modify('+7 days');
-			}else if ($jenis=='M'){ // BULANAN
+			} else if ($jenis == 'M') { // BULANAN
 				$date->modify('+1 month');
-
-			}else{
+			} else {
 				$date->modify('+7 days');
-
 			}
 		}
 
@@ -1266,92 +1264,42 @@ class SlsTTB extends BD_Controller
 		// echo $html;
 	}
 
-	function laporan_Detail_So_post()
+	function laporan_Detail_post()
 	{
-		/* A.02 Sales ORDER (DETAIL) */
+
 		$format_laporan =  $this->post('format_laporan', true);
 
-		// $id = (int)$segment_3;
+
 		$data = [];
 
-		$input = [
-			// 'lokasi_id' => 252,
-			'periode' => '2022-08',
-			// 'tgl_mulai' => '2022-09-01',
-			// 'tgl_akhir' => '2022-09-01',
-			'format_laporan' => 'view',
-		];
+		$input = $this->post();
 
-		// var_dump($this->post());
-		// exit();
-		// $lokasi_id = $this->post('lokasi_id', true);
-		$periode =  $this->post('periode', true);
-		// $tanggal_awal = $this->post('tgl_mulai', true);
-		// $tanggal_akhir = $this->post('tgl_akhir', true);
+		$lokasi_id = $input['lokasi_id'];
+		$tgl_mulai = $input['tgl_mulai'];
+		$tgl_akhir = $input['tgl_akhir'];
+		$format_laporan = $input['format_laporan'];
 
-		// $lokasi_id = $input['lokasi_id'];
-		// $periode = $input['periode'];
-		// $tanggal_awal = $input['tgl_mulai'];
-		// $tanggal_akhir = $input['tgl_akhir'];
-		// $format_laporan = $input['format_laporan'];
-
-		$date = new DateTime($periode . '-01');
-		$date->modify('last day of this month');
-		$last_day_this_month = $date->format('Y-m-d');
-		(int)$jumhari = date('d', strtotime($last_day_this_month));
-		$tgl_mulai = $periode . '-01';
-		$tgl_akhir = $periode . '-' . sprintf("%02d", $jumhari);
-
-		$queryhead = "SELECT 
-		c.no_ttb AS no_ttb, 
-		c.id as id FROM sls_so_dt a
-		INNER JOIN sls_ttb_ht c ON a.so_hd_id=c.id
-		INNER JOIN gbm_customer b ON c.customer_id=b.id
-		where c.tanggal between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
-		and c.status='RELEASE'
-		GROUP BY c.id,c.no_ttb 
-		";
-
-		$ressult = array();
-
-		$dataBkm = $this->db->query($queryhead)->result_array();
-
-		foreach ($dataBkm as $key => $hd) {
-			$querydetail = "SELECT a.*,
-			b.no_ttb as no_ttb,
-			b.id AS id_so,
-			d.no_pp as no_pp,
-			b.tanggal as tanggal,
-			e.nama_customer as nama_customer,
-			f.kode as kode_item,
-			f.nama as nama_item,
-			g.nama AS gudang,
-			b.id as id,
-			b.status
-			FROM sls_so_dt a
-			INNER JOIN sls_ttb_ht b ON a.so_hd_id=b.id
-			LEFT JOIN prc_pp_dt c ON a.pp_dt_id=c.id
-			LEFT JOIN prc_pp_ht d ON c.pp_hd_id=d.id
-			LEFT JOIN gbm_customer e ON b.customer_id=e.id
-			LEFT JOIN inv_item f ON a.item_id=f.id
-			LEFT JOIN gbm_organisasi g ON b.lokasi_id=g.id 
-			WHERE b.tanggal between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'
-			AND b.no_ttb='" . $hd['no_ttb'] . "'
-			";
-			$dataDtl = $this->db->query($querydetail)->result_array();
-			// var_dump($dataDtl)	;exit;
-			$hd['detail'] = $dataDtl;
-			$result[] = $hd;
+		$lokasi = $this->db->query("select * from gbm_organisasi where id=" . $lokasi_id)->row_array();
+		if ($lokasi) {
+			$filter_lokasi = $lokasi['nama'];
+			$lokasi_id = "= " . $lokasi_id;
+		} else {
+			$filter_lokasi = "Semua Lokasi";
 		}
 
-		$data['so'] = 	$result;
+		$query = "select * from sls_ttb_detail_vw where tanggal between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
+		and lokasi_id  " . $lokasi_id . "";
+		$dataDtl = $this->db->query($query)->result_array();
 
-		// $data['filter_lokasi'] = 	$filter_lokasi;
+
+		$data['data'] = 	$dataDtl;
+
+		$data['filter_lokasi'] = 	$filter_lokasi;
 		$data['filter_tgl_awal'] = 	$tgl_mulai;
 		$data['filter_tgl_akhir'] = $tgl_akhir;
 		$data['format_laporan'] = $format_laporan;
 
-		$html = $this->load->view('Sls_So_Laporan_Detail', $data, true);
+		$html = $this->load->view('Sls_TTB_Laporan_Detail', $data, true);
 
 		// $filename = 'report_' . time();
 		// $this->pdfgenerator->generate($html, $filename, true, 'A4', 'landscape');
@@ -1392,7 +1340,88 @@ class SlsTTB extends BD_Controller
 			$dompdf->stream($filename . ".pdf", array("Attachment" => 0));
 		}
 	}
+	function laporan_Rekap_post()
+	{
 
+		$format_laporan =  $this->post('format_laporan', true);
+
+
+		$data = [];
+
+		$input = $this->post();
+
+		$lokasi_id = $input['lokasi_id'];
+		$tgl_mulai = $input['tgl_mulai'];
+		$tgl_akhir = $input['tgl_akhir'];
+		$format_laporan = $input['format_laporan'];
+
+		$lokasi = $this->db->query("select * from gbm_organisasi where id=" . $lokasi_id)->row_array();
+		if ($lokasi) {
+			$filter_lokasi = $lokasi['nama'];
+			$lokasi_id = "= " . $lokasi_id;
+		} else {
+			$filter_lokasi = "Semua Lokasi";
+		}
+
+		$query = "SELECT lokasi_id,lokasi,tanggal,SUM(qty)AS qty,SUM(diskon)AS diskon,SUM(dp)AS dp,
+			SUM(total)AS total,SUM(nilai_piutang)as nilai_piutang,SUM(nilai_angsuran)AS nilai_angsuran
+			FROM sls_ttb_detail_vw
+			where tanggal between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
+			and lokasi_id  " . $lokasi_id . "
+			GROUP BY lokasi_id,lokasi,tanggal
+			ORDER BY tanggal 
+		";
+		$dataDtl = $this->db->query($query)->result_array();
+
+
+		$data['data'] = 	$dataDtl;
+
+		$data['filter_lokasi'] = 	$filter_lokasi;
+		$data['filter_tgl_awal'] = 	$tgl_mulai;
+		$data['filter_tgl_akhir'] = $tgl_akhir;
+		$data['format_laporan'] = $format_laporan;
+
+		$html = $this->load->view('Sls_TTB_Laporan_Rekap', $data, true);
+
+		// $filename = 'report_' . time();
+		// $this->pdfgenerator->generate($html, $filename, true, 'A4', 'landscape');
+		// echo $html;
+		if ($format_laporan == 'xls') {
+			echo $html;
+		} else if ($format_laporan == 'view') {
+			echo $html;
+		} else {
+			$filename = 'report_' . time();
+			// $this->pdfgenerator->generate($html, $filename, true, 'A4', 'landscape');
+			$dompdf = new DOMPDF;
+			$dompdf->loadHtml($html);
+			$dompdf->setPaper('A4', 'landscape');
+			$dompdf->render();
+			$filename = 'report_' . time();
+			$x          = 400;
+			$y          = 570;
+			$text       = "{PAGE_NUM} of {PAGE_COUNT}";
+			$font       = null; // $dompdf->getFontMetrics()->get_font('Helvetica', 'normal');
+			$size       = 10;
+			$color      = array(0, 0, 0);
+			$word_space = 0.0;
+			$char_space = 0.0;
+			$angle      = 0.0;
+
+			$dompdf->getCanvas()->page_text(
+				$x,
+				$y,
+				$text,
+				$font,
+				$size,
+				$color,
+				$word_space,
+				$char_space,
+				$angle
+			);
+			$dompdf->stream($filename . ".pdf", array("Attachment" => 0));
+		}
+	}
 	function laporanso_by_vendor_post()
 	{
 
