@@ -45,10 +45,14 @@ class SlsTTB extends BD_Controller
 		$post = $this->post();
 		$param = $post['parameter'];
 
-		$query  = "SELECT a.*,d.no_so, b.nama AS lokasi,c.nama_customer as nama_customer from sls_ttb_ht a 
+		$query  = "SELECT a.*,d.no_so, b.nama AS lokasi,c.nama_customer as nama_customer,
+		 f.nama as sales, g.nama as demo_booker, h.nama as sales_supervisor from sls_ttb_ht a 
 		left join gbm_organisasi b on a.lokasi_id=b.id
 		left join gbm_customer c on a.customer_id=c.id
-		left join sls_so_ht d on a.sls_so_id=d.id";
+		left join sls_so_ht d on a.sls_so_id=d.id
+		left join karyawan f on a.sales_id=f.id
+		left join karyawan g on a.demo_booker_id=g.id
+		left join karyawan h on a.sales_supervisor_id=h.id";
 		$search = array('no_ttb', 'a.tanggal', 'a.catatan', 'c.nama_customer','d.no_so');
 		$where  = null;
 
@@ -1222,8 +1226,8 @@ class SlsTTB extends BD_Controller
 		$id = (int)$segment_3;
 		$data = [];
 
-		$queryHeader = "SELECT a.*,b.nama as lokasi, i.nama AS surveyor,
-		h.nama AS sales,so.no_so,so.tanggal AS tanggal_so,
+		$queryHeader = "SELECT a.*,b.nama as lokasi,i.nama AS surveyor,
+		h.nama AS sales, j.nama as sales_supervisor, k.nama as demo_booker,so.no_so,so.tanggal AS tanggal_so,
 		c.kode_customer,c.nama_customer,c.alamat,c.no_telpon,c.no_ktp,d.nama AS provinsi,
 		e.nama AS kabupaten,f.nama as kecamatan,g.nama AS kelurahan
 		from  	sls_ttb_ht a 
@@ -1235,7 +1239,9 @@ class SlsTTB extends BD_Controller
 		LEFT JOIN gbm_kecamatan f ON c.provinsi_id=f.id
 		LEFT JOIN gbm_kelurahan g ON c.kelurahan_id=g.id
 		LEFT JOIN karyawan h ON a.sales_id=h.id
-		LEFT JOIN karyawan i ON a.surveyor_id=i.id	
+		LEFT JOIN karyawan i ON a.surveyor_id=i.id
+		LEFT JOIN karyawan j ON a.sales_supervisor_id=j.id
+		LEFT JOIN karyawan k ON a.demo_booker_id=k.id
 		WHERE a.id=" . $id . "";
 
 		$dataHeader = $this->db->query($queryHeader)->row_array();

@@ -50,9 +50,15 @@ class SlsSo extends BD_Controller
 		$post = $this->post();
 		$param = $post['parameter'];
 
-		$query  = "SELECT a.*, b.nama AS lokasi,c.nama_customer as nama_customer from sls_so_ht a 
+		$query  = "SELECT a.*, b.nama AS lokasi,c.nama_customer as nama_customer, d.nama as sales,
+		 e.nama as demo_booker, f.nama as sales_supervisor from sls_so_ht a 
 		left join gbm_organisasi b on a.lokasi_id=b.id
-		left join gbm_customer c on a.customer_id=c.id";
+		left join gbm_customer c on a.customer_id=c.id
+		left join karyawan d on a.sales_id=d.id
+		left join karyawan e on a.demo_booker_id=e.id
+		left join karyawan f on a.sales_supervisor_id=f.id
+		
+		";
 		$search = array('no_so', 'a.tanggal', 'a.catatan', 'c.nama_customer');
 		$where  = null;
 
@@ -119,7 +125,7 @@ class SlsSo extends BD_Controller
 				$queryDetail = "SELECT *  from sls_so_dt
 				where so_hd_id=" . $so['id'] . "";
 				$detail = $this->db->query($queryDetail)->result_array();
-				$data['data'][$i]['detail'] =$detail;
+				$data['data'][$i]['detail'] = $detail;
 			}
 		}
 
@@ -137,7 +143,7 @@ class SlsSo extends BD_Controller
 		$where  = null;
 
 
-		 $isWhere = " so_hd_id= ".$so_id;
+		$isWhere = " so_hd_id= " . $so_id;
 
 		$data = $this->M_DatatablesModel->get_tables_query($query, $search, $where, $isWhere, $post);
 
@@ -153,7 +159,7 @@ class SlsSo extends BD_Controller
 		$where  = null;
 
 
-		 $isWhere = " so_hd_id= ".$so_id;
+		$isWhere = " so_hd_id= " . $so_id;
 
 		$data = $this->M_DatatablesModel->get_tables_query($query, $search, $where, $isWhere, $post);
 
@@ -436,11 +442,11 @@ class SlsSo extends BD_Controller
 		$input = $this->post();
 		$input['diubah_oleh'] = $this->user_id;
 		$input['dibuat_oleh'] = $this->user_id;
-		$so=$this->db->query("select * from sls_so_ht where id=".$input['so_id']."")->row_array() ;
-		$so_id=$so['id'];
-		$customer_id=$so['customer_id'];
+		$so = $this->db->query("select * from sls_so_ht where id=" . $input['so_id'] . "")->row_array();
+		$so_id = $so['id'];
+		$customer_id = $so['customer_id'];
 		$this->load->library('Autonumber');
-		$input['no_invoice'] = $this->autonumber->sales_order_invoice( $input['tanggal'], $customer_id);
+		$input['no_invoice'] = $this->autonumber->sales_order_invoice($input['tanggal'], $customer_id);
 
 		$res =  $this->SlsSoModel->create_invoice($input);
 		// $this->set_response(array("status" => "OK", "data" => $input['no_so']), REST_Controller::HTTP_OK);
@@ -506,13 +512,14 @@ class SlsSo extends BD_Controller
 		$so = $this->SlsSoModel->retrieve($id);
 		if (empty($so)) {
 			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_OK);
+			return;
 		}
 		if (($so['id'])) {
-			$adaTTb=$this->db->query("SELECT * FROM sls_ttb_ht where dls_so_id=" . $so['id'])->row_array();
-			if (count($adaTTb)>0){
+			$adaTTb = $this->db->query("SELECT * FROM sls_ttb_ht where sls_so_id=" . $so['id'])->row_array();
+			if (count($adaTTb) > 0) {
 				$this->set_response(array("status" => "NOT OK", "data" => "Sudah Ada TTB, Tidak Bisa di ubah"), REST_Controller::HTTP_OK);
+				return;
 			}
-			
 		}
 
 		$res =   $this->SlsSoModel->update($so['id'], $input);
@@ -670,16 +677,17 @@ class SlsSo extends BD_Controller
 		$so = $this->SlsSoModel->retrieve($id);
 		if (empty($so)) {
 			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_OK);
+			return;
 		}
 		if (empty($so)) {
 			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_OK);
 		}
 		if (($so['id'])) {
-			$adaTTb=$this->db->query("SELECT * FROM sls_ttb_ht where dls_so_id=" . $so['id'])->row_array();
-			if (count($adaTTb)>0){
+			$adaTTb = $this->db->query("SELECT * FROM sls_ttb_ht where sls_so_id=" . $so['id'])->row_array();
+			if (count($adaTTb) > 0) {
 				$this->set_response(array("status" => "NOT OK", "data" => "Sudah Ada TTB, Tidak Bisa di ubah"), REST_Controller::HTTP_OK);
+				return;
 			}
-			
 		}
 
 		$res =  $this->SlsSoModel->delete($so['id']);
@@ -916,7 +924,7 @@ class SlsSo extends BD_Controller
 		$data = [];
 
 		$queryHeader = "SELECT a.*,b.nama as lokasi, i.nama AS surveyor,
-		h.nama AS sales,a.no_so,a.tanggal AS tanggal_so,
+		h.nama AS sales, j.nama as sales_supervisor, k.nama as demo_booker, a.no_so,a.tanggal AS tanggal_so,
 		c.kode_customer,c.nama_customer,c.alamat,c.no_telpon,c.no_ktp,d.nama AS provinsi,
 		e.nama AS kabupaten,f.nama as kecamatan,g.nama AS kelurahan
 		from  sls_so_ht a 
@@ -928,6 +936,8 @@ class SlsSo extends BD_Controller
 		LEFT JOIN gbm_kelurahan g ON c.kelurahan_id=g.id
 		LEFT JOIN karyawan h ON a.sales_id=h.id
 		LEFT JOIN karyawan i ON a.surveyor_id=i.id
+		LEFT JOIN karyawan j ON a.sales_supervisor_id=j.id
+		LEFT JOIN karyawan k ON a.demo_booker_id=k.id
 		WHERE a.id=" . $id . "";
 
 		$dataHeader = $this->db->query($queryHeader)->row_array();
@@ -987,8 +997,8 @@ class SlsSo extends BD_Controller
 		$dataDetail = $this->db->query($queryDetail)->result_array();
 
 		$this->load->helper("terbilangv2");
-		
-		$terbilang=terbilang($dataHeader['grand_total']);
+
+		$terbilang = terbilang($dataHeader['grand_total']);
 		$data['header'] = 	$dataHeader;
 		$data['detail'] = 	$dataDetail;
 		$data['invoice'] = [];
@@ -1217,8 +1227,8 @@ class SlsSo extends BD_Controller
 		$this->pdfgenerator->generate($html, $filename, true, 'A4', 'landscape');
 		// echo $html;
 	}
-	
-	
+
+
 
 	function laporan_Detail_So_post()
 	{

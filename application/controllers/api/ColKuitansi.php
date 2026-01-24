@@ -58,8 +58,12 @@ class ColKuitansi extends BD_Controller
 		$where  = null;
 
 		$isWhere = " 1=1 ";
+		if (($param['tampil_angsuran_1'] != true) ) {
+			$isWhere = $isWhere .  "  and a.angsuran_ke>1 ";
+		}
+
 		if ($param['tgl_mulai'] && $param['tgl_mulai']) {
-			$isWhere = " a.tanggal_tempo between '" . $param['tgl_mulai'] . "' and '" . $param['tgl_akhir'] . "'";
+			$isWhere = $isWhere ." and  (a.tanggal_tempo between '" . $param['tgl_mulai'] . "' and '" . $param['tgl_akhir'] . "')";
 		}
 		if (!empty($param['customer_id'])) {
 			$isWhere = $isWhere .  "  and a.customer_id=" . $param['customer_id'] . "";

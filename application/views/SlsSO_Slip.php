@@ -25,12 +25,55 @@
 
 		<div>
 			<h1 center class="title">SALES ORDER</h1>
-			<p>Lokasi : <strong><?= $header['lokasi'] ?></strong></p>
-			<p>No : <strong> <?= $header['no_so'] ?></strong></p>
-			<p>Tanggal :<strong> <?= tgl_indo($header['tanggal']) ?></strong></p>
-			<p>Sales :<strong> <?= ($header['nama_sales']) ?></strong></p>
-			<p>Surveyor :<strong> <?= ($header['nama_surveyor']) ?></strong></p>
-			<p>Customer :<strong> <?= ($header['nama_customer']) ?></strong></p>
+			<hr>
+			
+			<table>
+				<tr>
+					<td width="15%">No SO</td>
+					<td width="2%">:</td>
+					<td width="33%"><strong> <?= $header['no_so'] ?></strong></td>
+					<td width="15%">Tanggal SO</td>
+					<td width="2%">:</td>
+					<td width="33%"><strong> <?= tgl_indo($header['tanggal_so']) ?></strong></td>
+				</tr>	
+			</table>
+			
+			<table>
+				<tr>
+					
+					<td width="15%">Customer</td>
+					<td width="2%">:</td>
+					<td width="33%"><strong> <?= $header['nama_customer'] ?></strong></td>
+					<td width="15%">Tenor</td>
+					<td width="2%">:</td>
+					<td width="33%"><strong> <?= ($header['tenor']) ?></strong></td>
+				</tr>		
+			</table>
+	
+			<table>	
+				<tr>
+					<td width="15%">Sales</td>
+					<td width="2%">:</td>
+					<td width="33%"><strong> <?= $header['sales'] ?></strong></td>
+					<td width="15%">Surveyor</td>
+					<td width="2%">:</td>
+					<td width="33%"><strong> <?= ($header['surveyor']) ?></strong></td>
+				</tr>	
+					
+			</table>
+			
+			<table>	
+				<tr>
+					<td width="15%">Sales Supervisor</td>
+					<td width="2%">:</td>
+					<td width="33%"><strong> <?= $header['sales'] ?></strong></td>
+					<td width="15%">Demo Booker</td>
+					<td width="2%">:</td>
+					<td width="33%"><strong> <?= ($header['demo_booker']) ?></strong></td>
+				</tr>	
+					
+			</table>
+		
 			
 			<!-- <div id="pageCounter" class="page">
 				<page size="A4"></page>
@@ -60,9 +103,22 @@
 					</tr>
 				</thead>
 				<tbody>
-					<?php $no = 0 ?>
-					<?php foreach ($detail as $key => $val) { ?>
-						<?php $no = $no + 1 ?>
+					<?php 
+					$no = 0;
+					$total_piutang = 0;
+					$total_angsuran = 0;	
+					$total_diskon = 0;	
+					$total_dp = 0;	
+					$total_sub_total = 0;
+					
+					foreach ($detail as $key => $val) { 
+						$no = $no + 1;
+						$total_piutang += $val['nilai_piutang'];
+						$total_angsuran += $val['nilai_angsuran'];
+						$total_diskon += $val['diskon'];
+						$total_dp += $val['dp'];
+						$total_sub_total += $val['total'];
+						?>
 						<tr>
 							<td center width="2%"><?= $no ?></td>
 							<td width="10%"><?= $val['kode_barang'] ?></td>
@@ -77,9 +133,19 @@
 							<td center width="10%"><?= number_format($val['nilai_angsuran'],0) ?></td>
 							<!-- <td width="10%"><?= $val['ket'] ?></td> -->
 						</tr>
+
 					<?php } ?>
 				</tbody>
-				<tfoot></tfoot>
+				<tfoot>
+					<tr>
+						<td colspan="6" center>Total</td>
+						<td center><?= number_format($total_diskon,0) ?></td>
+						<td center><?= number_format($total_dp,0) ?></td>
+						<td center><?= number_format($total_sub_total,0) ?></td>
+						<td center><?= number_format($total_piutang,0) ?></td>
+						<td center><?= number_format($total_angsuran,0) ?></td>
+					</tr>
+				</tfoot>
 			</table>
 		
 			<br><br>

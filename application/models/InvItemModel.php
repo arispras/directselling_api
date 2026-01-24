@@ -80,6 +80,7 @@ class InvItemModel extends CI_Model
 		$harga_jual1    =  $arrdata['harga_jual1'];
 		$harga_jual2    =  $arrdata['harga_jual2'];
 		$komisi_sales    =  $arrdata['komisi_sales'];
+		$komisi_kordinator    =  $arrdata['komisi_kordinator'];
 		$bonus_sales    =  $arrdata['bonus_sales'];
 		$jenis_item    =  $arrdata['jenis_item'];
 		$aktif    =  $arrdata['aktif'];
@@ -92,6 +93,7 @@ class InvItemModel extends CI_Model
 			'harga_jual1' => $harga_jual1,
 			'harga_jual2' => $harga_jual2,
 			'komisi_sales' => $komisi_sales,
+			'komisi_kordinator' => $komisi_kordinator,
 			'bonus_sales' => $bonus_sales,
 			'min_stok' => $min_stok,
 			'jenis_item' => $jenis_item,
@@ -115,6 +117,7 @@ class InvItemModel extends CI_Model
 		$min_stok    =  $arrdata['min_stok'];
 		$harga_jual1    =  $arrdata['harga_jual1'];
 		$harga_jual2    =  $arrdata['harga_jual2'];
+		$komisi_kordinator    =  $arrdata['komisi_kordinator'];
 		$komisi_sales    =  $arrdata['komisi_sales'];
 		$bonus_sales    =  $arrdata['bonus_sales'];
 		$jenis_item    =  $arrdata['jenis_item'];
@@ -129,6 +132,7 @@ class InvItemModel extends CI_Model
 			'harga_jual1' => $harga_jual1,
 			'harga_jual2' => $harga_jual2,
 			'komisi_sales' => $komisi_sales,
+			'komisi_kordinator' => $komisi_kordinator,
 			'bonus_sales' => $bonus_sales,
 			'jenis_item' => $jenis_item,
 			'aktif' => $aktif
