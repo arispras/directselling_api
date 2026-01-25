@@ -52,8 +52,9 @@ class GbmSettingPremiModel extends CI_Model
             'akhir' => $input['akhir'],
             'komisi' => $input['komisi'],
             'bonus' => $input['bonus'],
-			'diubah_oleh' =>  $input['diubah_oleh'],
-			'diubah_tanggal' =>  date("Y-m-d H:i:s"),
+            'bonus_lunas' => $input['bonus_lunas'],
+            'diubah_oleh' =>  $input['diubah_oleh'],
+            'diubah_tanggal' =>  date("Y-m-d H:i:s"),
         );
         $this->db->where('id', $id);
         $this->db->update('gbm_setting_premi', $data);
@@ -84,10 +85,11 @@ class GbmSettingPremiModel extends CI_Model
             'akhir' => $input['akhir'],
             'komisi' => $input['komisi'],
             'bonus' => $input['bonus'],
+            'bonus_lunas' => $input['bonus_lunas'],
             'dibuat_oleh' =>  $input['dibuat_oleh'],
-			'dibuat_tanggal' =>  date("Y-m-d H:i:s"),
-			'diubah_oleh' =>  $input['diubah_oleh'],
-			'diubah_tanggal' =>  date("Y-m-d H:i:s"),
+            'dibuat_tanggal' =>  date("Y-m-d H:i:s"),
+            'diubah_oleh' =>  $input['diubah_oleh'],
+            'diubah_tanggal' =>  date("Y-m-d H:i:s"),
 
         );
         $this->db->insert('gbm_setting_premi', $data);

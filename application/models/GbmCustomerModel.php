@@ -47,7 +47,7 @@ class GbmCustomerModel extends CI_Model
 	public function create(
 		$arrdata
 	) {
-	
+
 		$kode_customer  =  $arrdata['kode_customer'];
 		$nama_customer    =  $arrdata['nama_customer'];
 		$no_ktp    =  $arrdata['no_ktp'];
@@ -82,17 +82,17 @@ class GbmCustomerModel extends CI_Model
 		$this->db->insert('gbm_customer', $data);
 		$id = $this->db->insert_id();
 
-		$details = $arrdata['details'];
-		foreach ($details as $key => $value) {
-			$this->db->insert("gbm_customer_alamat", array(
-				'customer_id' => $id,
-				'contact' => $value['contact'],
-				'alamat' => $value['alamat'],
-				'nama' => $value['nama'],
-				'telp' => $value['telp'],
-				'koordinat' => $value['koordinat']
-			));
-		}
+		// $details = $arrdata['details'];
+		// foreach ($details as $key => $value) {
+		// 	$this->db->insert("gbm_customer_alamat", array(
+		// 		'customer_id' => $id,
+		// 		'contact' => $value['contact'],
+		// 		'alamat' => $value['alamat'],
+		// 		'nama' => $value['nama'],
+		// 		'telp' => $value['telp'],
+		// 		'koordinat' => $value['koordinat']
+		// 	));
+		// }
 
 		return $id;
 		
@@ -140,16 +140,16 @@ class GbmCustomerModel extends CI_Model
 		$this->db->delete('gbm_customer_alamat');
 
 		$details = $arrdata['details'];
-		foreach ($details as $key => $value) {
-			$this->db->insert("gbm_customer_alamat", array(
-				'customer_id' => $id,
-				'contact' => $value['contact'],
-				'alamat' => $value['alamat'],
-				'nama' => $value['nama'],
-				'telp' => $value['telp'],
-				'koordinat' => $value['koordinat']
-			));
-		}
+		// foreach ($details as $key => $value) {
+		// 	$this->db->insert("gbm_customer_alamat", array(
+		// 		'customer_id' => $id,
+		// 		'contact' => $value['contact'],
+		// 		'alamat' => $value['alamat'],
+		// 		'nama' => $value['nama'],
+		// 		'telp' => $value['telp'],
+		// 		'koordinat' => $value['koordinat']
+		// 	));
+		// }
 
 		return true;
 	}
