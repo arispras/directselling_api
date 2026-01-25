@@ -999,7 +999,7 @@ class ColLHI extends BD_Controller
 		$html = $this->load->view('ColLHIBayar_Slip', $data, true);
 
 		$filename = 'slipso_' . time();
-		$this->pdfgenerator->generate($html, $filename, true, 'A4', 'portrait');
+		$this->pdfgenerator->generate($html, $filename, true, 'A4', 'landscape');
 		// echo $html;
 	}
 	function laporan_Detail_So_post()

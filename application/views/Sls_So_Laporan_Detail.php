@@ -2,7 +2,7 @@
 	<html>
 
 	<head>
-		<title>Sales Order Detail</title>
+		<title>Sales Order  Detail</title>
 	<?php	function format_number_report($angka,$fmt_laporan)
 	{
 		$format_laporan     =$fmt_laporan;
@@ -40,11 +40,16 @@
 
 		<!-- <pre><?php print_r($so) ?></pre> -->
 
-		<h3 class="title">A.02 Sales Order (DETAIL)</h3>
+		<h3 class="title">Sales Order DETAIL</h3>
 		<br>
 
 		<div class="d-flex flex-between">
 			<table class="no_border" style="width:30%">
+				<tr>
+					<td>Lokasi</td>
+					<td>:</td>
+					<td><?= $filter_lokasi ?></td>
+				</tr>
 
 				<tr>
 					<td>Periode Tanggal</td>
@@ -60,55 +65,86 @@
 		<table class="table-bg border">
 			<thead>
 				<tr>
-					<th style="width:2%">no</th>
-					<th style="width:9%">Order No</th>
-					<th style="width:6%">Request No</th>
+					<th style="width:2%">No</th>
+					<th style="width:9%">No SO</th>
+					<th style="width:9%">Tanggal</th>
 					<th style="width:12%">Customer</th>
-					<th style="width:5%">Item Code</th>
-					<th style="width:15%">Item Name</th>
+					<th style="width:12%">Surveyor</th>
+					<th style="width:12%">Sales SPV</th>
+					<th style="width:12%">Sales</th>
+					<th style="width:12%">Demo Booker</th>
+					<th style="width:5%">Kode Item</th>
+					<th style="width:15%">Nama Item</th>
 					<th style="width:5%">Qty</th>
-					<th style="width:5%">Price(RP)</th>
-					<th style="width:5%">Amount(RP)</th>
-					<th style="width:5%">Status</th>
+					<th style="width:5%">Harga</th>
+					<th style="width:5%">Diskon</th>
+					<th style="width:5%">Total</th>
+					<th style="width:5%">Dp</th>
+					<th style="width:5%">Nilai Piutang</th>
+					<th style="width:5%">@angsuran</th>
 				</tr>
 
 			</thead>
 			<tbody>
-				<?php $no = 0;
-				$sum = 0;
-				$j_qty = 0; ?>
-				<?php foreach ($so as $key => $val) { ?>
+				<?php 
+				$no = 0;
+				$jum_diskon = 0;
+				$jum_qty = 0;
+				$jum_dp = 0;
+				$jum_total= 0;
+				$jum_nilai_piutang = 0;
+				$jum_nilai_angsuran = 0;
+				
+				
+				?>
 
-					<?php $dt = $val['detail']; ?>
 
-					<?php foreach ($dt as $key => $res) { ?>
+					<?php foreach ($data as $key => $res) { ?>
 						<tr>
 							<?php
 							$no = $no + 1;
-							$sum = $sum + ($res['qty_order']*$res['harga_jual']);
-							$j_qty = $j_qty + $res['qty_order'];
+							$jum_diskon += $res['diskon'];
+							$jum_dp += $res['dp'];
+							$jum_total += $res['total'];	
+							$jum_nilai_piutang += $res['nilai_piutang'];
+							$jum_nilai_angsuran += $res['nilai_angsuran'];
+							$jum_qty += $res['qty'];
 							?>
 							<!-- <td center rowspan=<?php echo count($dt); ?>> <?= $no ?> </td>
 							<td left rowspan=<?php echo count($dt); ?>> <?= $val['no_so'] ?></td> -->
 							<td center> <?= $no ?> </td>
-							<td left> <?= $val['no_so'] ?></td>
-							<td center><?= $res['no_pp'] ?></td>
+							<td left> <?= $res['no_so'] ?></td>
+							<td center><?=  tgl_indo($res['tanggal']) ?></td>
 							<td left><?= $res['nama_customer'] ?></td>
+							<td left><?= $res['surveyor'] ?></td>
+							<td left><?= $res['sales_supervisor'] ?></td>
+							<td left><?= $res['sales'] ?></td>
+							<td left><?= $res['demo_booker'] ?></td>
 							<td center><?= $res['kode_item'] ?></td>
 							<td left><?= $res['nama_item'] ?></td>
-							<td right><?= format_number_report($res['qty_order'],$format_laporan) ?></td>
-							<td right><?= format_number_report($res['harga_jual'],$format_laporan) ?></td>
-							<td right><?= format_number_report($res['total_nilai_penjualan'],$format_laporan) ?></td>
-							<td left><?= $res['status'] ?></td>
+							<td right><?= format_number_report($res['qty'],$format_laporan) ?></td>
+							<td right><?= format_number_report($res['harga'],$format_laporan) ?></td>
+							<td right><?= format_number_report($res['diskon'],$format_laporan) ?></td>
+							<td right><?= format_number_report($res['total'],$format_laporan) ?></td>
+							<td right><?= format_number_report($res['dp'],$format_laporan) ?></td>
+							<td right><?= format_number_report($res['nilai_piutang'],$format_laporan) ?></td>
+							<td right><?= format_number_report($res['nilai_angsuran'],$format_laporan) ?></td>
+							
 						</tr>
 					<?php } ?>
 
-				<?php } ?>
+	
 				<tr>
-					<td colspan=6></td>
-					<td right><?= format_number_report($j_qty,$format_laporan) ?></td>
+					<td colspan=10></td>
+					<td right><?= format_number_report($jum_qty,$format_laporan) ?></td>
 					<td right></td>
-					<td right><?= format_number_report($sum,$format_laporan) ?></td>
+					<td right><?= format_number_report($jum_diskon,$format_laporan) ?></td>
+					
+					
+					<td right><?= format_number_report($jum_total,$format_laporan) ?></td>
+					<td right><?= format_number_report($jum_dp,$format_laporan) ?></td>
+					<td right><?= format_number_report($jum_nilai_piutang,$format_laporan) ?></td>
+					<td right><?= format_number_report($jum_nilai_angsuran,$format_laporan) ?></td>
 				</tr>
 
 			</tbody>

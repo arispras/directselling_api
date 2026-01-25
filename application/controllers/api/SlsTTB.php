@@ -1364,11 +1364,12 @@ class SlsTTB extends BD_Controller
 		}
 
 		$query = "SELECT lokasi_id,lokasi,tanggal,SUM(qty)AS qty,SUM(diskon)AS diskon,SUM(dp)AS dp,
-			SUM(total)AS total,SUM(nilai_piutang)as nilai_piutang,SUM(nilai_angsuran)AS nilai_angsuran
+			SUM(total)AS total,SUM(nilai_piutang)as nilai_piutang,SUM(nilai_angsuran)AS nilai_angsuran,
+			surveyor,sales,sales_supervisor,demo_booker
 			FROM sls_ttb_detail_vw
 			where tanggal between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
 			and lokasi_id  " . $lokasi_id . "
-			GROUP BY lokasi_id,lokasi,tanggal
+			GROUP BY lokasi_id,lokasi,tanggal,surveyor,sales,sales_supervisor,demo_booker
 			ORDER BY tanggal 
 		";
 		$dataDtl = $this->db->query($query)->result_array();

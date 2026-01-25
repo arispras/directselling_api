@@ -1013,221 +1013,165 @@ class SlsSo extends BD_Controller
 		$this->pdfgenerator->generate($html, $filename, true, 'A4', 'portrait');
 		// echo $html;
 	}
-	function print_slip_html_get($segment_3 = '')
+	function laporan_Detail_post()
 	{
 
-		$id = (int)$segment_3;
+		$format_laporan =  $this->post('format_laporan', true);
+
+
 		$data = [];
 
-		$queryHeader = "SELECT a.*,
+		$input = $this->post();
 
-		f.nama_customer as nama_customer,
-		f.alamat as alamat_customer,
-		f.no_telpon as no_telepon_customer,
-		f.nama_bank as nama_bank,
-		f.no_rekening as no_rekening,
-		f.atas_nama as atas_nama,
-		f.contact_person as contact_person_customer,
-		f.no_hp as no_hp_customer,
+		$lokasi_id = $input['lokasi_id'];
+		$tgl_mulai = $input['tgl_mulai'];
+		$tgl_akhir = $input['tgl_akhir'];
+		$format_laporan = $input['format_laporan'];
 
-		g.jenis as jenis_bayar,
-		g.ket as ket_bayar,
-
-		h.nama as nama_franco,
-		h.alamat as alamat_franco,
-		h.contact as contact_franco,
-		h.telp as telp_franco,
-
-		i.kode as mata_uang_kode,
-		i.simbol as mata_uang_simbol,
-		i.nama as mata_uang_nama,
-
-		z.nama as user_approve1,
-		x.nama as user_approve_jabatan1,
-		zz.nama as user_approve2,
-		xx.nama as user_approve_jabatan2,
-		zzz.nama as user_approve3,
-		xxx.nama as user_approve_jabatan3,
-		zzzz.nama as user_approve4,
-		xxxx.nama as user_approve_jabatan4,
-		zzzzz.nama as user_approve5,
-		xxxxx.nama as user_approve_jabatan5,
-
-		e.nama as lokasi
-		FROM sls_so_ht a 
-		INNER JOIN gbm_organisasi e ON a.lokasi_id=e.id
-		INNER JOIN gbm_customer f ON a.customer_id=f.id
-		INNER JOIN prc_syarat_bayar g ON a.syarat_bayar_id=g.id
-		INNER JOIN prc_franco h ON a.franco_id=h.id
-		LEFT JOIN karyawan z ON a.user_approve1=z.id
-		LEFT JOIN payroll_jabatan x ON z.jabatan_id=x.id
-		LEFT JOIN karyawan zz ON a.user_approve2=zz.id
-		LEFT JOIN payroll_jabatan xx ON zz.jabatan_id=xx.id
-		LEFT JOIN karyawan zzz ON a.user_approve3=zzz.id
-		LEFT JOIN payroll_jabatan xxx ON zzz.jabatan_id=xxx.id
-		LEFT JOIN karyawan zzzz ON a.user_approve4=zzzz.id
-		LEFT JOIN payroll_jabatan xxxx ON zzzz.jabatan_id=xxxx.id
-		LEFT JOIN karyawan zzzzz ON a.user_approve5=zzzzz.id
-		LEFT JOIN payroll_jabatan xxxxx ON zzzzz.jabatan_id=xxxxx.id
-		LEFT JOIN acc_mata_uang i ON a.mata_uang_id=i.id
-		LEFT JOIN karyawan j ON a.dibuat_oleh=j.id
-		WHERE a.id=" . $id . "";
-		$dataHeader = $this->db->query($queryHeader)->row_array();
-
-		$queryDetail = "SELECT a.*,
-		b.kode as kode_barang,
-		b.nama as nama_barang,
-		f.nama as uom,
-		d.lokasi_id as lokasi_pp_id
-		FROM sls_so_dt a 
-		INNER JOIN prc_pp_dt c on a.pp_dt_id=c.id
-		inner join prc_pp_ht d on c.pp_hd_id=d.id
-		LEFT join inv_item b on a.item_id=b.id 
-		LEFT join gbm_uom f on b.uom_id=f.id 
-		WHERE  a.so_hd_id = " . $id . "";
-		$dataDetail = $this->db->query($queryDetail)->result_array();
-
-		foreach ($dataDetail as $key => $value) {
-			$stok = $this->InvItemModel->cek_stok_lokasi_get($value['lokasi_pp_id'], $value['item_id'], $dataHeader['tanggal']);
-			$dataDetail[$key]['stok'] = $stok;
+		$lokasi = $this->db->query("select * from gbm_organisasi where id=" . $lokasi_id)->row_array();
+		if ($lokasi) {
+			$filter_lokasi = $lokasi['nama'];
+			$lokasi_id = "= " . $lokasi_id;
+		} else {
+			$filter_lokasi = "Semua Lokasi";
 		}
 
-		$queryUser = "SELECT a.*, b.nama as peminta FROM fwk_users a LEFT JOIN karyawan b ON a.employee_id=b.id WHERE a.id=" . $dataHeader['dibuat_oleh'];
-		$dataUser = $this->db->query($queryUser)->row_array();
-
-		$data['header'] = 	$dataHeader;
-		$data['detail'] = 	$dataDetail;
-		$data['user'] = $dataUser;
+		$query = "select * from sls_so_detail_vw where tanggal between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
+		and lokasi_id  " . $lokasi_id . "";
+		$dataDtl = $this->db->query($query)->result_array();
 
 
-		$data['database'] = $this->db;
+		$data['data'] = 	$dataDtl;
 
-		$html = $this->load->view('SlsSo_laporan', $data, true);
+		$data['filter_lokasi'] = 	$filter_lokasi;
+		$data['filter_tgl_awal'] = 	$tgl_mulai;
+		$data['filter_tgl_akhir'] = $tgl_akhir;
+		$data['format_laporan'] = $format_laporan;
 
-		echo $html;
-	}
-	function print_slip_cek_harga_get($segment_3 = '')
-	{
+		$html = $this->load->view('Sls_SO_Laporan_Detail', $data, true);
 
-		$id = (int)$segment_3;
-		$data = [];
-
-		$queryHeader = "SELECT a.*,
-		-- d.nama as gudang,
-		f.nama_customer as nama_customer,
-		f.alamat as alamat_customer,
-		f.no_telpon as no_telepon_customer,
-		f.nama_bank as nama_bank,
-		f.no_rekening as no_rekening,
-		f.atas_nama as atas_nama,
-		f.contact_person as contact_person_customer,
-		f.no_hp as no_hp_customer,
-
-		g.jenis as jenis_bayar,
-		g.ket as ket_bayar,
-
-		h.nama as nama_franco,
-		h.alamat as alamat_franco,
-		h.contact as contact_franco,
-		h.telp as telp_franco,
-
-		i.kode as mata_uang_kode,
-		i.simbol as mata_uang_simbol,
-		i.nama as mata_uang_nama,
-
-		z.nama as user_approve1,
-		x.nama as user_approve_jabatan1,
-		zz.nama as user_approve2,
-		xx.nama as user_approve_jabatan2,
-		zzz.nama as user_approve3,
-		xxx.nama as user_approve_jabatan3,
-		zzzz.nama as user_approve4,
-		xxxx.nama as user_approve_jabatan4,
-		zzzzz.nama as user_approve5,
-		xxxxx.nama as user_approve_jabatan5,
-
-		e.nama as lokasi
-		FROM sls_so_ht a 
-		-- INNER JOIN gbm_organisasi d ON a.gudang_id=d.id
-		INNER JOIN gbm_organisasi e ON a.lokasi_id=e.id
-		INNER JOIN gbm_customer f ON a.customer_id=f.id
-		INNER JOIN prc_syarat_bayar g ON a.syarat_bayar_id=g.id
-		INNER JOIN prc_franco h ON a.franco_id=h.id
-
-		LEFT JOIN karyawan z ON a.user_approve1=z.id
-		LEFT JOIN payroll_jabatan x ON z.jabatan_id=x.id
-		LEFT JOIN karyawan zz ON a.user_approve2=zz.id
-		LEFT JOIN payroll_jabatan xx ON zz.jabatan_id=xx.id
-		LEFT JOIN karyawan zzz ON a.user_approve3=zzz.id
-		LEFT JOIN payroll_jabatan xxx ON zzz.jabatan_id=xxx.id
-		LEFT JOIN karyawan zzzz ON a.user_approve4=zzzz.id
-		LEFT JOIN payroll_jabatan xxxx ON zzzz.jabatan_id=xxxx.id
-		LEFT JOIN karyawan zzzzz ON a.user_approve5=zzzzz.id
-		LEFT JOIN payroll_jabatan xxxxx ON zzzzz.jabatan_id=xxxxx.id
-		
-		LEFT JOIN acc_mata_uang i ON a.mata_uang_id=i.id
-		LEFT JOIN karyawan j ON a.dibuat_oleh=j.id
-		WHERE a.id=" . $id . "";
-		$dataHeader = $this->db->query($queryHeader)->row_array();
-
-		$queryDetail = "SELECT a.*,
-		b.kode as kode_barang,
-		b.nama as nama_barang,
-		f.nama as uom,
-		d.lokasi_id as lokasi_pp_id
-		FROM sls_so_dt a 
-		INNER JOIN prc_pp_dt c on a.pp_dt_id=c.id
-		inner join prc_pp_ht d on c.pp_hd_id=d.id
-		LEFT join inv_item b on a.item_id=b.id 
-		LEFT join gbm_uom f on b.uom_id=f.id 
-		WHERE  a.so_hd_id = " . $id . "";
-		$dataDetail = $this->db->query($queryDetail)->result_array();
-
-		foreach ($dataDetail as $key => $value) {
-			$stok = $this->InvItemModel->cek_stok_lokasi_get($value['lokasi_pp_id'], $value['item_id'], $dataHeader['tanggal']);
-			$dataDetail[$key]['stok'] = $stok;
-
-			$queryLastPO = "select a.no_so,a.tanggal,c.nama_customer ,b.harga from sls_so_ht a 
-			inner join sls_so_dt b on a.id=b.so_hd_id 
-			inner join gbm_customer c on a.customer_id=c.id
-			where b.item_id='" . $value['item_id'] . "'
-			and a.tanggal <'" . ($dataHeader['tanggal']) . "'
-			order by a.tanggal desc limit 1 ";
-			$last_po = $this->db->query($queryLastPO)->row_array();
-			if ($last_po) {
-				$dataDetail[$key]['last_no_so'] = $last_po['no_so'];
-				$dataDetail[$key]['last_harga_po'] = $last_po['harga'];
-				$dataDetail[$key]['last_tanggal_po'] = $last_po['tanggal'];
-				$dataDetail[$key]['last_customer'] = $last_po['nama_customer'];
-			} else {
-				$dataDetail[$key]['last_no_so'] = '';
-				$dataDetail[$key]['last_harga_po'] = 0;
-				$dataDetail[$key]['last_tanggal_po'] = '';
-				$dataDetail[$key]['last_customer'] = '';
-			}
-		}
-
-		$queryUser = "SELECT a.*, b.nama as peminta FROM fwk_users a LEFT JOIN karyawan b ON a.employee_id=b.id WHERE a.id=" . $dataHeader['dibuat_oleh'];
-		$dataUser = $this->db->query($queryUser)->row_array();
-
-		// var_dump($dataUser); die;
-
-
-		// $perminta = $this->InvPermintaanBarangModel->print_slip($id);
-		$data['header'] = 	$dataHeader;
-		$data['detail'] = 	$dataDetail;
-		$data['user'] = $dataUser;
-
-
-		$data['database'] = $this->db;
-
-		$html = $this->load->view('SlsSo_laporan_cek_harga', $data, true);
-
-		$filename = 'report_prcpo_' . time();
-		$this->pdfgenerator->generate($html, $filename, true, 'A4', 'landscape');
+		// $filename = 'report_' . time();
+		// $this->pdfgenerator->generate($html, $filename, true, 'A4', 'landscape');
 		// echo $html;
-	}
+		if ($format_laporan == 'xls') {
+			echo $html;
+		} else if ($format_laporan == 'view') {
+			echo $html;
+		} else {
+			$filename = 'report_' . time();
+			// $this->pdfgenerator->generate($html, $filename, true, 'A4', 'landscape');
+			$dompdf = new DOMPDF;
+			$dompdf->loadHtml($html);
+			$dompdf->setPaper('A4', 'landscape');
+			$dompdf->render();
+			$filename = 'report_' . time();
+			$x          = 400;
+			$y          = 570;
+			$text       = "{PAGE_NUM} of {PAGE_COUNT}";
+			$font       = null; // $dompdf->getFontMetrics()->get_font('Helvetica', 'normal');
+			$size       = 10;
+			$color      = array(0, 0, 0);
+			$word_space = 0.0;
+			$char_space = 0.0;
+			$angle      = 0.0;
 
+			$dompdf->getCanvas()->page_text(
+				$x,
+				$y,
+				$text,
+				$font,
+				$size,
+				$color,
+				$word_space,
+				$char_space,
+				$angle
+			);
+			$dompdf->stream($filename . ".pdf", array("Attachment" => 0));
+		}
+	}
+	function laporan_Rekap_post()
+	{
+
+		$format_laporan =  $this->post('format_laporan', true);
+
+
+		$data = [];
+
+		$input = $this->post();
+
+		$lokasi_id = $input['lokasi_id'];
+		$tgl_mulai = $input['tgl_mulai'];
+		$tgl_akhir = $input['tgl_akhir'];
+		$format_laporan = $input['format_laporan'];
+
+		$lokasi = $this->db->query("select * from gbm_organisasi where id=" . $lokasi_id)->row_array();
+		if ($lokasi) {
+			$filter_lokasi = $lokasi['nama'];
+			$lokasi_id = "= " . $lokasi_id;
+		} else {
+			$filter_lokasi = "Semua Lokasi";
+		}
+
+		$query = "SELECT lokasi_id,lokasi,tanggal,SUM(qty)AS qty,SUM(diskon)AS diskon,SUM(dp)AS dp,
+			SUM(total)AS total,SUM(nilai_piutang)as nilai_piutang,SUM(nilai_angsuran)AS nilai_angsuran,
+			surveyor,sales,sales_supervisor,demo_booker
+			FROM sls_so_detail_vw
+			where tanggal between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
+			and lokasi_id  " . $lokasi_id . "
+			GROUP BY lokasi_id,lokasi,tanggal,surveyor,sales,sales_supervisor,demo_booker
+			ORDER BY tanggal 
+		";
+		$dataDtl = $this->db->query($query)->result_array();
+
+
+		$data['data'] = 	$dataDtl;
+
+		$data['filter_lokasi'] = 	$filter_lokasi;
+		$data['filter_tgl_awal'] = 	$tgl_mulai;
+		$data['filter_tgl_akhir'] = $tgl_akhir;
+		$data['format_laporan'] = $format_laporan;
+
+		$html = $this->load->view('Sls_SO_Laporan_Rekap', $data, true);
+
+		// $filename = 'report_' . time();
+		// $this->pdfgenerator->generate($html, $filename, true, 'A4', 'landscape');
+		// echo $html;
+		if ($format_laporan == 'xls') {
+			echo $html;
+		} else if ($format_laporan == 'view') {
+			echo $html;
+		} else {
+			$filename = 'report_' . time();
+			// $this->pdfgenerator->generate($html, $filename, true, 'A4', 'landscape');
+			$dompdf = new DOMPDF;
+			$dompdf->loadHtml($html);
+			$dompdf->setPaper('A4', 'landscape');
+			$dompdf->render();
+			$filename = 'report_' . time();
+			$x          = 400;
+			$y          = 570;
+			$text       = "{PAGE_NUM} of {PAGE_COUNT}";
+			$font       = null; // $dompdf->getFontMetrics()->get_font('Helvetica', 'normal');
+			$size       = 10;
+			$color      = array(0, 0, 0);
+			$word_space = 0.0;
+			$char_space = 0.0;
+			$angle      = 0.0;
+
+			$dompdf->getCanvas()->page_text(
+				$x,
+				$y,
+				$text,
+				$font,
+				$size,
+				$color,
+				$word_space,
+				$char_space,
+				$angle
+			);
+			$dompdf->stream($filename . ".pdf", array("Attachment" => 0));
+		}
+	}
 
 
 	function laporan_Detail_So_post()
