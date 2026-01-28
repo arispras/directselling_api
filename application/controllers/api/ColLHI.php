@@ -68,9 +68,9 @@ class ColLHI extends BD_Controller
 		// var_dump($data['data']);
 		$this->set_response($data, REST_Controller::HTTP_OK);
 	}
-	
-	
-	
+
+
+
 	function index_get($segment_3 = '')
 	{
 		$id = $segment_3;
@@ -83,9 +83,9 @@ class ColLHI extends BD_Controller
 			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
 		}
 	}
-	
-	
-	
+
+
+
 	function getAll_get()
 	{
 
@@ -98,7 +98,7 @@ class ColLHI extends BD_Controller
 		}
 	}
 
-	
+
 	function getLHIKuitansiBlmLunas_post()
 	{
 		$collector_id = $this->post('collector_id');
@@ -115,12 +115,18 @@ class ColLHI extends BD_Controller
 				GROUP BY b.kuitansi_id) kuitansi ON a.id=kuitansi.kuitansi_id
 				WHERE  1=1 
 				and a.lokasi_id=" . $lokasi_id . " and ((
-		tanggal_tempo between '" . $tanggal_mulai . "' and '" . $tanggal_akhir . "')or 
-		(tanggal_janji between '" . $tanggal_mulai . "' and '" . $tanggal_akhir . "'))
-		and collector_id=" . $collector_id . " and (nilai_angsuran > ifnull(kuitansi.dibayar,0))
-		and a.angsuran_ke>1
-		order by a.no_kuitansi";
+				a.tanggal_tempo between '" . $tanggal_mulai . "' and '" . $tanggal_akhir . "')or 
+				(a.tanggal_janji between '" . $tanggal_mulai . "' and '" . $tanggal_akhir . "'))
+				and collector_id=" . $collector_id . " and (nilai_angsuran > ifnull(kuitansi.dibayar,0))
+				and a.angsuran_ke>1
+				order by a.no_kuitansi";
 		$retrieve =	$this->db->query($sql)->result_array();
+		foreach ($retrieve as $key => $v) {
+			$lhiLama = $this->db->query("SELECT *
+				FROM col_lhi_ht a INNER JOIN col_lhi_dt b ON a.id=b.lhi_id where b.kuitansi_id=" . $v['id'] . " 
+				order by a.tanggal DESC LIMIT 1 ")->row_array();
+			$retrieve[$key]['lhi_lama'] = $lhiLama['no_lhi'] ? $lhiLama['no_lhi'] : "";
+		}
 
 		if (!empty($retrieve)) {
 
@@ -166,9 +172,9 @@ class ColLHI extends BD_Controller
 			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
 		}
 	}
-	
-	
-	
+
+
+
 	function index_put($segment_3 = '')
 	{
 		$input = $this->put();
@@ -970,7 +976,163 @@ class ColLHI extends BD_Controller
 		$this->pdfgenerator->generate($html, $filename, true, 'A4', 'portrait');
 		// echo $html;
 	}
+	function laporan_Detail_post()
+	{
 
+		$format_laporan =  $this->post('format_laporan', true);
+
+
+		$data = [];
+
+		$input = $this->post();
+
+		$lokasi_id = $input['lokasi_id'];
+		$tgl_mulai = $input['tgl_mulai'];
+		$tgl_akhir = $input['tgl_akhir'];
+		$format_laporan = $input['format_laporan'];
+
+		$lokasi = $this->db->query("select * from gbm_organisasi where id=" . $lokasi_id)->row_array();
+		if ($lokasi) {
+			$filter_lokasi = $lokasi['nama'];
+			$lokasi_id = "= " . $lokasi_id;
+		} else {
+			$filter_lokasi = "Semua Lokasi";
+		}
+
+		$query = "select * from col_lhi_detail_vw where tanggal between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
+		and lokasi_id  " . $lokasi_id . "";
+		$dataDtl = $this->db->query($query)->result_array();
+
+
+		$data['data'] = 	$dataDtl;
+
+		$data['filter_lokasi'] = 	$filter_lokasi;
+		$data['filter_tgl_awal'] = 	$tgl_mulai;
+		$data['filter_tgl_akhir'] = $tgl_akhir;
+		$data['format_laporan'] = $format_laporan;
+
+		$html = $this->load->view('Col_LHI_Laporan_Detail', $data, true);
+
+		// $filename = 'report_' . time();
+		// $this->pdfgenerator->generate($html, $filename, true, 'A4', 'landscape');
+		// echo $html;
+		if ($format_laporan == 'xls') {
+			echo $html;
+		} else if ($format_laporan == 'view') {
+			echo $html;
+		} else {
+			$filename = 'report_' . time();
+			// $this->pdfgenerator->generate($html, $filename, true, 'A4', 'landscape');
+			$dompdf = new DOMPDF;
+			$dompdf->loadHtml($html);
+			$dompdf->setPaper('A4', 'landscape');
+			$dompdf->render();
+			$filename = 'report_' . time();
+			$x          = 400;
+			$y          = 570;
+			$text       = "{PAGE_NUM} of {PAGE_COUNT}";
+			$font       = null; // $dompdf->getFontMetrics()->get_font('Helvetica', 'normal');
+			$size       = 10;
+			$color      = array(0, 0, 0);
+			$word_space = 0.0;
+			$char_space = 0.0;
+			$angle      = 0.0;
+
+			$dompdf->getCanvas()->page_text(
+				$x,
+				$y,
+				$text,
+				$font,
+				$size,
+				$color,
+				$word_space,
+				$char_space,
+				$angle
+			);
+			$dompdf->stream($filename . ".pdf", array("Attachment" => 0));
+		}
+	}
+	function laporan_Rekap_post()
+	{
+
+		$format_laporan =  $this->post('format_laporan', true);
+
+
+		$data = [];
+
+		$input = $this->post();
+
+		$lokasi_id = $input['lokasi_id'];
+		$tgl_mulai = $input['tgl_mulai'];
+		$tgl_akhir = $input['tgl_akhir'];
+		$format_laporan = $input['format_laporan'];
+
+		$lokasi = $this->db->query("select * from gbm_organisasi where id=" . $lokasi_id)->row_array();
+		if ($lokasi) {
+			$filter_lokasi = $lokasi['nama'];
+			$lokasi_id = "= " . $lokasi_id;
+		} else {
+			$filter_lokasi = "Semua Lokasi";
+		}
+
+		$query = "SELECT lokasi_id,lokasi,tanggal, SUM(dibayar)AS dibayar, count(kuitansi_id)as jum_kuitansi,collector,no_lhi
+			FROM col_lhi_detail_vw
+			where tanggal between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
+			and lokasi_id  " . $lokasi_id . "
+			GROUP BY lokasi_id,lokasi,tanggal,collector,no_lhi
+			ORDER BY tanggal 
+		";
+		$dataDtl = $this->db->query($query)->result_array();
+
+
+		$data['data'] = 	$dataDtl;
+
+		$data['filter_lokasi'] = 	$filter_lokasi;
+		$data['filter_tgl_awal'] = 	$tgl_mulai;
+		$data['filter_tgl_akhir'] = $tgl_akhir;
+		$data['format_laporan'] = $format_laporan;
+
+		$html = $this->load->view('Col_LHI_Laporan_Rekap', $data, true);
+
+		// $filename = 'report_' . time();
+		// $this->pdfgenerator->generate($html, $filename, true, 'A4', 'landscape');
+		// echo $html;
+		if ($format_laporan == 'xls') {
+			echo $html;
+		} else if ($format_laporan == 'view') {
+			echo $html;
+		} else {
+			$filename = 'report_' . time();
+			// $this->pdfgenerator->generate($html, $filename, true, 'A4', 'landscape');
+			$dompdf = new DOMPDF;
+			$dompdf->loadHtml($html);
+			$dompdf->setPaper('A4', 'landscape');
+			$dompdf->render();
+			$filename = 'report_' . time();
+			$x          = 400;
+			$y          = 570;
+			$text       = "{PAGE_NUM} of {PAGE_COUNT}";
+			$font       = null; // $dompdf->getFontMetrics()->get_font('Helvetica', 'normal');
+			$size       = 10;
+			$color      = array(0, 0, 0);
+			$word_space = 0.0;
+			$char_space = 0.0;
+			$angle      = 0.0;
+
+			$dompdf->getCanvas()->page_text(
+				$x,
+				$y,
+				$text,
+				$font,
+				$size,
+				$color,
+				$word_space,
+				$char_space,
+				$angle
+			);
+			$dompdf->stream($filename . ".pdf", array("Attachment" => 0));
+		}
+	}
 	function print_slip_bayar_get($segment_3 = '')
 	{
 

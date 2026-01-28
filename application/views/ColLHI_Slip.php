@@ -46,12 +46,12 @@
 						<th>No</th>
 						<th>NoKuitansi</th>
 						<th>Customer</th>
-						<th>AngsKe</th>
+						<th>Angs Ke</th>
 						<th>Tgl Tempo</th>
 						<th>Sisa Angsuran</th>
 						<th>Dibayar</th>
 						<th>Tanggal Janji</th>					
-						<th>Catatan</th>
+						<!-- <th>Catatan</th> -->
 					</tr>
 				</thead>
 				<tbody>
@@ -62,11 +62,11 @@
 							<td center width="2%"><?= $no ?></td>
 							<td width="10%"><?= $val['no_kuitansi'] ?></td>
 							<td width="10%"><?= $val['nama_customer'] ?></td>
-							<td width="7%"><?= $val['angsuran_ke'] ?></td>
-							<td width="11%"><?=  tgl_indo($val['tanggal_tempo']) ?></td>
+							<td width="3%"><?= $val['angsuran_ke'] ?></td>
+							<td width="10%"><?=  tgl_indo($val['tanggal_tempo']) ?></td>
 							<td center width="8%"><?= number_format( $val['sisa_angsuran'],0 )?></td>							
-							<td center width="12%"></td>						
-							<td center width="12%"></td>
+							<td center width="9%"></td>						
+							<td center width="9%"></td>
 							
 						</tr>
 					<?php } ?>

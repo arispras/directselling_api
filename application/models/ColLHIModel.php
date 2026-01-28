@@ -175,6 +175,13 @@ class ColLHIModel extends CI_Model
 				'lhi_lama' => $value['lhi_lama'],
 				'ket' => $value['ket'],
 			));
+			if ($value['tanggal_janji'] != null || $value['tanggal_janji'] != '') {
+				// update kuitansi
+				$kui['tanggal_janji'] = $value['tanggal_janji'];
+				$this->db->where('id', $value['kuitansi_id']);
+				$this->db->update('col_kuitansi_ht', $kui);
+			}
+
 		}
 		return true;
 	}

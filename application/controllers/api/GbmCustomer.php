@@ -28,16 +28,21 @@ class GbmCustomer extends BD_Controller
 		$post = $this->post();
 
 		// $query  = "select a.*,b.nama_kelompok from gbm_customer a left join gbm_customer_kelompok b on a.kelompok_id=b.id";
-		$query  = "SELECT a.*,d.nama as lokasi,
+		$query  = "SELECT a.*,d.nama as lokasi,e.nama as provinsi,f.nama as kabupaten,
+		g.nama as kecamatan,h.nama as kelurahan,
 		b.user_full_name AS dibuat,
 		c.user_full_name AS diubah 
 		from gbm_customer a
 		LEFT JOIN fwk_users b ON a.dibuat_oleh = b.id
 		LEFT JOIN fwk_users c ON a.diubah_oleh = c.id
 		LEFT JOIN gbm_organisasi d ON a.lokasi_id = d.id
+		LEFT JOIN gbm_provinsi e ON a.provinsi_id = e.id
+		LEFT JOIN gbm_kabupaten f ON a.kabupaten_id = f.id
+		LEFT JOIN gbm_kecamatan g ON a.kecamatan_id = g.id	
+		LEFT JOIN gbm_kelurahan h ON a.kelurahan_id = h.id
 		";
 		// $search = array('a.kode_customer', 'a.nama_customer','b.nama_kelompok');
-		$search = array('kode_customer', 'nama_customer', 'no_telpon','alamat');
+		$search = array('kode_customer', 'nama_customer', 'no_telpon','alamat', 'd.nama', 'e.nama', 'f.nama', 'g.nama', 'h.nama');
 		$where  = null;
 
 		$isWhere = null;

@@ -75,7 +75,7 @@
 				<tr>
 					<td width="15%">Sales Supervisor</td>
 					<td width="2%">:</td>
-					<td width="33%"><strong> <?= $header['sales'] ?></strong></td>
+					<td width="33%"><strong> <?= $header['sales_supervisor'] ?></strong></td>
 					<td width="15%">Demo Booker</td>
 					<td width="2%">:</td>
 					<td width="33%"><strong> <?= ($header['demo_booker']) ?></strong></td>

@@ -636,7 +636,7 @@ class ColKuitansi extends BD_Controller
 			// $dompdf->stream($filename . ".pdf", array("Attachment" => 0));
 		}
 	}
-	function getLaporanCetakKuitansi_post()
+	function getLaporanCetakKuitansi_2kuitansi_post()
 	{
 
 		$format_laporan =  $this->post('format_laporan', true);
@@ -1004,7 +1004,271 @@ class ColKuitansi extends BD_Controller
 		$filename = 'kuitansi-dotmatrix-' . date('Ymd-His') . '.pdf';
 		$dompdf->stream($filename, ['Attachment' => false]);
 	}
+	function getLaporanCetakKuitansi_post()
+	{
 
+		$format_laporan =  $this->post('format_laporan', true);
+
+		// $id = (int)$segment_3;
+		$data = [];
+
+		$input = [
+			// 'lokasi_id' => 252,
+			'periode' => '2022-08',
+			// 'tgl_mulai' => '2022-09-01',
+			// 'tgl_akhir' => '2022-09-01',
+			'format_laporan' => 'view',
+		];
+
+
+		$tanggal_awal = $this->post('tgl_mulai', true);
+		$tanggal_akhir = $this->post('tgl_akhir', true);
+
+		$lokasi_id = $this->post('lokasi_id');
+		$customer_id = $this->post('customer_id');
+		$mulai_angsuran_ke = $this->post('mulai_angsuran_ke');
+		$sd_angsuran_ke = $this->post('sd_angsuran_ke');
+
+		$lokasi = $this->db->query("SELECT * from gbm_organisasi where id=" . $lokasi_id)->row_array();
+
+
+		$query = " SELECT *
+		from col_kuitansi_vw where tanggal_tempo between  '" . $tanggal_awal . "' and  '" . $tanggal_akhir . "'	
+		and lokasi_id=" . $lokasi_id .	"";
+
+		if ($mulai_angsuran_ke) {
+			$query = $query . " and angsuran_ke >= " . $mulai_angsuran_ke . " ";
+		}
+		if ($sd_angsuran_ke) {
+			$query = $query . " and angsuran_ke <= " . $sd_angsuran_ke . " ";
+		}
+
+		if ($customer_id) {
+			$query = $query . " and customer_id=" . $customer_id . " ";
+		}
+
+		// 	
+		$query = $query . " order by customer_id,tanggal_tempo,no_kuitansi";
+		$data_kuitansi = $this->db->query($query)->result_array();
+
+
+
+		$html = '<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 5mm;
+    font-family: "Courier New", monospace;
+    font-size: 10pt;
+}
+
+/* GRID 2x2 */
+.grid {
+    width: 100%;
+    border-collapse: collapse;
+    page-break-inside: avoid;
+}
+
+.grid td {
+    width: 50%;
+    vertical-align: top;
+    padding: 4mm;
+}
+
+/* KUITANSI */
+.kuitansi {
+    border: 1px solid #000;
+    padding: 4mm;
+}
+
+/* HEADER */
+.header {
+    text-align: center;
+    border-bottom: 1px solid #000;
+    margin-bottom: 3mm;
+}
+
+.nama-perusahaan {
+    font-weight: bold;
+    font-size: 11pt;
+}
+
+.alamat-perusahaan {
+    font-size: 8pt;
+}
+
+/* JUDUL */
+.judul-kuitansi {
+    text-align: center;
+    font-weight: bold;
+    font-size: 12pt;
+    margin: 3mm 0;
+}
+
+/* DETAIL */
+.detail-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 9pt;
+}
+
+.detail-table td {
+    padding: 1mm 0;
+    vertical-align: top;
+}
+
+.label {
+    width: 20%;
+    font-weight: bold;
+}
+
+/* NILAI */
+.nilai-section {
+    border: 1px solid #000;
+    padding: 2mm;
+    margin-top: 3mm;
+    text-align: center;
+}
+
+.nilai-uang {
+    font-size: 13pt;
+    font-weight: bold;
+}
+
+/* TTD */
+.ttd-table {
+    width: 100%;
+    margin-top: 6mm;
+    font-size: 8pt;
+    text-align: center;
+}
+
+.ttd-table td {
+    padding-top: 12mm;
+}
+</style>
+</head>
+<body>';
+
+
+		$total = count($data_kuitansi);
+		$per_halaman = 4;
+		$total_halaman = ceil($total / $per_halaman);
+
+		for ($h = 0; $h < $total_halaman; $h++) {
+
+			$html .= '<table class="grid">';
+
+			for ($row = 0; $row < 2; $row++) {
+				$html .= '<tr>';
+
+				for ($col = 0; $col < 2; $col++) {
+					$idx = ($h * 4) + ($row * 2) + $col;
+					$html .= '<td>';
+
+					if (isset($data_kuitansi[$idx])) {
+						$d = $data_kuitansi[$idx];
+						$rupiah = 'Rp ' . number_format($d['nilai_angsuran'], 0, ',', '.');
+
+						$html .= '
+                <div class="kuitansi">
+                    <div class="header">
+                        <div class="nama-perusahaan">' . $lokasi['nama_pt'] . '</div>
+                        <div class="alamat-perusahaan">
+                           ' . $lokasi['alamat'] . '<br>
+                            Telp. ' . $lokasi['no_telp'] . '
+                        </div>
+                    </div>
+
+                    <div class="judul-kuitansi">KUITANSI</div>
+
+                    <table class="detail-table">
+                        <tr><td style="width: 20%;" class="label">No</td><td>: ' . $d['no_kuitansi'] . '</td></tr>
+                        <tr><td style="width: 20%;"class="label">Tanggal</td><td>: ' . tgl_indo($d['tanggal_tempo']) . '</td></tr>
+                        <tr><td style="width: 20%;"class="label">Customer</td><td>: ' . $d['nama_customer'] . '</td></tr>
+                        <tr><td style="width: 20%;"class="label">Alamat</td><td>: ' . $d['alamat'] . '</td></tr>
+                    </table>
+
+                    <div class="nilai-section">
+                        <div>Telah diterima uang sejumlah</div>
+                        <div class="nilai-uang">' . $rupiah . '</div>
+                        <div>' . terbilang($d['nilai_angsuran']) . ' Rupiah</div>
+                    </div>
+
+                    <table class="ttd-table">
+                        <tr>
+                            <td>ADMIN</td>
+                            <td>COLLECTOR</td>
+                            <td>CUSTOMER</td>
+                        </tr>
+                        <tr>
+                            <td>(________)</td>
+                            <td>(________)</td>
+                            <td>(________)</td>
+                        </tr>
+                    </table>
+                </div>';
+					}
+
+					$html .= '</td>';
+				}
+
+				$html .= '</tr>';
+			}
+
+			$html .= '</table>';
+
+			if ($h < $total_halaman - 1) {
+				$html .= '<div style="page-break-after: always;"></div>';
+			}
+		}
+
+		$html .= '</body></html>';
+
+
+		$dompdf = new Dompdf();
+
+		// **PENTING: Gunakan font Courier untuk dot matrix**
+		$dompdf->set_option('defaultFont', 'Courier');
+
+		// **PENTING: Set DPI rendah untuk dot matrix (cepat print)**
+		$dompdf->set_option('dpi', 72);
+
+		// **PENTING: Disable font subsetting untuk monospace**
+		$dompdf->set_option('isFontSubsettingEnabled', false);
+
+		// **PENTING: Enable HTML5 parser**
+		$dompdf->set_option('isHtml5ParserEnabled', true);
+
+		// **PENTING: Disable remote untuk kecepatan**
+		$dompdf->set_option('isRemoteEnabled', false);
+
+		// **PENTING: Margin minimal untuk dot matrix**
+		$dompdf->set_option('margin_top', 5);
+		$dompdf->set_option('margin_right', 5);
+		$dompdf->set_option('margin_bottom', 5);
+		$dompdf->set_option('margin_left', 5);
+
+		// Set paper A4 
+		$dompdf->setPaper('A4', 'portrait');
+
+		// Load HTML
+		$dompdf->loadHtml($html);
+
+		// **PENTING: Render dengan quality rendah untuk kecepatan**
+		$dompdf->render();
+
+		// Output
+		$filename = 'kuitansi-4up-' . date('Ymd-His') . '.pdf';
+		$dompdf->stream($filename, ['Attachment' => false]);
+	}
 	function generateKuitansiDotMatrix($data, $idx)
 	{
 		$rupiah = 'Rp ' . number_format($data['nilai_angsuran'], 0, ',', '.');
@@ -1146,6 +1410,166 @@ class ColKuitansi extends BD_Controller
 		$html = $this->load->view('ColKuitansiCetakRekap', $data, true);
 
 
+		if ($format_laporan == 'xls') {
+			echo $html;
+		} else if ($format_laporan == 'view') {
+			echo $html;
+		} else {
+			$filename = 'report_' . time();
+			// $this->pdfgenerator->generate($html, $filename, true, 'A4', 'landscape');
+			$dompdf = new DOMPDF;
+			$dompdf->loadHtml($html);
+			$dompdf->setPaper('A4', 'landscape');
+			$dompdf->render();
+			$filename = 'report_' . time();
+			$x          = 400;
+			$y          = 570;
+			$text       = "{PAGE_NUM} of {PAGE_COUNT}";
+			$font       = null; // $dompdf->getFontMetrics()->get_font('Helvetica', 'normal');
+			$size       = 10;
+			$color      = array(0, 0, 0);
+			$word_space = 0.0;
+			$char_space = 0.0;
+			$angle      = 0.0;
+
+			$dompdf->getCanvas()->page_text(
+				$x,
+				$y,
+				$text,
+				$font,
+				$size,
+				$color,
+				$word_space,
+				$char_space,
+				$angle
+			);
+			$dompdf->stream($filename . ".pdf", array("Attachment" => 0));
+		}
+	}
+
+	function getLaporanPiutangDetailByTTB_post()
+	{
+
+		$format_laporan =  $this->post('format_laporan', true);
+
+
+		$data = [];
+
+		$input = $this->post();
+
+		$lokasi_id = $input['lokasi_id'];
+		$tgl_mulai = $input['tgl_mulai'];
+		$tgl_akhir = $input['tgl_akhir'];
+		$format_laporan = $input['format_laporan'];
+
+		$lokasi = $this->db->query("select * from gbm_organisasi where id=" . $lokasi_id)->row_array();
+		if ($lokasi) {
+			$filter_lokasi = $lokasi['nama'];
+			$lokasi_id = "= " . $lokasi_id;
+		} else {
+			$filter_lokasi = "Semua Lokasi";
+		}
+
+		$query = "select * from col_piutang_by_ttb_vw where tanggal_ttb between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
+		and lokasi_id  " . $lokasi_id . "";
+		$dataDtl = $this->db->query($query)->result_array();
+		
+		foreach ($dataDtl as $key => $d) {
+		
+			$queryKuitansi = "select * from col_piutang_by_ttb_detail_vw where ttb_id=" . $d['ttb_id'] . " order by angsuran_ke";
+			$kuitansi = $this->db->query($queryKuitansi)->result_array();
+			$dataDtl[$key]['kuitansi'] = $kuitansi;
+		}
+
+
+		$data['data'] = 	$dataDtl;
+
+		$data['filter_lokasi'] = 	$filter_lokasi;
+		$data['filter_tgl_awal'] = 	$tgl_mulai;
+		$data['filter_tgl_akhir'] = $tgl_akhir;
+		$data['format_laporan'] = $format_laporan;
+
+		$html = $this->load->view('Col_Piutang_By_TTB_Laporan_Detail', $data, true);
+
+		// $filename = 'report_' . time();
+		// $this->pdfgenerator->generate($html, $filename, true, 'A4', 'landscape');
+		// echo $html;
+		if ($format_laporan == 'xls') {
+			echo $html;
+		} else if ($format_laporan == 'view') {
+			echo $html;
+		} else {
+			$filename = 'report_' . time();
+			// $this->pdfgenerator->generate($html, $filename, true, 'A4', 'landscape');
+			$dompdf = new DOMPDF;
+			$dompdf->loadHtml($html);
+			$dompdf->setPaper('A4', 'landscape');
+			$dompdf->render();
+			$filename = 'report_' . time();
+			$x          = 400;
+			$y          = 570;
+			$text       = "{PAGE_NUM} of {PAGE_COUNT}";
+			$font       = null; // $dompdf->getFontMetrics()->get_font('Helvetica', 'normal');
+			$size       = 10;
+			$color      = array(0, 0, 0);
+			$word_space = 0.0;
+			$char_space = 0.0;
+			$angle      = 0.0;
+
+			$dompdf->getCanvas()->page_text(
+				$x,
+				$y,
+				$text,
+				$font,
+				$size,
+				$color,
+				$word_space,
+				$char_space,
+				$angle
+			);
+			$dompdf->stream($filename . ".pdf", array("Attachment" => 0));
+		}
+	}
+	function getLaporanPiutangByTTB_post()
+	{
+
+		$format_laporan =  $this->post('format_laporan', true);
+
+
+		$data = [];
+
+		$input = $this->post();
+
+		$lokasi_id = $input['lokasi_id'];
+		$tgl_mulai = $input['tgl_mulai'];
+		$tgl_akhir = $input['tgl_akhir'];
+		$format_laporan = $input['format_laporan'];
+
+		$lokasi = $this->db->query("select * from gbm_organisasi where id=" . $lokasi_id)->row_array();
+		if ($lokasi) {
+			$filter_lokasi = $lokasi['nama'];
+			$lokasi_id = "= " . $lokasi_id;
+		} else {
+			$filter_lokasi = "Semua Lokasi";
+		}
+
+		$query = "select * from col_piutang_by_ttb_vw where tanggal_ttb between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
+		and lokasi_id  " . $lokasi_id . " order by tanggal_ttb";
+		$dataDtl = $this->db->query($query)->result_array();
+
+
+		$data['data'] = 	$dataDtl;
+
+		$data['filter_lokasi'] = 	$filter_lokasi;
+		$data['filter_tgl_awal'] = 	$tgl_mulai;
+		$data['filter_tgl_akhir'] = $tgl_akhir;
+		$data['format_laporan'] = $format_laporan;
+
+		$html = $this->load->view('Col_Piutang_By_TTB_Laporan', $data, true);
+
+		// $filename = 'report_' . time();
+		// $this->pdfgenerator->generate($html, $filename, true, 'A4', 'landscape');
+		// echo $html;
 		if ($format_laporan == 'xls') {
 			echo $html;
 		} else if ($format_laporan == 'view') {

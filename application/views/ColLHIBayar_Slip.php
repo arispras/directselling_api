@@ -63,12 +63,12 @@
 							<td center width="2%"><?= $no ?></td>
 							<td width="10%"><?= $val['no_kuitansi'] ?></td>
 							<td width="10%"><?= $val['nama_customer'] ?></td>
-							<td width="7%"><?= $val['angsuran_ke'] ?></td>
-							<td width="11%"><?=  tgl_indo($val['tanggal_tempo']) ?></td>
+							<td width="3%"><?= $val['angsuran_ke'] ?></td>
+							<td width="8%"><?=  tgl_indo($val['tanggal_tempo']) ?></td>
 							<td center width="8%"><?= number_format( $val['sisa_angsuran'],0 )?></td>							
 							<td center width="8%"><?= number_format( $val['dibayar'],0 )?></td>
 							<td center width="8%"><?= number_format( $val['sisa_akhir'],0 )?></td>	
-							<td center width="10%"><?=  tgl_indo($val['tanggal_tempo']) ?></td>					
+							<td center width="8%"><?=  tgl_indo($val['tanggal_janji']) ?></td>					
 							<td center width="10%"><?=  ($val['ket']) ?></td>
 							
 						</tr>
