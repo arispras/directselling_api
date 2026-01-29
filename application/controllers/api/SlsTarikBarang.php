@@ -1,23 +1,10 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 require 'vendor/autoload.php';
 
-use Dompdf\Adapter\CPDF;
 use Dompdf\Dompdf;
-use Dompdf\Exception;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-
-use PhpOffice\PhpSpreadsheet\Shared\Date;
-use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
-use PhpOffice\PhpSpreadsheet\Cell\DataType;
-use PhpOffice\PhpSpreadsheet\Style\Border;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
-use PhpOffice\PhpSpreadsheet\IOFactory;
-use Carbon\Carbon;
-use Dompdf\Positioner\NullPositioner;
 use Restserver\Libraries\REST_Controller;
 
-class SlsTTB extends BD_Controller
+class SlsTarikBarang extends BD_Controller
 {
 	public $user_id;
 	public $theCredential;
@@ -26,7 +13,7 @@ class SlsTTB extends BD_Controller
 	{
 		parent::__construct();
 		date_default_timezone_set("Asia/Jakarta");
-		$this->load->model('SlsTTBModel');
+		$this->load->model('SlsTarikBarangModel');
 		$this->load->model('InvItemModel');
 		$this->load->model('M_DatatablesModel');
 		$this->load->library('pdfgenerator');
@@ -45,15 +32,13 @@ class SlsTTB extends BD_Controller
 		$post = $this->post();
 		$param = $post['parameter'];
 
-		$query  = "SELECT a.*,d.no_so, b.nama AS lokasi,c.nama_customer as nama_customer,
-		 f.nama as sales, g.nama as demo_booker, h.nama as sales_supervisor from sls_ttb_ht a 
+		$query  = "SELECT a.*,d.no_ttb, b.nama AS lokasi,c.nama_customer as nama_customer,
+		 f.nama as collector from sls_tarik_barang_ht a 
 		left join gbm_organisasi b on a.lokasi_id=b.id
 		left join gbm_customer c on a.customer_id=c.id
-		left join sls_so_ht d on a.sls_so_id=d.id
-		left join karyawan f on a.sales_id=f.id
-		left join karyawan g on a.demo_booker_id=g.id
-		left join karyawan h on a.sales_supervisor_id=h.id";
-		$search = array('no_ttb', 'a.tanggal', 'a.catatan', 'c.nama_customer', 'd.no_so');
+		left join sls_ttb_ht d on a.sls_ttb_id=d.id
+		left join karyawan f on a.collector_id=f.id";
+		$search = array('no_tarik_barang', 'a.tanggal', 'a.catatan', 'c.nama_customer', 'd.no_ttb');
 		$where  = null;
 
 		$isWhere = " 1=1 ";
@@ -80,41 +65,6 @@ class SlsTTB extends BD_Controller
 		// 		$data['data'][$i]['bayar'] = $bayar ? $bayar['bayar'] : 0;
 		// 	}
 		// }
-
-
-		// var_dump($data['data']);
-		$this->set_response($data, REST_Controller::HTTP_OK);
-	}
-	public function listLookup_post($lokasi_id)
-	{
-		$post = $this->post();
-		$param = $post['parameter'];
-
-			$query  = "SELECT a.*,d.no_so, b.nama AS lokasi,c.nama_customer as nama_customer,
-		 f.nama as sales, g.nama as demo_booker, h.nama as sales_supervisor from sls_ttb_ht a 
-		left join gbm_organisasi b on a.lokasi_id=b.id
-		left join gbm_customer c on a.customer_id=c.id
-		left join sls_so_ht d on a.sls_so_id=d.id
-		left join karyawan f on a.sales_id=f.id
-		left join karyawan g on a.demo_booker_id=g.id
-		left join karyawan h on a.sales_supervisor_id=h.id";
-		$search = array('no_ttb', 'a.tanggal', 'a.catatan', 'c.nama_customer', 'd.no_so');
-		$where  = null;
-
-		$isWhere = " is_posting=1  ";
-		$isWhere = $isWhere .  "  and a.lokasi_id=" . $lokasi_id . "";
-
-
-		$data = $this->M_DatatablesModel->get_tables_query($query, $search, $where, $isWhere, $post);
-		if (count($data['data']) > 0) {
-			for ($i = 0; $i < (count($data['data'])); $i++) {
-				$so = $data['data'][$i];
-				$queryDetail = "SELECT *  from sls_ttb_dt
-				where ttb_hd_id=" . $so['id'] . "";
-				$detail = $this->db->query($queryDetail)->result_array();
-				$data['data'][$i]['detail'] = $detail;
-			}
-		}
 
 
 		// var_dump($data['data']);
@@ -157,12 +107,12 @@ class SlsTTB extends BD_Controller
 	{
 		$post = $this->post();
 
-		$query  = "SELECT a.*, b.nama AS lokasi,c.nama_customer as nama_customer,d.no_quotation,d.no_referensi from sls_ttb_ht a 
+		$query  = "SELECT a.*, b.nama AS lokasi,c.nama_customer as nama_customer,d.no_quotation,d.no_referensi from sls_tarik_barang_ht a 
 		left join gbm_organisasi b on a.lokasi_id=b.id
 		left join gbm_customer c on a.customer_id=c.id
 		-- LEFT JOIN inv_pengiriman_so_ht e ON a.id=e.so_id
 		left join prc_quotation d on a.quotation_id=d.id";
-		$search = array('no_ttb', 'a.tanggal', 'a.catatan', 'c.nama_customer', 'd.no_quotation', 'd.no_referensi');
+		$search = array('no_tarik_barang', 'a.tanggal', 'a.catatan', 'c.nama_customer', 'd.no_quotation', 'd.no_referensi');
 		$where  = null;
 
 		$isWhere = null;
@@ -188,11 +138,11 @@ class SlsTTB extends BD_Controller
 		$post = $this->post();
 
 		$query  = "SELECT a.*, b.nama AS lokasi,d.nama_customer as nama_customer,e.no_quotation,e.no_referensi 
-		from sls_ttb_ht a left join gbm_organisasi b on a.lokasi_id=b.id 
+		from sls_tarik_barang_ht a left join gbm_organisasi b on a.lokasi_id=b.id 
 				inner join fwk_users c on a.last_approve_user=c.employee_id
 				inner join gbm_customer d on a.customer_id=d.id
 				left join prc_quotation e on a.quotation_id=e.id";
-		$search = array('no_ttb', 'a.tanggal', 'a.catatan', 'd.nama_customer', 'e.no_quotation', 'e.no_referensi');
+		$search = array('no_tarik_barang', 'a.tanggal', 'a.catatan', 'd.nama_customer', 'e.no_quotation', 'e.no_referensi');
 
 		$where  = null;
 
@@ -216,7 +166,7 @@ class SlsTTB extends BD_Controller
 	{
 		$post = $this->post();
 
-		$query  = "SELECT a.*, b.nama AS lokasi,d.nama_customer as nama_customer,e.no_quotation,e.no_referensi from sls_ttb_ht a left join gbm_organisasi b on a.lokasi_id=b.id 
+		$query  = "SELECT a.*, b.nama AS lokasi,d.nama_customer as nama_customer,e.no_quotation,e.no_referensi from sls_tarik_barang_ht a left join gbm_organisasi b on a.lokasi_id=b.id 
 				inner join fwk_users c on a.last_approve_user=c.employee_id
 				inner join gbm_customer d on a.customer_id=d.id
 				left join prc_quotation e on a.quotation_id=e.id
@@ -239,7 +189,7 @@ class SlsTTB extends BD_Controller
 	{
 
 		if ($this->user_id) {
-			$query  = "SELECT COUNT(*)as jumlah from sls_ttb_ht a left join gbm_organisasi b on a.lokasi_id=b.id 
+			$query  = "SELECT COUNT(*)as jumlah from sls_tarik_barang_ht a left join gbm_organisasi b on a.lokasi_id=b.id 
 				inner join fwk_users c on a.last_approve_user=c.employee_id
 				where a.proses_approval=1 and a.status not in ('REJECTED','RELEASE') and c.id=" . $this->user_id;
 
@@ -254,8 +204,8 @@ class SlsTTB extends BD_Controller
 	function index_get($segment_3 = '')
 	{
 		$id = $segment_3;
-		$retrieve = $this->SlsTTBModel->retrieve($id);
-		$retrieve['detail'] = $this->SlsTTBModel->retrieve_detail($id);
+		$retrieve = $this->SlsTarikBarangModel->retrieve($id);
+		$retrieve['detail'] = $this->SlsTarikBarangModel->retrieve_detail($id);
 
 		if (!empty($retrieve)) {
 			$this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
@@ -266,7 +216,7 @@ class SlsTTB extends BD_Controller
 	function pembayaran_by_so_get($segment_3 = '')
 	{
 		$id = $segment_3;
-		$retrieve = $this->SlsTTBModel->retrieve_pembayaran_by_so($id);
+		$retrieve = $this->SlsTarikBarangModel->retrieve_pembayaran_by_so($id);
 
 		if (!empty($retrieve)) {
 			$this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
@@ -277,7 +227,7 @@ class SlsTTB extends BD_Controller
 	function invoice_by_so_get($segment_3 = '')
 	{
 		$id = $segment_3;
-		$retrieve = $this->SlsTTBModel->retrieve_invoice_by_so($id);
+		$retrieve = $this->SlsTarikBarangModel->retrieve_invoice_by_so($id);
 
 		if (!empty($retrieve)) {
 			$this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
@@ -288,7 +238,7 @@ class SlsTTB extends BD_Controller
 	function pembayaran_by_id_get($segment_3 = '')
 	{
 		$id = $segment_3;
-		$retrieve = $this->SlsTTBModel->retrieve_pembayaran_by_id($id);
+		$retrieve = $this->SlsTarikBarangModel->retrieve_pembayaran_by_id($id);
 
 		if (!empty($retrieve)) {
 			$this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
@@ -299,7 +249,7 @@ class SlsTTB extends BD_Controller
 	function invoice_by_id_get($segment_3 = '')
 	{
 		$id = $segment_3;
-		$retrieve = $this->SlsTTBModel->retrieve_pembayaran_by_id($id);
+		$retrieve = $this->SlsTarikBarangModel->retrieve_pembayaran_by_id($id);
 
 		if (!empty($retrieve)) {
 			$this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
@@ -310,8 +260,8 @@ class SlsTTB extends BD_Controller
 	function getPOMobile_post($segment_3 = '')
 	{
 		$id = $segment_3;
-		$retrieve = $this->SlsTTBModel->retrieve($id);
-		$retrieve['detail'] = $this->SlsTTBModel->retrieve_detail($id);
+		$retrieve = $this->SlsTarikBarangModel->retrieve($id);
+		$retrieve['detail'] = $this->SlsTarikBarangModel->retrieve_detail($id);
 
 		if (!empty($retrieve)) {
 			$this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
@@ -322,7 +272,7 @@ class SlsTTB extends BD_Controller
 	function getAll_get()
 	{
 
-		$retrieve = $this->SlsTTBModel->retrieve_all_kategori();
+		$retrieve = $this->SlsTarikBarangModel->retrieve_all_kategori();
 
 		if (!empty($retrieve)) {
 			$this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
@@ -334,7 +284,7 @@ class SlsTTB extends BD_Controller
 	function getAllByCustomer_get($supp_id)
 	{
 
-		$retrieve = $this->SlsTTBModel->retrieve_all_by_customer($supp_id);
+		$retrieve = $this->SlsTarikBarangModel->retrieve_all_by_customer($supp_id);
 
 		if (!empty($retrieve)) {
 			$this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
@@ -345,7 +295,7 @@ class SlsTTB extends BD_Controller
 	function getAllSOReleaseByCustomer_get($supp_id)
 	{
 
-		$retrieve = $this->SlsTTBModel->retrieve_all_so_release_by_customer($supp_id);
+		$retrieve = $this->SlsTarikBarangModel->retrieve_all_so_release_by_customer($supp_id);
 
 		if (!empty($retrieve)) {
 			$this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
@@ -357,15 +307,15 @@ class SlsTTB extends BD_Controller
 	{
 		$hasil = array();
 		$hasil = [];
-		$retrieve = $this->SlsTTBModel->retrieve_all_so_release_by_customer($supp_id);
+		$retrieve = $this->SlsTarikBarangModel->retrieve_all_so_release_by_customer($supp_id);
 
 		if (!empty($retrieve)) {
 			// Cek PO msh ada outstanding atau Tidak //
 			foreach ($retrieve as $key => $ret) {
 
-				$sqlCek = "Select a.id, f.nama as lokasi, a.tanggal,a.no_ttb,a.catatan,b.id, b.item_id,c.kode as kode_item,c.nama as nama_item,d.kode as uom, b.qty,IFNULL(e.qty_terima, 0)as qty_sudah_terima,
+				$sqlCek = "Select a.id, f.nama as lokasi, a.tanggal,a.no_tarik_barang,a.catatan,b.id, b.item_id,c.kode as kode_item,c.nama as nama_item,d.kode as uom, b.qty,IFNULL(e.qty_terima, 0)as qty_sudah_terima,
 					b.qty-IFNULL(e.qty_terima, 0)as qty_belum_terima ,  b.harga,b.diskon 
-					from sls_ttb_ht a INNER JOIN sls_so_dt b ON a.id=b.so_hd_id
+					from sls_tarik_barang_ht a INNER JOIN sls_so_dt b ON a.id=b.so_hd_id
 					INNER JOIN inv_item c on b.item_id=c.id 
 					INNER join gbm_uom d on c.uom_id=d.id
 					LEFT join (
@@ -374,7 +324,7 @@ class SlsTTB extends BD_Controller
 					left join gbm_organisasi f on a.lokasi_id=f.id
 					where a.status='RELEASE' and a.id=" . $ret['id'] . "
 					and b.qty-IFNULL(e.qty_terima, 0)>0
-					order by a.tanggal,a.no_ttb";
+					order by a.tanggal,a.no_tarik_barang";
 				$result =	$this->db->query($sqlCek)->result_array();
 				if (count($result) > 0) {
 					$hasil[] = $ret;
@@ -391,15 +341,15 @@ class SlsTTB extends BD_Controller
 		$input['diubah_oleh'] = $this->user_id;
 		$input['dibuat_oleh'] = $this->user_id;
 		$this->load->library('Autonumber');
-		$input['no_ttb'] = $this->autonumber->ttb($input['lokasi_id']['id'], $input['tanggal']);
-		$res =  $this->SlsTTBModel->create($input);
-		// $this->set_response(array("status" => "OK", "data" => $input['no_ttb']), REST_Controller::HTTP_OK);
+		$input['no_tarik_barang'] = $this->autonumber->tarik_barang($input['lokasi_id']['id'], $input['tanggal']);
+		$res =  $this->SlsTarikBarangModel->create($input);
+		// $this->set_response(array("status" => "OK", "data" => $input['no_tarik_barang']), REST_Controller::HTTP_OK);
 		if (!empty($res)) {
 			/* start audit trail */
-			$audit = array('user_id' => $this->user_id, 'desc' => json_encode($this->post()), 'entity' => 'sls_ttb_ht', 'action' => 'new', 'entity_id' => $res, 'key_text' => $input['no_ttb']);
+			$audit = array('user_id' => $this->user_id, 'desc' => json_encode($this->post()), 'entity' => 'sls_tarik_barang_ht', 'action' => 'new', 'entity_id' => $res, 'key_text' => $input['no_tarik_barang']);
 			$this->db->insert('fwk_user_audit', $audit);
 			/* end audit trail */
-			$this->set_response(array("status" => "OK", "data" => $input['no_ttb']), REST_Controller::HTTP_CREATED);
+			$this->set_response(array("status" => "OK", "data" => $input['no_tarik_barang']), REST_Controller::HTTP_CREATED);
 		} else {
 			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_OK);
 		}
@@ -410,14 +360,14 @@ class SlsTTB extends BD_Controller
 		$input['diubah_oleh'] = $this->user_id;
 		$input['dibuat_oleh'] = $this->user_id;
 		$this->load->library('Autonumber');
-		$res =  $this->SlsTTBModel->create_pembayaran($input);
-		// $this->set_response(array("status" => "OK", "data" => $input['no_ttb']), REST_Controller::HTTP_OK);
+		$res =  $this->SlsTarikBarangModel->create_pembayaran($input);
+		// $this->set_response(array("status" => "OK", "data" => $input['no_tarik_barang']), REST_Controller::HTTP_OK);
 		if (!empty($res)) {
 			/* start audit trail */
 			$audit = array('user_id' => $this->user_id, 'desc' => json_encode($this->post()), 'entity' => 'sls_so_pembayaran', 'action' => 'new', 'entity_id' => $res, 'key_text' => $res['id']);
 			$this->db->insert('fwk_user_audit', $audit);
 			/* end audit trail */
-			$this->set_response(array("status" => "OK", "data" => $input['no_ttb']), REST_Controller::HTTP_CREATED);
+			$this->set_response(array("status" => "OK", "data" => $input['no_tarik_barang']), REST_Controller::HTTP_CREATED);
 		} else {
 			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
 		}
@@ -427,14 +377,14 @@ class SlsTTB extends BD_Controller
 		$input = $this->post();
 		$input['diubah_oleh'] = $this->user_id;
 		$input['dibuat_oleh'] = $this->user_id;
-		$so = $this->db->query("select * from sls_ttb_ht where id=" . $input['so_id'] . "")->row_array();
+		$so = $this->db->query("select * from sls_tarik_barang_ht where id=" . $input['so_id'] . "")->row_array();
 		$so_id = $so['id'];
 		$customer_id = $so['customer_id'];
 		$this->load->library('Autonumber');
 		$input['no_invoice'] = $this->autonumber->sales_order_invoice($input['tanggal'], $customer_id);
 
-		$res =  $this->SlsTTBModel->create_invoice($input);
-		// $this->set_response(array("status" => "OK", "data" => $input['no_ttb']), REST_Controller::HTTP_OK);
+		$res =  $this->SlsTarikBarangModel->create_invoice($input);
+		// $this->set_response(array("status" => "OK", "data" => $input['no_tarik_barang']), REST_Controller::HTTP_OK);
 		if (!empty($res)) {
 			/* start audit trail */
 			$audit = array('user_id' => $this->user_id, 'desc' => json_encode($this->post()), 'entity' => 'sls_so_invoice', 'action' => 'new', 'entity_id' => $res, 'key_text' => $res['id']);
@@ -450,12 +400,12 @@ class SlsTTB extends BD_Controller
 		$input = $this->put();
 		$input['diubah_oleh'] = $this->user_id;
 		$id = (int)$segment_3;
-		$so = $this->SlsTTBModel->retrieve_pembayaran_by_id($id);
+		$so = $this->SlsTarikBarangModel->retrieve_pembayaran_by_id($id);
 		if (empty($so)) {
 			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
 		}
 
-		$res =   $this->SlsTTBModel->update_pembayaran($so['id'], $input);
+		$res =   $this->SlsTarikBarangModel->update_pembayaran($so['id'], $input);
 		// $this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
 		if (!empty($res)) {
 			/* start audit trail */
@@ -472,12 +422,12 @@ class SlsTTB extends BD_Controller
 		$input = $this->put();
 		$input['diubah_oleh'] = $this->user_id;
 		$id = (int)$segment_3;
-		$so = $this->SlsTTBModel->retrieve_invoice_by_id($id);
+		$so = $this->SlsTarikBarangModel->retrieve_invoice_by_id($id);
 		if (empty($so)) {
 			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
 		}
 
-		$res =   $this->SlsTTBModel->update_invoice($so['id'], $input);
+		$res =   $this->SlsTarikBarangModel->update_invoice($so['id'], $input);
 		// $this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
 		if (!empty($res)) {
 			/* start audit trail */
@@ -494,16 +444,16 @@ class SlsTTB extends BD_Controller
 		$input = $this->put();
 		$input['diubah_oleh'] = $this->user_id;
 		$id = (int)$segment_3;
-		$so = $this->SlsTTBModel->retrieve($id);
+		$so = $this->SlsTarikBarangModel->retrieve($id);
 		if (empty($so)) {
 			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_OK);
 		}
 
-		$res =   $this->SlsTTBModel->update($so['id'], $input);
+		$res =   $this->SlsTarikBarangModel->update($so['id'], $input);
 		// $this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
 		if (!empty($res)) {
 			/* start audit trail */
-			$audit = array('user_id' => $this->user_id, 'desc' => json_encode($this->put()), 'entity' => 'sls_ttb_ht', 'action' => 'edit', 'entity_id' => $id, 'key_text' => $so['no_ttb']);
+			$audit = array('user_id' => $this->user_id, 'desc' => json_encode($this->put()), 'entity' => 'sls_tarik_barang_ht', 'action' => 'edit', 'entity_id' => $id, 'key_text' => $so['no_tarik_barang']);
 			$this->db->insert('fwk_user_audit', $audit);
 			/* end audit trail */
 			$this->set_response(array("status" => "OK", "data" => $res), REST_Controller::HTTP_CREATED);
@@ -521,10 +471,10 @@ class SlsTTB extends BD_Controller
 			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
 			return;
 		}
-		$so = $this->SlsTTBModel->retrieve($id);
+		$so = $this->SlsTarikBarangModel->retrieve($id);
 
 		if (!empty($so)) {
-			$penerimaan = $this->db->query("SELECT b.so_id,a.* FROM sls_ttb_ht a
+			$penerimaan = $this->db->query("SELECT b.so_id,a.* FROM sls_tarik_barang_ht a
 			LEFT JOIN inv_pengiriman_so_ht b ON b.so_id=a.id
 			WHERE b.so_id=" . $so['id'] . "")->row_array();
 			if (empty($penerimaan)) {
@@ -536,7 +486,7 @@ class SlsTTB extends BD_Controller
 			$this->set_response(array("status" => "OK", "data" => $so), REST_Controller::HTTP_CREATED);
 		}
 
-		$res =   $this->SlsTTBModel->revisi($so['id'], $input);
+		$res =   $this->SlsTarikBarangModel->revisi($so['id'], $input);
 		if (!empty($res)) {
 			if ($so['is_revisi'] != 1) { // JIka Posisi blm di revisi maka kembalikan ke posisi terakhir 
 				/* Kembalikan ke status terkahir */
@@ -597,7 +547,7 @@ class SlsTTB extends BD_Controller
 			}
 			$ht['is_revisi'] = 1;
 			$this->db->where('id', $id);
-			$this->db->update('sls_ttb_ht', $ht);
+			$this->db->update('sls_tarik_barang_ht', $ht);
 			if ($so['is_revisi'] != 1) {
 				if ($karyawan_id) {
 					$karyawan = $this->db->query("select email,nama from karyawan where id=" . $karyawan_id)->row_array();
@@ -605,7 +555,7 @@ class SlsTTB extends BD_Controller
 						$email_subject = 'Info Notifikasi Approval Revisi PO';
 						$email_body    = 'Hallo, Bpk/Ibu. ' . $karyawan['nama'] . '! <br>
 					<br>
-					No PO : ' .	$so['no_ttb'] . ' direvisi dan diajukan ulang kepada Anda.<br> 
+					No PO : ' .	$so['no_tarik_barang'] . ' direvisi dan diajukan ulang kepada Anda.<br> 
 					Silakan melakukan approve pada Aplikasi Antech Sistem melalui   <a href="http://erp.dpaplant.com" target="_blank">AnTech Plantation - DPA</a>. 
 					<br> <br> Salam 
 					 <br> (Antech Sistem)';
@@ -642,7 +592,7 @@ class SlsTTB extends BD_Controller
 		$input['diubah_oleh'] = $this->user_id;
 
 		// $retrieve = $this->PrcPpModel->closing($id['id'], $input);
-		$this->db->query("UPDATE sls_ttb_ht  SET `status`='" . $input['status'] . "', `diubah_tanggal`='" . $input['diubah_tanggal'] . "', `diubah_oleh`=" . $input['diubah_oleh'] . " WHERE id=" . $id);
+		$this->db->query("UPDATE sls_tarik_barang_ht  SET `status`='" . $input['status'] . "', `diubah_tanggal`='" . $input['diubah_tanggal'] . "', `diubah_oleh`=" . $input['diubah_oleh'] . " WHERE id=" . $id);
 
 		// $this->set_response(array("status" => "OK", "data" => true), REST_Controller::HTTP_OK);
 	}
@@ -651,16 +601,16 @@ class SlsTTB extends BD_Controller
 	{
 
 		$id = (int)$segment_3;
-		$so = $this->SlsTTBModel->retrieve($id);
+		$so = $this->SlsTarikBarangModel->retrieve($id);
 		if (empty($so)) {
 			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_OK);
 		}
 
-		$res =  $this->SlsTTBModel->delete($so['id']);
+		$res =  $this->SlsTarikBarangModel->delete($so['id']);
 		// $this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
 		if (!empty($res)) {
 			/* start audit trail */
-			$audit = array('user_id' => $this->user_id, 'desc' => json_encode(array('id' => $id)), 'entity' => 'sls_ttb_ht', 'action' => 'delete', 'entity_id' => $id, 'key_text' => $so['no_ttb']);
+			$audit = array('user_id' => $this->user_id, 'desc' => json_encode(array('id' => $id)), 'entity' => 'sls_tarik_barang_ht', 'action' => 'delete', 'entity_id' => $id, 'key_text' => $so['no_tarik_barang']);
 			$this->db->insert('fwk_user_audit', $audit);
 			/* end audit trail */
 			$this->set_response(array("status" => "OK", "data" => $res), REST_Controller::HTTP_CREATED);
@@ -672,12 +622,12 @@ class SlsTTB extends BD_Controller
 	{
 
 		$id = (int)$segment_3;
-		$so = $this->SlsTTBModel->retrieve_pembayaran_by_id($id);
+		$so = $this->SlsTarikBarangModel->retrieve_pembayaran_by_id($id);
 		if (empty($so)) {
 			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
 		}
 
-		$res =  $this->SlsTTBModel->delete_pembayaran($so['id']);
+		$res =  $this->SlsTarikBarangModel->delete_pembayaran($so['id']);
 		if (!empty($res)) {
 			/* start audit trail */
 			$audit = array('user_id' => $this->user_id, 'desc' => json_encode(array('id' => $id)), 'entity' => 'sls_so_pembayaran', 'action' => 'delete', 'entity_id' => $id, 'key_text' => $so['id']);
@@ -692,12 +642,12 @@ class SlsTTB extends BD_Controller
 	{
 
 		$id = (int)$segment_3;
-		$so = $this->SlsTTBModel->retrieve_invoice_by_id($id);
+		$so = $this->SlsTarikBarangModel->retrieve_invoice_by_id($id);
 		if (empty($so)) {
 			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
 		}
 
-		$res =  $this->SlsTTBModel->delete_invoice($so['id']);
+		$res =  $this->SlsTarikBarangModel->delete_invoice($so['id']);
 		if (!empty($res)) {
 			/* start audit trail */
 			$audit = array('user_id' => $this->user_id, 'desc' => json_encode(array('id' => $id)), 'entity' => 'sls_so_invoice', 'action' => 'delete', 'entity_id' => $id, 'key_text' => $so['id']);
@@ -713,13 +663,13 @@ class SlsTTB extends BD_Controller
 		$input = $this->post();
 		$input['diubah_oleh'] = $this->user_id;
 		$id = (int)$segment_3;
-		$so = $this->SlsTTBModel->retrieve($id);
+		$so = $this->SlsTarikBarangModel->retrieve($id);
 		if (empty($so)) {
 			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
 			return;
 		}
 
-		$retrieve =   $this->SlsTTBModel->approval($so['id'], $input);
+		$retrieve =   $this->SlsTarikBarangModel->approval($so['id'], $input);
 		if ($retrieve) {
 			if ($input['karyawan_id']['id']) {
 				$karyawan = $this->db->query("select email,nama from karyawan where id=" . $input['karyawan_id']['id'])->row_array();
@@ -727,7 +677,7 @@ class SlsTTB extends BD_Controller
 					$email_subject = 'Info Notifikasi Approval PO';
 					$email_body    = 'Hallo, Bpk/Ibu. ' . $karyawan['nama'] . '! <br>
 					<br>
-					No PO : ' .	$so['no_ttb'] . ' diajukan kepada Anda.<br> 
+					No PO : ' .	$so['no_tarik_barang'] . ' diajukan kepada Anda.<br> 
 					Silakan melakukan approve pada Aplikasi Antech Sistem melalui   <a href="http://erp.dpaplant.com" target="_blank">AnTech Plantation - DPA</a>. 
 					<br> <br> Salam 
 					 <br> (Antech Sistem)';
@@ -745,13 +695,13 @@ class SlsTTB extends BD_Controller
 				$usr = $this->db->query("select * from fwk_users where employee_id=" . $input['karyawan_id']['id'] . "")->row_array();
 				if ($usr['fcm_token']) {
 					$title = "Approval PO";
-					$message = "Hallo, Bpk/Ibu. " . $karyawan['nama'] . "!. No PO : " .	$so['no_ttb'] . " diajukan kepada Anda.";
+					$message = "Hallo, Bpk/Ibu. " . $karyawan['nama'] . "!. No PO : " .	$so['no_tarik_barang'] . " diajukan kepada Anda.";
 					$this->sendNotification($usr['fcm_token'], $title, $message, '');
 				}
 			} else {
 			}
 
-			$so = $this->SlsTTBModel->retrieve($id);
+			$so = $this->SlsTarikBarangModel->retrieve($id);
 			if ($so['status'] == 'RELEASE') {
 				$query_email = "SELECT a.new_, a.user_id,b.user_name,d.nama,d.email  FROM fwk_users_acces a INNER JOIN fwk_users b ON a.user_id=b.id
 				INNER JOIN fwk_menu c ON a.menu_id=c.id
@@ -764,7 +714,7 @@ class SlsTTB extends BD_Controller
 							$email_subject = 'Info Notifikasi Approval PO';
 							$email_body    = 'Hallo, Bpk/Ibu. ' . $value['nama'] . '! <br>
 					<br>
-					No PO : ' .	$so['no_ttb'] . ' Sudah Di-Release.<br> 
+					No PO : ' .	$so['no_tarik_barang'] . ' Sudah Di-Release.<br> 
 					Silakan melakukan pemeriksaan pada Aplikasi Antech Sistem melalui   <a href="http://erp.dpaplant.com" target="_blank">AnTech Plantation - DPA</a>. 
 					<br> <br> Salam 
 					 <br> (Antech Sistem)';
@@ -793,12 +743,12 @@ class SlsTTB extends BD_Controller
 		$input = $this->post();
 		$input['diubah_oleh'] = $this->user_id;
 		$id = (int)$segment_3;
-		$so = $this->SlsTTBModel->retrieve($id);
+		$so = $this->SlsTarikBarangModel->retrieve($id);
 		if (empty($pp)) {
 			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
 		}
 
-		$retrieve =   $this->SlsTTBModel->reject($so['id'], $input);
+		$retrieve =   $this->SlsTarikBarangModel->reject($so['id'], $input);
 		$this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
 	}
 
@@ -807,13 +757,13 @@ class SlsTTB extends BD_Controller
 		$id = (int)$segment_3;
 		$data = $this->post();
 		$data['diubah_oleh'] = $this->user_id;
-		$ttb = $this->SlsTTBModel->retrieve($id);
+		$ttb = $this->SlsTarikBarangModel->retrieve($id);
 		if (empty($ttb)) {
 			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_OK);
 		}
 		$tenor = $ttb['tenor'];
 		$lokasi_id = $ttb['lokasi_id'];
-		$no_ttb = $ttb['no_ttb'];
+		$no_tarik_barang = $ttb['no_tarik_barang'];
 		$tgl_ttb = $ttb['tanggal'];
 		$collector_id = $ttb['collector_id'];
 		$customer_id = $ttb['customer_id'];
@@ -827,7 +777,7 @@ class SlsTTB extends BD_Controller
 
 			$tanggal_tempo = $date->format('Y-m-d');
 			$angsuran_ke = $i;
-			$no_kuitansi = $no_ttb . "." . sprintf("%02s", $angsuran_ke);
+			$no_kuitansi = $no_tarik_barang . "." . sprintf("%02s", $angsuran_ke);
 			if ($angsuran_ke == 1) {
 				$nilai_angsuran = $ttb['total_dp'];
 			} else {
@@ -844,7 +794,7 @@ class SlsTTB extends BD_Controller
 				'collector_id' => $collector_id,
 				'customer_id' => $customer_id,
 				'tanggal_tempo' => $tanggal_tempo,
-				'keterangan' => 'Cicilan TTB No. ' . $no_ttb . ' Angsuran Ke-' . $angsuran_ke,
+				'keterangan' => 'Cicilan TTB No. ' . $no_tarik_barang . ' Angsuran Ke-' . $angsuran_ke,
 				'dibuat_oleh' => $this->user_id,
 				'dibuat_tanggal' => date('Y-m-d H:i:s')
 
@@ -859,10 +809,10 @@ class SlsTTB extends BD_Controller
 			}
 		}
 
-		$res = $this->SlsTTBModel->posting($id, $data);
+		$res = $this->SlsTarikBarangModel->posting($id, $data);
 		if (!empty($res)) {
 			/* start audit trail */
-			$audit = array('user_id' => $this->user_id, 'desc' => json_encode(array('id' => $id)), 'entity' => 'sls_ttb_ht', 'action' => 'posting', 'entity_id' => $id, 'key_text' => $so['no_ttb']);
+			$audit = array('user_id' => $this->user_id, 'desc' => json_encode(array('id' => $id)), 'entity' => 'sls_tarik_barang_ht', 'action' => 'posting', 'entity_id' => $id, 'key_text' => $so['no_tarik_barang']);
 			$this->db->insert('fwk_user_audit', $audit);
 			/* end audit trail */
 			$this->set_response(array("status" => "OK", "data" => $res), REST_Controller::HTTP_CREATED);
@@ -873,7 +823,7 @@ class SlsTTB extends BD_Controller
 	function getAllDetail_get($so_id)
 	{
 		$retrieve = array();
-		$dtl = $this->SlsTTBModel->retrieve_so_dtl($so_id);
+		$dtl = $this->SlsTarikBarangModel->retrieve_so_dtl($so_id);
 		$retrieve['dtl'] = $dtl;
 		$retrieve['AKUN_PPN'] = $this->db->query("select * from acc_auto_jurnal where kode='PPN_KELUARAN'")->row_array()['acc_akun_id'];
 		$retrieve['AKUN_PENGIRIMAN_BARANG_SO'] = $this->db->query("select * from acc_auto_jurnal where kode='PENGIRIMAN_BARANG_SO'")->row_array()['acc_akun_id'];
@@ -890,7 +840,7 @@ class SlsTTB extends BD_Controller
 		// $retrieve['AKUN_PPBKB'] = $this->db->query("select * from acc_auto_jurnal where kode='PPBKB_PEMBELIAN'")->row_array()['acc_akun_id'];
 		// $retrieve['AKUN_BIAYA_KIRIM'] = $this->db->query("select * from acc_auto_jurnal where kode='BIAYA_KIRIM_PO'")->row_array()['acc_akun_id'];
 		// $retrieve['AKUN_BIAYA_LAIN'] = $this->db->query("select * from acc_auto_jurnal where kode='BIAYA_LAIN_PO'")->row_array()['acc_akun_id'];
-		$ret_so_ht = $this->db->query("select * from sls_ttb_ht where id= " . $so_id)->row_array();
+		$ret_so_ht = $this->db->query("select * from sls_tarik_barang_ht where id= " . $so_id)->row_array();
 		$retrieve['SO_HT'] =	$ret_so_ht;
 		if (!empty($retrieve)) {
 			$this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
@@ -900,7 +850,7 @@ class SlsTTB extends BD_Controller
 	}
 	function getAllDetailBlmTerkirim_get($so_id)
 	{
-		$retrieve = $this->SlsTTBModel->retrieve_so_dtl_blm_terkirim($so_id);
+		$retrieve = $this->SlsTarikBarangModel->retrieve_so_dtl_blm_terkirim($so_id);
 
 		if (!empty($retrieve)) {
 			$this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
@@ -911,7 +861,7 @@ class SlsTTB extends BD_Controller
 	function getAllDetailSdhTerkirim_get($so_id)
 	{
 		$retrieve = array();
-		$dtl = $this->SlsTTBModel->retrieve_so_dtl_sdh_terkirim($so_id);
+		$dtl = $this->SlsTarikBarangModel->retrieve_so_dtl_sdh_terkirim($so_id);
 		$retrieve['dtl'] = $dtl;
 		$retrieve['AKUN_PPN'] = $this->db->query("select * from acc_auto_jurnal where kode='PPN_KELUARAN'")->row_array()['acc_akun_id'];
 		$retrieve['AKUN_PENGIRIMAN_BARANG_SO'] = $this->db->query("select * from acc_auto_jurnal where kode='AKUN_PENGIRIMAN_BARANG_SO'")->row_array()['acc_akun_id'];
@@ -921,7 +871,7 @@ class SlsTTB extends BD_Controller
 		$retrieve['AKUN_BIAYA_KIRIM'] = $this->db->query("select * from acc_auto_jurnal where kode='BIAYA_KIRIM_SO'")->row_array()['acc_akun_id'];
 		$retrieve['AKUN_BIAYA_LAIN'] = $this->db->query("select * from acc_auto_jurnal where kode='BIAYA_LAIN_SO'")->row_array()['acc_akun_id'];
 
-		$ret_so_ht = $this->db->query("select * from sls_ttb_ht where id= " . $so_id)->row_array();
+		$ret_so_ht = $this->db->query("select * from sls_tarik_barang_ht where id= " . $so_id)->row_array();
 		$retrieve['SO_HT'] =	$ret_so_ht;
 		if (!empty($retrieve)) {
 			$this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
@@ -931,358 +881,36 @@ class SlsTTB extends BD_Controller
 	}
 
 
-	function print_slip_so_get($segment_3 = '')
-	{
-
-		$id = (int)$segment_3;
-		$data = [];
-
-		$queryHeader = "SELECT a.*,
-		f.nama_customer,
-		a.alamat_pengiriman as alamat_customer,
-		a.telp_pengiriman as no_telepon_customer,
-		a.contact_pengiriman as contact_person_customer,
-		g.jenis as jenis_bayar,
-		g.ket as ket_bayar
-		FROM sls_ttb_ht a 
-		left JOIN gbm_organisasi e ON a.lokasi_id=e.id
-		left JOIN gbm_customer f ON a.customer_id=f.id
-		left JOIN prc_syarat_bayar g ON a.syarat_bayar_id=g.id
-		WHERE a.id=" . $id . "";
-
-		$dataHeader = $this->db->query($queryHeader)->row_array();
-
-		$queryDetail = "SELECT a.*,
-		b.kode as kode_barang,
-		b.nama as nama_barang,
-		f.nama as uom
-		FROM sls_so_dt a 
-		LEFT join inv_item b on a.item_id=b.id 
-		LEFT join gbm_uom f on b.uom_id=f.id 
-		WHERE  a.so_hd_id = " . $id . "";
-		$dataDetail = $this->db->query($queryDetail)->result_array();
-
-		// foreach ($dataDetail as $key => $value) {
-		// 	$stok = $this->InvItemModel->cek_stok_lokasi_get($value['lokasi_pp_id'], $value['item_id'], $dataHeader['tanggal']);
-		// 	$dataDetail[$key]['stok'] = $stok;
-		// }
-
-		// $queryUser = "SELECT a.*, b.nama as peminta FROM fwk_users a LEFT JOIN karyawan b ON a.employee_id=b.id WHERE a.id=" . $dataHeader['dibuat_oleh'];
-		// $dataUser = $this->db->query($queryUser)->row_array();
-
-		// var_dump($dataUser); die;
-
-
-		// $perminta = $this->InvPermintaanBarangModel->print_slip($id);
-		$data['header'] = 	$dataHeader;
-		$data['detail'] = 	$dataDetail;
-		// $data['user'] = $dataUser;
-
-
-		$data['database'] = $this->db;
-
-		$html = $this->load->view('SlsTTB_laporan', $data, true);
-
-		$filename = 'report_so_' . time();
-		$this->pdfgenerator->generate($html, $filename, true, 'A4', 'portrait');
-		// echo $html;
-	}
-	function print_slip_invoice_get($segment_3 = '')
-	{
-
-		$id = (int)$segment_3;
-		$data = [];
-		// $queryInv = "SELECT * from sls_so_invoice
-		// WHERE id=" . $id . "";
-		// $dataInv = $this->db->query($queryInv)->row_array();
-
-
-		$queryHeader = "SELECT a.*,
-		f.nama_customer,
-		a.alamat_pengiriman as alamat_customer,
-		a.telp_pengiriman as no_telepon_customer,
-		a.contact_pengiriman as contact_person_customer,
-		g.jenis as jenis_bayar,
-		g.ket as ket_bayar
-		FROM sls_ttb_ht a 
-		INNER JOIN gbm_organisasi e ON a.lokasi_id=e.id
-		INNER JOIN gbm_customer f ON a.customer_id=f.id
-		INNER JOIN prc_syarat_bayar g ON a.syarat_bayar_id=g.id
-		WHERE a.id=" . $id . "";
-		$dataHeader = $this->db->query($queryHeader)->row_array();
-
-		$queryDetail = "	SELECT a.*,
-		b.kode as kode_barang,
-		b.nama as nama_barang,
-		c.nama as uom
-		FROM sls_so_dt a 
-		LEFT join inv_item b on a.item_id=b.id 
-		LEFT join gbm_uom c on b.uom_id=c.id 
-
-		WHERE  a.so_hd_id = " . $id . "";
-		$dataDetail = $this->db->query($queryDetail)->result_array();
-
-		$this->load->helper("terbilangv2");
-
-		$terbilang = terbilang($dataHeader['grand_total']);
-		$data['header'] = 	$dataHeader;
-		$data['detail'] = 	$dataDetail;
-		$data['invoice'] = [];
-		$data['terbilang'] = 	$terbilang;
-
-
-		$data['database'] = $this->db;
-
-		$html = $this->load->view('SlsTTBSlipInvoice', $data, true);
-
-		$filename = 'report_invoice_' . time();
-		$this->pdfgenerator->generate($html, $filename, true, 'A4', 'portrait');
-		// echo $html;
-	}
-	function print_slip_html_get($segment_3 = '')
-	{
-
-		$id = (int)$segment_3;
-		$data = [];
-
-		$queryHeader = "SELECT a.*,
-
-		f.nama_customer as nama_customer,
-		f.alamat as alamat_customer,
-		f.no_telpon as no_telepon_customer,
-		f.nama_bank as nama_bank,
-		f.no_rekening as no_rekening,
-		f.atas_nama as atas_nama,
-		f.contact_person as contact_person_customer,
-		f.no_hp as no_hp_customer,
-
-		g.jenis as jenis_bayar,
-		g.ket as ket_bayar,
-
-		h.nama as nama_franco,
-		h.alamat as alamat_franco,
-		h.contact as contact_franco,
-		h.telp as telp_franco,
-
-		i.kode as mata_uang_kode,
-		i.simbol as mata_uang_simbol,
-		i.nama as mata_uang_nama,
-
-		z.nama as user_approve1,
-		x.nama as user_approve_jabatan1,
-		zz.nama as user_approve2,
-		xx.nama as user_approve_jabatan2,
-		zzz.nama as user_approve3,
-		xxx.nama as user_approve_jabatan3,
-		zzzz.nama as user_approve4,
-		xxxx.nama as user_approve_jabatan4,
-		zzzzz.nama as user_approve5,
-		xxxxx.nama as user_approve_jabatan5,
-
-		e.nama as lokasi
-		FROM sls_ttb_ht a 
-		INNER JOIN gbm_organisasi e ON a.lokasi_id=e.id
-		INNER JOIN gbm_customer f ON a.customer_id=f.id
-		INNER JOIN prc_syarat_bayar g ON a.syarat_bayar_id=g.id
-		INNER JOIN prc_franco h ON a.franco_id=h.id
-		LEFT JOIN karyawan z ON a.user_approve1=z.id
-		LEFT JOIN payroll_jabatan x ON z.jabatan_id=x.id
-		LEFT JOIN karyawan zz ON a.user_approve2=zz.id
-		LEFT JOIN payroll_jabatan xx ON zz.jabatan_id=xx.id
-		LEFT JOIN karyawan zzz ON a.user_approve3=zzz.id
-		LEFT JOIN payroll_jabatan xxx ON zzz.jabatan_id=xxx.id
-		LEFT JOIN karyawan zzzz ON a.user_approve4=zzzz.id
-		LEFT JOIN payroll_jabatan xxxx ON zzzz.jabatan_id=xxxx.id
-		LEFT JOIN karyawan zzzzz ON a.user_approve5=zzzzz.id
-		LEFT JOIN payroll_jabatan xxxxx ON zzzzz.jabatan_id=xxxxx.id
-		LEFT JOIN acc_mata_uang i ON a.mata_uang_id=i.id
-		LEFT JOIN karyawan j ON a.dibuat_oleh=j.id
-		WHERE a.id=" . $id . "";
-		$dataHeader = $this->db->query($queryHeader)->row_array();
-
-		$queryDetail = "SELECT a.*,
-		b.kode as kode_barang,
-		b.nama as nama_barang,
-		f.nama as uom,
-		d.lokasi_id as lokasi_pp_id
-		FROM sls_so_dt a 
-		INNER JOIN prc_pp_dt c on a.pp_dt_id=c.id
-		inner join prc_pp_ht d on c.pp_hd_id=d.id
-		LEFT join inv_item b on a.item_id=b.id 
-		LEFT join gbm_uom f on b.uom_id=f.id 
-		WHERE  a.so_hd_id = " . $id . "";
-		$dataDetail = $this->db->query($queryDetail)->result_array();
-
-		foreach ($dataDetail as $key => $value) {
-			$stok = $this->InvItemModel->cek_stok_lokasi_get($value['lokasi_pp_id'], $value['item_id'], $dataHeader['tanggal']);
-			$dataDetail[$key]['stok'] = $stok;
-		}
-
-		$queryUser = "SELECT a.*, b.nama as peminta FROM fwk_users a LEFT JOIN karyawan b ON a.employee_id=b.id WHERE a.id=" . $dataHeader['dibuat_oleh'];
-		$dataUser = $this->db->query($queryUser)->row_array();
-
-		$data['header'] = 	$dataHeader;
-		$data['detail'] = 	$dataDetail;
-		$data['user'] = $dataUser;
-
-
-		$data['database'] = $this->db;
-
-		$html = $this->load->view('SlsTTB_laporan', $data, true);
-
-		echo $html;
-	}
-	function print_slip_cek_harga_get($segment_3 = '')
-	{
-
-		$id = (int)$segment_3;
-		$data = [];
-
-		$queryHeader = "SELECT a.*,
-		-- d.nama as gudang,
-		f.nama_customer as nama_customer,
-		f.alamat as alamat_customer,
-		f.no_telpon as no_telepon_customer,
-		f.nama_bank as nama_bank,
-		f.no_rekening as no_rekening,
-		f.atas_nama as atas_nama,
-		f.contact_person as contact_person_customer,
-		f.no_hp as no_hp_customer,
-
-		g.jenis as jenis_bayar,
-		g.ket as ket_bayar,
-
-		h.nama as nama_franco,
-		h.alamat as alamat_franco,
-		h.contact as contact_franco,
-		h.telp as telp_franco,
-
-		i.kode as mata_uang_kode,
-		i.simbol as mata_uang_simbol,
-		i.nama as mata_uang_nama,
-
-		z.nama as user_approve1,
-		x.nama as user_approve_jabatan1,
-		zz.nama as user_approve2,
-		xx.nama as user_approve_jabatan2,
-		zzz.nama as user_approve3,
-		xxx.nama as user_approve_jabatan3,
-		zzzz.nama as user_approve4,
-		xxxx.nama as user_approve_jabatan4,
-		zzzzz.nama as user_approve5,
-		xxxxx.nama as user_approve_jabatan5,
-
-		e.nama as lokasi
-		FROM sls_ttb_ht a 
-		-- INNER JOIN gbm_organisasi d ON a.gudang_id=d.id
-		INNER JOIN gbm_organisasi e ON a.lokasi_id=e.id
-		INNER JOIN gbm_customer f ON a.customer_id=f.id
-		INNER JOIN prc_syarat_bayar g ON a.syarat_bayar_id=g.id
-		INNER JOIN prc_franco h ON a.franco_id=h.id
-
-		LEFT JOIN karyawan z ON a.user_approve1=z.id
-		LEFT JOIN payroll_jabatan x ON z.jabatan_id=x.id
-		LEFT JOIN karyawan zz ON a.user_approve2=zz.id
-		LEFT JOIN payroll_jabatan xx ON zz.jabatan_id=xx.id
-		LEFT JOIN karyawan zzz ON a.user_approve3=zzz.id
-		LEFT JOIN payroll_jabatan xxx ON zzz.jabatan_id=xxx.id
-		LEFT JOIN karyawan zzzz ON a.user_approve4=zzzz.id
-		LEFT JOIN payroll_jabatan xxxx ON zzzz.jabatan_id=xxxx.id
-		LEFT JOIN karyawan zzzzz ON a.user_approve5=zzzzz.id
-		LEFT JOIN payroll_jabatan xxxxx ON zzzzz.jabatan_id=xxxxx.id
-		
-		LEFT JOIN acc_mata_uang i ON a.mata_uang_id=i.id
-		LEFT JOIN karyawan j ON a.dibuat_oleh=j.id
-		WHERE a.id=" . $id . "";
-		$dataHeader = $this->db->query($queryHeader)->row_array();
-
-		$queryDetail = "SELECT a.*,
-		b.kode as kode_barang,
-		b.nama as nama_barang,
-		f.nama as uom,
-		d.lokasi_id as lokasi_pp_id
-		FROM sls_so_dt a 
-		INNER JOIN prc_pp_dt c on a.pp_dt_id=c.id
-		inner join prc_pp_ht d on c.pp_hd_id=d.id
-		LEFT join inv_item b on a.item_id=b.id 
-		LEFT join gbm_uom f on b.uom_id=f.id 
-		WHERE  a.so_hd_id = " . $id . "";
-		$dataDetail = $this->db->query($queryDetail)->result_array();
-
-		foreach ($dataDetail as $key => $value) {
-			$stok = $this->InvItemModel->cek_stok_lokasi_get($value['lokasi_pp_id'], $value['item_id'], $dataHeader['tanggal']);
-			$dataDetail[$key]['stok'] = $stok;
-
-			$queryLastPO = "select a.no_ttb,a.tanggal,c.nama_customer ,b.harga from sls_ttb_ht a 
-			inner join sls_so_dt b on a.id=b.so_hd_id 
-			inner join gbm_customer c on a.customer_id=c.id
-			where b.item_id='" . $value['item_id'] . "'
-			and a.tanggal <'" . ($dataHeader['tanggal']) . "'
-			order by a.tanggal desc limit 1 ";
-			$last_po = $this->db->query($queryLastPO)->row_array();
-			if ($last_po) {
-				$dataDetail[$key]['last_no_ttb'] = $last_po['no_ttb'];
-				$dataDetail[$key]['last_harga_po'] = $last_po['harga'];
-				$dataDetail[$key]['last_tanggal_po'] = $last_po['tanggal'];
-				$dataDetail[$key]['last_customer'] = $last_po['nama_customer'];
-			} else {
-				$dataDetail[$key]['last_no_ttb'] = '';
-				$dataDetail[$key]['last_harga_po'] = 0;
-				$dataDetail[$key]['last_tanggal_po'] = '';
-				$dataDetail[$key]['last_customer'] = '';
-			}
-		}
-
-		$queryUser = "SELECT a.*, b.nama as peminta FROM fwk_users a LEFT JOIN karyawan b ON a.employee_id=b.id WHERE a.id=" . $dataHeader['dibuat_oleh'];
-		$dataUser = $this->db->query($queryUser)->row_array();
-
-		// var_dump($dataUser); die;
-
-
-		// $perminta = $this->InvPermintaanBarangModel->print_slip($id);
-		$data['header'] = 	$dataHeader;
-		$data['detail'] = 	$dataDetail;
-		$data['user'] = $dataUser;
-
-
-		$data['database'] = $this->db;
-
-		$html = $this->load->view('SlsTTB_laporan_cek_harga', $data, true);
-
-		$filename = 'report_prcpo_' . time();
-		$this->pdfgenerator->generate($html, $filename, true, 'A4', 'landscape');
-		// echo $html;
-	}
+	
+	
+	
 	function print_slip_get($segment_3 = '')
 	{
 
 		$id = (int)$segment_3;
 		$data = [];
 
-		$queryHeader = "SELECT a.*,b.nama as lokasi,i.nama AS surveyor,
-		h.nama AS sales, j.nama as sales_supervisor, k.nama as demo_booker,so.no_so,so.tanggal AS tanggal_so,
+		$queryHeader = "SELECT a.*,b.nama as lokasi,
+		h.nama AS collector,ttb.no_ttb,ttb.tanggal AS tanggal_ttb,
 		c.kode_customer,c.nama_customer,c.alamat,c.no_telpon,c.no_ktp,d.nama AS provinsi,
 		e.nama AS kabupaten,f.nama as kecamatan,g.nama AS kelurahan
-		from  	sls_ttb_ht a 
-		inner JOIN sls_so_ht so ON a.sls_so_id=so.id 
+		from  	sls_tarik_barang_ht a 
+		inner JOIN sls_ttb_ht ttb ON a.sls_ttb_id=ttb.id 
 		INNER JOIN gbm_organisasi b ON a.lokasi_id=b.id
 		INNER JOIN gbm_customer c ON a.customer_id=c.id
 		LEFT JOIN gbm_provinsi d ON c.provinsi_id=d.id
 		LEFT JOIN gbm_kabupaten e ON c.kabupaten_id=e.id
 		LEFT JOIN gbm_kecamatan f ON c.provinsi_id=f.id
 		LEFT JOIN gbm_kelurahan g ON c.kelurahan_id=g.id
-		LEFT JOIN karyawan h ON a.sales_id=h.id
-		LEFT JOIN karyawan i ON a.surveyor_id=i.id
-		LEFT JOIN karyawan j ON a.sales_supervisor_id=j.id
-		LEFT JOIN karyawan k ON a.demo_booker_id=k.id
+		LEFT JOIN karyawan h ON a.collector_id=h.id
 		WHERE a.id=" . $id . "";
 
 		$dataHeader = $this->db->query($queryHeader)->row_array();
 
-		$queryDetail = "SELECT a.*,b.kode as kode_barang,b.nama as nama_barang,c.kode AS uom FROM sls_ttb_dt a
+		$queryDetail = "SELECT a.*,b.kode as kode_barang,b.nama as nama_barang,c.kode AS uom FROM sls_tarik_barang_dt a
 		 left JOIN inv_item b 
 		ON a.item_id=b.id left JOIN gbm_uom c ON b.uom_id=c.id
-		WHERE  a.ttb_hd_id = " . $id . "";
+		WHERE  a.tarik_barang_hd_id = " . $id . "";
 		$dataDetail = $this->db->query($queryDetail)->result_array();
 
 		$data['header'] = 	$dataHeader;
@@ -1292,7 +920,7 @@ class SlsTTB extends BD_Controller
 
 		$data['database'] = $this->db;
 
-		$html = $this->load->view('SlsTTB_Slip', $data, true);
+		$html = $this->load->view('SlsTarikBarang_Slip', $data, true);
 
 		$filename = 'slipso_' . time();
 		$this->pdfgenerator->generate($html, $filename, true, 'A4', 'portrait');
@@ -1322,7 +950,7 @@ class SlsTTB extends BD_Controller
 			$filter_lokasi = "Semua Lokasi";
 		}
 
-		$query = "select * from sls_ttb_detail_vw where tanggal between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
+		$query = "select * from sls_tarik_barang_detail_vw where tanggal between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
 		and lokasi_id  " . $lokasi_id . "";
 		$dataDtl = $this->db->query($query)->result_array();
 
@@ -1334,7 +962,7 @@ class SlsTTB extends BD_Controller
 		$data['filter_tgl_akhir'] = $tgl_akhir;
 		$data['format_laporan'] = $format_laporan;
 
-		$html = $this->load->view('Sls_TTB_Laporan_Detail', $data, true);
+		$html = $this->load->view('sls_tarik_barang_Laporan_Detail', $data, true);
 
 		// $filename = 'report_' . time();
 		// $this->pdfgenerator->generate($html, $filename, true, 'A4', 'landscape');
@@ -1401,7 +1029,7 @@ class SlsTTB extends BD_Controller
 		$query = "SELECT lokasi_id,lokasi,tanggal,SUM(qty)AS qty,SUM(diskon)AS diskon,SUM(dp)AS dp,
 			SUM(total)AS total,SUM(nilai_piutang)as nilai_piutang,SUM(nilai_angsuran)AS nilai_angsuran,
 			surveyor,sales,sales_supervisor,demo_booker
-			FROM sls_ttb_detail_vw
+			FROM sls_tarik_barang_detail_vw
 			where tanggal between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
 			and lokasi_id  " . $lokasi_id . "
 			GROUP BY lokasi_id,lokasi,tanggal,surveyor,sales,sales_supervisor,demo_booker
@@ -1417,7 +1045,7 @@ class SlsTTB extends BD_Controller
 		$data['filter_tgl_akhir'] = $tgl_akhir;
 		$data['format_laporan'] = $format_laporan;
 
-		$html = $this->load->view('Sls_TTB_Laporan_Rekap', $data, true);
+		$html = $this->load->view('sls_tarik_barang_Laporan_Rekap', $data, true);
 
 		// $filename = 'report_' . time();
 		// $this->pdfgenerator->generate($html, $filename, true, 'A4', 'landscape');
@@ -1497,7 +1125,7 @@ class SlsTTB extends BD_Controller
 		$tgl_akhir = $periode . '-' . sprintf("%02d", $jumhari);
 
 		$queryhead = "SELECT b.nama_customer as nama_customer, c.customer_id FROM sls_so_dt a
-		INNER JOIN sls_ttb_ht c ON a.so_hd_id=c.id
+		INNER JOIN sls_tarik_barang_ht c ON a.so_hd_id=c.id
 		INNER JOIN gbm_customer b ON c.customer_id=b.id
 		where c.tanggal between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
 		and c.status  in ('RELEASE')
@@ -1509,7 +1137,7 @@ class SlsTTB extends BD_Controller
 
 		foreach ($dataBkm as $key => $hd) {
 			$querydetail = "SELECT a.*,
-			b.no_ttb as no_ttb,
+			b.no_tarik_barang as no_tarik_barang,
 			d.no_pp as no_pp,
 			b.tanggal as tanggal,
 			b.tgl_approve1 AS aprrove1,
@@ -1520,7 +1148,7 @@ class SlsTTB extends BD_Controller
 			f.nama as nama_item,
 			g.nama AS gudang
 			FROM sls_so_dt a
-			INNER JOIN sls_ttb_ht b ON a.so_hd_id=b.id
+			INNER JOIN sls_tarik_barang_ht b ON a.so_hd_id=b.id
 			LEFT JOIN prc_pp_dt c ON a.pp_dt_id=c.id
 			LEFT JOIN prc_pp_ht d ON c.pp_hd_id=d.id
 			LEFT JOIN gbm_customer e ON b.customer_id=e.id
@@ -1624,7 +1252,7 @@ class SlsTTB extends BD_Controller
 		// $tgl_akhir = $periode . '-' . sprintf("%02d", $jumhari);
 
 		$queryhead = "SELECT b.nama_customer as nama_customer, c.customer_id FROM sls_so_dt a
-		INNER JOIN sls_ttb_ht c ON a.so_hd_id=c.id
+		INNER JOIN sls_tarik_barang_ht c ON a.so_hd_id=c.id
 		INNER JOIN gbm_customer b ON c.customer_id=b.id
 		where c.tanggal between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
 		and c.status  in ('RELEASE')
@@ -1636,7 +1264,7 @@ class SlsTTB extends BD_Controller
 
 		foreach ($dataBkm as $key => $hd) {
 			$querydetail = "SELECT a.*,b.nama_customer AS nama_customer 
-			FROM sls_ttb_ht a
+			FROM sls_tarik_barang_ht a
 			LEFT JOIN gbm_customer b ON a.customer_id=b.id
 			WHERE a.customer_id=" . $hd['customer_id'] . "
 			AND a.tanggal between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'
@@ -1738,7 +1366,7 @@ class SlsTTB extends BD_Controller
 		$tgl_akhir = $periode . '-' . sprintf("%02d", $jumhari);
 
 		$queryhead = "SELECT DISTINCT c.status AS statuss FROM sls_so_dt a
-		INNER JOIN sls_ttb_ht c ON a.so_hd_id=c.id
+		INNER JOIN sls_tarik_barang_ht c ON a.so_hd_id=c.id
 		where c.tanggal between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
 		and c.status not in ('REJECTED')
 		GROUP BY c.status, c.id
@@ -1748,7 +1376,7 @@ class SlsTTB extends BD_Controller
 		$dataSt = $this->db->query($queryhead)->result_array();
 
 		foreach ($dataSt as $key => $hd) {
-			$querydetail = "SELECT a.*, b.nama AS lokasi, c.nama_customer as nama_customer FROM sls_ttb_ht a
+			$querydetail = "SELECT a.*, b.nama AS lokasi, c.nama_customer as nama_customer FROM sls_tarik_barang_ht a
 			LEFT JOIN gbm_organisasi b ON a.lokasi_id=b.id
 			LEFT JOIN gbm_customer c ON a.customer_id=c.id
 			WHERE a.status='" . $hd['statuss'] . "'
@@ -1850,7 +1478,7 @@ class SlsTTB extends BD_Controller
 		$tgl_akhir = $periode . '-' . sprintf("%02d", $jumhari);
 
 		$queryhead = "SELECT DISTINCT c.status AS statuss FROM sls_so_dt a
-		INNER JOIN sls_ttb_ht c ON a.so_hd_id=c.id
+		INNER JOIN sls_tarik_barang_ht c ON a.so_hd_id=c.id
 		where c.tanggal between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
 		and c.status  in ('REJECTED')
 		GROUP BY c.status, c.id
@@ -1860,7 +1488,7 @@ class SlsTTB extends BD_Controller
 		$dataSt = $this->db->query($queryhead)->result_array();
 
 		foreach ($dataSt as $key => $hd) {
-			$querydetail = "SELECT a.*, b.nama AS lokasi, c.nama_customer as nama_customer FROM sls_ttb_ht a
+			$querydetail = "SELECT a.*, b.nama AS lokasi, c.nama_customer as nama_customer FROM sls_tarik_barang_ht a
 			LEFT JOIN gbm_organisasi b ON a.lokasi_id=b.id
 			LEFT JOIN gbm_customer c ON a.customer_id=c.id
 			WHERE a.status='" . $hd['statuss'] . "'
@@ -1957,11 +1585,11 @@ class SlsTTB extends BD_Controller
 		$tgl_mulai = $periode . '-01';
 		$tgl_akhir = $periode . '-' . sprintf("%02d", $jumhari);
 
-		$queryhead = "SELECT c.no_ttb AS no_ttb, c.id AS id  FROM sls_so_dt a
-		INNER JOIN sls_ttb_ht c ON a.so_hd_id=c.id
+		$queryhead = "SELECT c.no_tarik_barang AS no_tarik_barang, c.id AS id  FROM sls_so_dt a
+		INNER JOIN sls_tarik_barang_ht c ON a.so_hd_id=c.id
 		where c.tanggal between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
 		and c.status='RELEASE'
-		GROUP BY c.no_ttb, c.id
+		GROUP BY c.no_tarik_barang, c.id
 		";
 
 		$ressult = array();
@@ -1969,7 +1597,7 @@ class SlsTTB extends BD_Controller
 
 		foreach ($dataPo as $key => $hd) {
 			$querydetail = "SELECT a.*,
-			b.no_ttb as no_ttb,
+			b.no_tarik_barang as no_tarik_barang,
 			d.no_pp as no_pp,
 			b.tanggal as tanggal,
 			b.tgl_approve1 AS aprrove1,
@@ -1981,7 +1609,7 @@ class SlsTTB extends BD_Controller
 			g.nama AS gudang,
 			b.status
 			FROM sls_so_dt a
-			INNER JOIN sls_ttb_ht b ON a.so_hd_id=b.id
+			INNER JOIN sls_tarik_barang_ht b ON a.so_hd_id=b.id
 			LEFT JOIN prc_pp_dt c ON a.pp_dt_id=c.id
 			LEFT JOIN prc_pp_ht d ON c.pp_hd_id=d.id
 			LEFT JOIN gbm_customer e ON b.customer_id=e.id
@@ -2086,7 +1714,7 @@ class SlsTTB extends BD_Controller
 		c.inv_kategori_id,
 		d.nama AS kategori
 		FROM sls_so_dt a
-		INNER JOIN sls_ttb_ht b ON a.so_hd_id=b.id
+		INNER JOIN sls_tarik_barang_ht b ON a.so_hd_id=b.id
 		INNER JOIN inv_item c ON a.item_id=c.id
 		INNER JOIN inv_kategori d ON c.inv_kategori_id=d.id
 		where b.tanggal between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
@@ -2100,7 +1728,7 @@ class SlsTTB extends BD_Controller
 		b.nama_customer as nama_customer,
 		c.customer_id
 		FROM sls_so_dt a
-		INNER JOIN sls_ttb_ht c ON a.so_hd_id=c.id
+		INNER JOIN sls_tarik_barang_ht c ON a.so_hd_id=c.id
 		INNER JOIN gbm_customer b ON c.customer_id=b.id
 		INNER JOIN inv_item d ON a.item_id=d.id
 		INNER JOIN inv_kategori e ON d.inv_kategori_id=e.id
@@ -2113,7 +1741,7 @@ class SlsTTB extends BD_Controller
 			$res_supp = [];
 			foreach ($dataSupp as $key => $hd) {
 				$querydetail = "SELECT a.*,
-				b.no_ttb as no_ttb,
+				b.no_tarik_barang as no_tarik_barang,
 				d.no_pp as no_pp,
 				b.tanggal as tanggal,
 				b.tgl_approve1 AS aprrove1,
@@ -2125,7 +1753,7 @@ class SlsTTB extends BD_Controller
 				g.nama AS gudang,
 				h.nama AS kategori
 				FROM sls_so_dt a
-				INNER JOIN sls_ttb_ht b ON a.so_hd_id=b.id
+				INNER JOIN sls_tarik_barang_ht b ON a.so_hd_id=b.id
 				LEFT JOIN prc_pp_dt c ON a.pp_dt_id=c.id
 				LEFT JOIN prc_pp_ht d ON c.pp_hd_id=d.id
 				LEFT JOIN gbm_customer e ON b.customer_id=e.id
@@ -2219,7 +1847,7 @@ class SlsTTB extends BD_Controller
 		c.inv_kategori_id,
 		d.nama AS kategori
 		FROM sls_so_dt a
-		INNER JOIN sls_ttb_ht b ON a.so_hd_id=b.id
+		INNER JOIN sls_tarik_barang_ht b ON a.so_hd_id=b.id
 		INNER JOIN inv_item c ON a.item_id=c.id
 		INNER JOIN inv_kategori d ON c.inv_kategori_id=d.id
 		WHERE (c.inv_kategori_id IS NOT NULL AND c.inv_kategori_id <>0)
@@ -2240,7 +1868,7 @@ class SlsTTB extends BD_Controller
 				$querydetail = "SELECT 
 			SUM(a.total) AS jml_kat_rp
 			FROM sls_so_dt a
-			INNER JOIN sls_ttb_ht b ON a.so_hd_id=b.id
+			INNER JOIN sls_tarik_barang_ht b ON a.so_hd_id=b.id
 			LEFT JOIN prc_pp_dt c ON a.pp_dt_id=c.id
 			LEFT JOIN prc_pp_ht d ON c.pp_hd_id=d.id
 			LEFT JOIN gbm_customer e ON b.customer_id=e.id
@@ -2302,7 +1930,7 @@ class SlsTTB extends BD_Controller
 		}
 
 		$queryPo = "SELECT a.*,
-		b.no_ttb as noso,
+		b.no_tarik_barang as noso,
 		b.tanggal as tanggal,
 		c.nama as item,
 		d.nama as uom,
@@ -2321,7 +1949,7 @@ class SlsTTB extends BD_Controller
 		
 		FROM sls_so_dt a
 		
-		INNER JOIN sls_ttb_ht b on a.so_hd_id=b.id
+		INNER JOIN sls_tarik_barang_ht b on a.so_hd_id=b.id
 		INNER JOIN inv_item c on a.item_id=c.id
 		INNER JOIN gbm_customer e on b.customer_id=e.id
 		LEFT JOIN gbm_uom d on c.uom_id=d.id
@@ -2468,7 +2096,7 @@ class SlsTTB extends BD_Controller
 		b.nama_customer as sup,
 		c.kode as mata_uang	,
 		d.ket AS syarat_bayar	
-		from sls_ttb_ht a 
+		from sls_tarik_barang_ht a 
 		INNER JOIN gbm_customer b on a.customer_id=b.id
 		inner JOIN acc_mata_uang c on a.mata_uang_id=c.id
 		INNER JOIN prc_syarat_bayar d ON a.syarat_bayar_id=d.id
@@ -2492,7 +2120,7 @@ class SlsTTB extends BD_Controller
 			$tgl_penerimaan = '';
 			$no_surat_jalan = '';
 			$qty_terima = 0;
-			$res_penerimaan = $this->db->query(" 	SELECT a.* FROM inv_pengiriman_so_ht a INNER JOIN sls_ttb_ht b ON a.po_id=b.id
+			$res_penerimaan = $this->db->query(" 	SELECT a.* FROM inv_pengiriman_so_ht a INNER JOIN sls_tarik_barang_ht b ON a.po_id=b.id
 			where a.po_id=" . $po['id'] . " ")->result_array();
 			if ($res_penerimaan) {
 				foreach ($res_penerimaan as $key2 => $penerimaan) {
@@ -2688,7 +2316,7 @@ class SlsTTB extends BD_Controller
 		$qry = "SELECT DISTINCT c.nama AS lokasi,
 		b.lokasi_pp_id AS lokasi_pp_id
 		FROM sls_so_dt a
-		INNER JOIN sls_ttb_ht b ON a.so_hd_id=b.id
+		INNER JOIN sls_tarik_barang_ht b ON a.so_hd_id=b.id
 		INNER JOIN gbm_organisasi c ON b.lokasi_pp_id=c.id
 		WHERE (b.lokasi_pp_id IS NOT NULL AND b.lokasi_pp_id <>0) 
 		and tanggal>='" . $tgl_mulai . "' 
@@ -2711,7 +2339,7 @@ class SlsTTB extends BD_Controller
 				$retrieveRpPO = $this->db->query("SELECT 
 				SUM(a.total) AS jml_kat_rp
 				FROM sls_so_dt a
-				INNER JOIN sls_ttb_ht b ON a.so_hd_id=b.id
+				INNER JOIN sls_tarik_barang_ht b ON a.so_hd_id=b.id
 				INNER JOIN gbm_organisasi c ON b.lokasi_pp_id=c.id
 				WHERE DATE_FORMAT(b.tanggal, '%Y-%m')='" . $yymm . "'
 				AND b.lokasi_pp_id=" . $s['lokasi_pp_id'] . "
@@ -2886,7 +2514,7 @@ class SlsTTB extends BD_Controller
 		c.inv_kategori_id,
 		d.nama AS kategori
 		FROM sls_so_dt a
-		INNER JOIN sls_ttb_ht b ON a.so_hd_id=b.id
+		INNER JOIN sls_tarik_barang_ht b ON a.so_hd_id=b.id
 		INNER JOIN inv_item c ON a.item_id=c.id
 		INNER JOIN inv_kategori d ON c.inv_kategori_id=d.id
 		WHERE (c.inv_kategori_id IS NOT NULL AND c.inv_kategori_id <>0) 
@@ -2909,7 +2537,7 @@ class SlsTTB extends BD_Controller
 				$retrieveKgSupp = $this->db->query("SELECT 
 				SUM(a.total) AS jml_kat_rp
 				FROM sls_so_dt a
-				INNER JOIN sls_ttb_ht b ON a.so_hd_id=b.id
+				INNER JOIN sls_tarik_barang_ht b ON a.so_hd_id=b.id
 				LEFT JOIN prc_pp_dt c ON a.pp_dt_id=c.id
 				LEFT JOIN prc_pp_ht d ON c.pp_hd_id=d.id
 				LEFT JOIN gbm_customer e ON b.customer_id=e.id
@@ -3033,7 +2661,7 @@ class SlsTTB extends BD_Controller
 				a.customer_id,
 				b.nama_customer as nama_customer,
 				sum(grand_total)as amount
-				from sls_ttb_ht a 
+				from sls_tarik_barang_ht a 
 				INNER JOIN gbm_customer b on a.customer_id=b.id
 				INNER JOIN acc_mata_uang c on a.mata_uang_id=c.id
 				INNER JOIN prc_syarat_bayar d ON a.syarat_bayar_id=d.id

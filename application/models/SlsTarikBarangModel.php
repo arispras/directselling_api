@@ -1,6 +1,6 @@
 <?php
 
-class SlsSoModel extends CI_Model
+class SlsTarikBarangModel extends CI_Model
 {
 
 	public function retrieve_all(
@@ -12,7 +12,7 @@ class SlsSoModel extends CI_Model
 
 		$where = array();
 
-		$data = $this->pager->set('sls_so_ht', $no_of_records, $page_no, $where);
+		$data = $this->pager->set('sls_tarik_barang_ht', $no_of_records, $page_no, $where);
 
 		return $data;
 	}
@@ -22,7 +22,7 @@ class SlsSoModel extends CI_Model
 	{
 		// $this->db->where('aktif' , 1);
 		$this->db->order_by('id', 'ASC');
-		$this->db->from('sls_so_ht a');
+		$this->db->from('sls_tarik_barang_ht a');
 		$this->db->select('a.*, b.nama_customer');
 		$this->db->join('gbm_customer b', 'a.customer_id = b.id');
 		$result = $this->db->get();
@@ -33,7 +33,7 @@ class SlsSoModel extends CI_Model
 	{
 		$this->db->where('customer_id', $supp_id);
 		$this->db->order_by('id', 'ASC');
-		$this->db->from('sls_so_ht a');
+		$this->db->from('sls_tarik_barang_ht a');
 		$this->db->select('a.*, b.nama_customer');
 		$this->db->join('gbm_customer b', 'a.customer_id = b.id');
 		$result = $this->db->get();
@@ -42,9 +42,8 @@ class SlsSoModel extends CI_Model
 	public function retrieve_all_so_release_by_customer($supp_id)
 	{
 		$this->db->where('customer_id', $supp_id);
-		// $this->db->where('status' , 'RELEASE');
 		$this->db->order_by('id', 'ASC');
-		$this->db->from('sls_so_ht a');
+		$this->db->from('sls_tarik_barang_ht a');
 		$this->db->select('a.*, b.nama_customer');
 		$this->db->join('gbm_customer b', 'a.customer_id = b.id');
 		$result = $this->db->get();
@@ -54,10 +53,10 @@ class SlsSoModel extends CI_Model
 	public function delete($id)
 	{
 		$id = (int)$id;
-		$this->db->where('so_hd_id', $id);
-		$this->db->delete('sls_so_dt');
+		$this->db->where('tarik_barang_hd_id', $id);
+		$this->db->delete('sls_tarik_barang_dt');
 		$this->db->where('id', $id);
-		$this->db->delete('sls_so_ht');
+		$this->db->delete('sls_tarik_barang_ht');
 		return true;
 	}
 
@@ -66,15 +65,15 @@ class SlsSoModel extends CI_Model
 	{
 
 		$ht['lokasi_id'] = $input['lokasi_id']['id'];
-		$ht['status_so'] = $input['status_so']['id'];
-
+		$ht['sls_ttb_id'] = $input['ttb_id'];
 		$ht['customer_id'] = $input['customer_id'];
-		$ht['sales_id'] = $input['sales_id']['id'];
-		$ht['surveyor_id'] = $input['surveyor_id']['id'];
-		$ht['sales_supervisor_id'] = $input['sales_supervisor_id']['id'];
-		$ht['demo_booker_id'] = $input['demo_booker_id']['id'];
+		// $ht['sales_id'] = $input['sales_id']['id'];
+		// $ht['surveyor_id'] = $input['surveyor_id']['id'];
+		// $ht['sales_supervisor_id'] = $input['sales_supervisor_id']['id'];
+		// $ht['demo_booker_id'] = $input['demo_booker_id']['id'];
+		$ht['collector_id'] = $input['collector_id']['id'];
 
-		$ht['no_so'] = $input['no_so'];
+		$ht['no_tarik_barang'] = $input['no_tarik_barang'];
 		$ht['catatan'] = $input['catatan'];
 		$ht['jenis'] = $input['jenis'];
 		$ht['tenor'] = $input['tenor'];
@@ -84,19 +83,17 @@ class SlsSoModel extends CI_Model
 		$ht['total_piutang'] = $input['total_piutang'];
 		$ht['total_nilai_angsuran'] = $input['total_nilai_angsuran'];
 		$ht['tanggal'] = $input['tanggal'];
-		$ht['tanggal_survey'] = $input['tanggal_survey'];
 		$ht['dibuat_tanggal'] = date('Y-m-d H:i:s');
 		$ht['dibuat_oleh'] = $input['dibuat_oleh'];
+		
 
-
-
-		$this->db->insert('sls_so_ht', $ht);
+		$this->db->insert('sls_tarik_barang_ht', $ht);
 		$id = $this->db->insert_id();
 
 		$details = $input['details'];
 		foreach ($details as $key => $value) {
-			$this->db->insert("sls_so_dt", array(
-				'so_hd_id' => $id,
+			$this->db->insert("sls_tarik_barang_dt", array(
+				'tarik_barang_hd_id' => $id,
 				'item_id' => $value['item']['id'],
 				'qty' => $value['qty'],
 				'qty_awal' => $value['qty_awal'],
@@ -116,14 +113,14 @@ class SlsSoModel extends CI_Model
 	{
 		$id = (int)$id;
 		$ht['lokasi_id'] = $input['lokasi_id']['id'];
-
+		$ht['sls_ttb_id'] = $input['ttb_id'];
 		$ht['customer_id'] = $input['customer_id'];
-		$ht['sales_id'] = $input['sales_id']['id'];
-		$ht['surveyor_id'] = $input['surveyor_id']['id'];
-		$ht['sales_supervisor_id'] = $input['sales_supervisor_id']['id'];
-		$ht['demo_booker_id'] = $input['demo_booker_id']['id'];
-		$ht['status_so'] = $input['status_so']['id'];
-		$ht['no_so'] = $input['no_so'];
+		// $ht['sales_id'] = $input['sales_id']['id'];
+		// $ht['surveyor_id'] = $input['surveyor_id']['id'];
+		// $ht['sales_supervisor_id'] = $input['sales_supervisor_id']['id'];
+		// $ht['demo_booker_id'] = $input['demo_booker_id']['id'];
+		$ht['collector_id'] = $input['collector_id']['id'];
+		$ht['no_tarik_barang'] = $input['no_tarik_barang'];
 		$ht['catatan'] = $input['catatan'];
 		$ht['jenis'] = $input['jenis'];
 		$ht['tenor'] = $input['tenor'];
@@ -133,22 +130,20 @@ class SlsSoModel extends CI_Model
 		$ht['total_piutang'] = $input['total_piutang'];
 		$ht['total_nilai_angsuran'] = $input['total_nilai_angsuran'];
 		$ht['tanggal'] = $input['tanggal'];
-		$ht['tanggal_survey'] = $input['tanggal_survey'];
 		$ht['diubah_oleh'] = $input['diubah_oleh'];
 		$input['diubah_tanggal'] = date('Y-m-d H:i:s');
 		$this->db->where('id', $id);
-		$this->db->update('sls_so_ht', $ht);
-
-
+		$this->db->update('sls_tarik_barang_ht', $ht);
+		
 
 		// hapus  detail
-		$this->db->where('so_hd_id', $id);
-		$this->db->delete('sls_so_dt');
+		$this->db->where('tarik_barang_hd_id', $id);
+		$this->db->delete('sls_tarik_barang_dt');
 
 		$details = $input['details'];
 		foreach ($details as $key => $value) {
-			$this->db->insert("sls_so_dt", array(
-				'so_hd_id' => $id,
+			$this->db->insert("sls_tarik_barang_dt", array(
+				'tarik_barang_hd_id' => $id,
 				'item_id' => $value['item']['id'],
 				'qty_awal' => $value['qty_awal'],
 				'qty' => $value['qty'],
@@ -178,7 +173,7 @@ class SlsSoModel extends CI_Model
 		$ht['mata_uang_id'] = $input['mata_uang_id']['id'];
 		$ht['quotation_id'] = $input['quotation_id'];
 		$ht['status_so'] = $input['status_so']['id'];
-		$ht['no_so'] = $input['no_so'];
+		$ht['no_tarik_barang'] = $input['no_tarik_barang'];
 		$ht['catatan'] = $input['catatan'];
 		$ht['ket_indent'] = $input['ket_indent'];
 		$ht['info_pengiriman'] = $input['info_pengiriman'];
@@ -199,16 +194,16 @@ class SlsSoModel extends CI_Model
 		$ht['diubah_oleh'] = $input['diubah_oleh'];
 		$input['diubah_tanggal'] = date('Y-m-d H:i:s');
 		$this->db->where('id', $id);
-		$this->db->update('sls_so_ht', $ht);
+		$this->db->update('sls_tarik_barang_ht', $ht);
 
 		// hapus  detail
-		$this->db->where('so_hd_id', $id);
-		$this->db->delete('sls_so_dt');
+		$this->db->where('tarik_barang_hd_id', $id);
+		$this->db->delete('sls_tarik_barang_dt');
 
 		$details = $input['details'];
 		foreach ($details as $key => $value) {
-			$this->db->insert("sls_so_dt", array(
-				'so_hd_id' => $id,
+			$this->db->insert("sls_tarik_barang_dt", array(
+				'tarik_barang_hd_id' => $id,
 				'item_id' => $value['item']['id'],
 				'qty' => $value['qty'],
 				'qty_awal' => $value['qty_awal'],
@@ -229,9 +224,11 @@ class SlsSoModel extends CI_Model
 		$id = (int)$id;
 
 
-		$this->db->from('sls_so_ht a');
-		$this->db->select('a.*, b.nama_customer');
-		$this->db->join('gbm_customer b', 'a.customer_id = b.id');
+
+		$this->db->select('a.*, b.nama_customer,c.no_ttb,c.tanggal as tanggal_ttb');
+		$this->db->from('sls_tarik_barang_ht a');
+		$this->db->join('gbm_customer b', 'a.customer_id = b.id', "left");
+		$this->db->join('sls_ttb_ht c', 'a.sls_ttb_id = c.id', "left");
 		$this->db->where('a.id', $id);
 		$result = $this->db->get();
 		return $result->row_array();
@@ -239,10 +236,9 @@ class SlsSoModel extends CI_Model
 
 	public function retrieve_detail($hdid)
 	{
-		// $this->db->select('est_spat_dt.*,gbm_organisasi.kode as kode_blok,gbm_organisasi.nama as nama_blok');
-		$this->db->select('sls_so_dt.*');
-		$this->db->from('sls_so_dt');
-		$this->db->where('so_hd_id', $hdid);
+		$this->db->select('sls_tarik_barang_dt.*');
+		$this->db->from('sls_tarik_barang_dt');
+		$this->db->where('tarik_barang_hd_id', $hdid);
 		$res = $this->db->get();
 		return $res->result_array();
 	}
@@ -319,7 +315,7 @@ class SlsSoModel extends CI_Model
 		$ht['diubah_tanggal'] = date('Y-m-d H:i:s');
 		$ht['diubah_oleh'] = $input['diubah_oleh'];
 		$this->db->where('id', $id);
-		$this->db->update('sls_so_ht', $ht);
+		$this->db->update('sls_tarik_barang_ht', $ht);
 		// $details = $input['details'];
 		// foreach ($details as $key => $value) {
 		// 	$field_qty = '';
@@ -411,32 +407,30 @@ class SlsSoModel extends CI_Model
 		$ht['diubah_tanggal'] = date('Y-m-d H:i:s');
 		$ht['diubah_oleh'] = $input['diubah_oleh'];
 		$this->db->where('id', $id);
-		$this->db->update('sls_so_ht', $ht);
+		$this->db->update('sls_tarik_barang_ht', $ht);
 
 		return true;
 	}
 	public function posting($id,	$input)
 	{
 		$id = (int)$id;
-		$data['status'] = 'RELEASE';
-		$data['last_approve_position'] = NULL;
-		$data['last_approve_user'] = NULL;
+		$data['status_ttb'] = 'kuitansi';
 		$data['is_posting'] = 1;
 		$data['diposting_tanggal'] = date('Y-m-d H:i:s');
 		$data['diposting_oleh'] =  $input['diubah_oleh'];
-		$data['diubah_tanggal'] = date('Y-m-d H:i:s');
-		$data['diubah_oleh'] = $input['diubah_oleh'];
+		// $data['diubah_tanggal'] = date('Y-m-d H:i:s');
+		// $data['diubah_oleh'] = $input['diubah_oleh'];
 		$this->db->where('id', $id);
-		$this->db->update('sls_so_ht', $data);
+		$this->db->update('sls_tarik_barang_ht', $data);
 
 
 		return true;
 	}
-	public function retrieve_so_dtl_blm_terima2($so_id)
+	public function retrieve_so_dtl_blm_terima2($ttb_id)
 	{
-		$sql = "Select f.nama as lokasi, a.tanggal,a.no_so,a.catatan,b.id, b.item_id,c.kode as kode_item,c.nama as nama_item,d.kode as uom, b.qty,IFNULL(e.qty_terkirim, 0)as qty_sudah_terima,
+		$sql = "Select f.nama as lokasi, a.tanggal,a.no_tarik_barang,a.catatan,b.id, b.item_id,c.kode as kode_item,c.nama as nama_item,d.kode as uom, b.qty,IFNULL(e.qty_terkirim, 0)as qty_sudah_terima,
 		b.qty-IFNULL(e.qty_terkirim, 0)as qty_belum_terima ,  b.harga,b.diskon 
-			from sls_so_ht a INNER JOIN sls_so_dt b ON a.id=b.so_hd_id
+			from sls_tarik_barang_ht a INNER JOIN sls_tarik_barang_dt b ON a.id=b.tarik_barang_hd_id
 			INNER JOIN inv_item c on b.item_id=c.id 
 			INNER join gbm_uom d on c.uom_id=d.id
 			LEFT join (
@@ -444,18 +438,18 @@ class SlsSoModel extends CI_Model
 			on b.id=e.so_dt_id
 			left join gbm_organisasi f on a.lokasi_id=f.id
 			where a.status='RELEASE'
-			and a.id=" . $so_id . "
+			and a.id=" . $ttb_id . "
 			and b.qty-IFNULL(e.qty_terkirim, 0)>0
-			order by a.tanggal,a.no_so";
+			order by a.tanggal,a.no_tarik_barang";
 		$result =	$this->db->query($sql)->result_array();
 		return $result;
 	}
 
-	public function retrieve_so_dtl_blm_terkirm($so_id)
+	public function retrieve_so_dtl_blm_terkirm($ttb_id)
 	{
-		$sql = "Select f.nama as lokasi, a.tanggal,a.no_so,a.catatan,b.id, b.item_id,c.kode as kode_item,c.nama as nama_item,d.kode as uom, b.qty,IFNULL(e.qty_terkirim, 0)as qty_sudah_terima,
+		$sql = "Select f.nama as lokasi, a.tanggal,a.no_tarik_barang,a.catatan,b.id, b.item_id,c.kode as kode_item,c.nama as nama_item,d.kode as uom, b.qty,IFNULL(e.qty_terkirim, 0)as qty_sudah_terima,
 		b.qty-IFNULL(e.qty_terkirim, 0)as qty_belum_terima ,  b.harga,b.diskon 
-			from sls_so_ht a INNER JOIN sls_so_dt b ON a.id=b.so_hd_id
+			from sls_tarik_barang_ht a INNER JOIN sls_tarik_barang_dt b ON a.id=b.tarik_barang_hd_id
 			INNER JOIN inv_item c on b.item_id=c.id 
 			INNER join gbm_uom d on c.uom_id=d.id
 			LEFT join (
@@ -463,42 +457,42 @@ class SlsSoModel extends CI_Model
 			on b.id=e.so_dt_id
 			left join gbm_organisasi f on a.lokasi_id=f.id
 			where 1=1
-			and a.id=" . $so_id . "
+			and a.id=" . $ttb_id . "
 			and b.qty-IFNULL(e.qty_terkirim, 0)>0
-			order by a.tanggal,a.no_so";
+			order by a.tanggal,a.no_tarik_barang";
 		$result =	$this->db->query($sql)->result_array();
 		return $result;
 	}
-	public function retrieve_so_dtl_sdh_terkirim($so_id)
+	public function retrieve_so_dtl_sdh_terkirim($ttb_id)
 	{
-		$sql = "Select f.nama as lokasi, a.tanggal,a.no_so,a.catatan,b.id, b.item_id,c.kode as kode_item,c.nama as nama_item,d.kode as uom, 
+		$sql = "Select f.nama as lokasi, a.tanggal,a.no_tarik_barang,a.catatan,b.id, b.item_id,c.kode as kode_item,c.nama as nama_item,d.kode as uom, 
 		b.qty,IFNULL(e.qty_terkirim, 0)as qty_sudah_terima,b.qty-IFNULL(e.qty_terkirim, 0)as qty_belum_terima, b.harga ,b.diskon 
-			from sls_so_ht a INNER JOIN sls_so_dt b ON a.id=b.so_hd_id
+			from sls_tarik_barang_ht a INNER JOIN sls_tarik_barang_dt b ON a.id=b.tarik_barang_hd_id
 			INNER JOIN inv_item c on b.item_id=c.id 
 			INNER join gbm_uom d on c.uom_id=d.id
 			LEFT join (
 			select so_dt_id,sum(qty)as qty_terkirim from inv_pengiriman_so_dt group by so_dt_id)e 
 			on b.id=e.so_dt_id
 			left join gbm_organisasi f on a.lokasi_id=f.id
-			where a.status='RELEASE' and a.id=" . $so_id . "
+			where a.status='RELEASE' and a.id=" . $ttb_id . "
 			and IFNULL(e.qty_terkirim, 0)>0
-			order by a.tanggal,a.no_so";
+			order by a.tanggal,a.no_tarik_barang";
 		$result =	$this->db->query($sql)->result_array();
 		return $result;
 	}
-	public function retrieve_so_dtl($so_id)
+	public function retrieve_so_dtl($ttb_id)
 	{
-		$sql = "Select f.nama as lokasi, a.tanggal,a.no_so,a.catatan,b.id, b.item_id,c.kode as kode_item,c.nama as nama_item,d.kode as uom, 
+		$sql = "Select f.nama as lokasi, a.tanggal,a.no_tarik_barang,a.catatan,b.id, b.item_id,c.kode as kode_item,c.nama as nama_item,d.kode as uom, 
 		b.qty,IFNULL(e.qty_terkirim, 0)as qty_sudah_terima,b.qty-IFNULL(e.qty_terkirim, 0)as qty_belum_terima, b.harga ,b.diskon 
-			from sls_so_ht a INNER JOIN sls_so_dt b ON a.id=b.so_hd_id
+			from sls_tarik_barang_ht a INNER JOIN sls_tarik_barang_dt b ON a.id=b.tarik_barang_hd_id
 			INNER JOIN inv_item c on b.item_id=c.id 
 			INNER join gbm_uom d on c.uom_id=d.id
 			LEFT join (
 			select so_dt_id,sum(qty)as qty_terkirim from inv_pengiriman_so_dt group by so_dt_id)e 
 			on b.id=e.so_dt_id
 			left join gbm_organisasi f on a.lokasi_id=f.id
-			where a.id=" . $so_id . "
-			order by a.tanggal,a.no_so";
+			where a.id=" . $ttb_id . "
+			order by a.tanggal,a.no_tarik_barang";
 		$result =	$this->db->query($sql)->result_array();
 		return $result;
 	}
@@ -514,7 +508,7 @@ class SlsSoModel extends CI_Model
             -- c.kode,
             -- c.nama,
             -- c.satuan
-		FROM sls_so_ht a 
+		FROM sls_tarik_barang_ht a 
         inner join pks_tanki b on a.tanki_id = b.id
         inner join inv_item c on a.produk_id = c.id
 	    -- inner join inv_item c on b.item=c.id
@@ -524,9 +518,9 @@ class SlsSoModel extends CI_Model
 		$data = $this->db->query($query)->row_array();
 		return $data;
 	}
-	public function retrieve_pembayaran_by_so($so_id)
+	public function retrieve_pembayaran_by_so($ttb_id)
 	{
-		$this->db->where('so_hd_id', $so_id);
+		$this->db->where('tarik_barang_hd_id', $ttb_id);
 		$this->db->order_by('id', 'ASC');
 		$this->db->from('sls_so_pembayaran ');
 		$this->db->select('*');
@@ -557,9 +551,9 @@ class SlsSoModel extends CI_Model
 		$keterangan    =  $arrdata['keterangan'];
 		$jenis_invoice  =  $arrdata['jenis_invoice']['id'];
 		$tipe_pembayaran  =  $arrdata['tipe_pembayaran']['id'];
-		$so_id = $arrdata['so_id'];
+		$ttb_id = $arrdata['ttb_id'];
 		$data = array(
-			'so_hd_id' => $so_id,
+			'tarik_barang_hd_id' => $ttb_id,
 			'nilai' => $nilai,
 			'tanggal' => $tanggal,
 			'keterangan' => $keterangan,
@@ -575,14 +569,14 @@ class SlsSoModel extends CI_Model
 		$arrdata
 	) {
 
-		$so_id = $arrdata['so_id'];
+		$ttb_id = $arrdata['ttb_id'];
 		$nilai = $arrdata['nilai'];
 		$tanggal    =  $arrdata['tanggal'];
 		$keterangan    =  $arrdata['keterangan'];
 		$jenis_invoice  =  $arrdata['jenis_invoice']['id'];
 		$tipe_pembayaran  =  $arrdata['tipe_pembayaran']['id'];
 		$data = array(
-			'so_hd_id' => $so_id,
+			'tarik_barang_hd_id' => $ttb_id,
 			'nilai' => $nilai,
 			'tanggal' => $tanggal,
 			'keterangan' => $keterangan,
@@ -602,9 +596,9 @@ class SlsSoModel extends CI_Model
 		return true;
 	}
 
-	public function retrieve_invoice_by_so($so_id)
+	public function retrieve_invoice_by_so($ttb_id)
 	{
-		$this->db->where('so_hd_id', $so_id);
+		$this->db->where('tarik_barang_hd_id', $ttb_id);
 		$this->db->order_by('id', 'ASC');
 		$this->db->from('sls_so_invoice ');
 		$this->db->select('*');
@@ -630,7 +624,7 @@ class SlsSoModel extends CI_Model
 
 
 		$id = (int)$id;
-		$so_id = $arrdata['so_id'];
+		$ttb_id = $arrdata['ttb_id'];
 		$nilai_invoice = $arrdata['nilai_invoice'];
 		$dp_persen = $arrdata['dp_persen'];
 		$tanggal    =  $arrdata['tanggal'];
@@ -639,7 +633,7 @@ class SlsSoModel extends CI_Model
 		$jenis_invoice  =  $arrdata['jenis_invoice']['id'];
 		$no_invoice  =  $arrdata['no_invoice'];
 		$data = array(
-			'so_hd_id' => $so_id,
+			'tarik_barang_hd_id' => $ttb_id,
 			'nilai_invoice' => $nilai_invoice,
 			'dp_persen' => $dp_persen,
 			'tanggal' => $tanggal,
@@ -658,7 +652,7 @@ class SlsSoModel extends CI_Model
 		$arrdata
 	) {
 
-		$so_id = $arrdata['so_id'];
+		$ttb_id = $arrdata['ttb_id'];
 		$nilai_invoice = $arrdata['nilai_invoice'];
 		$dp_persen = $arrdata['dp_persen'];
 		$tanggal    =  $arrdata['tanggal'];
@@ -667,7 +661,7 @@ class SlsSoModel extends CI_Model
 		$jenis_invoice  =  $arrdata['jenis_invoice']['id'];
 		$no_invoice  =  $arrdata['no_invoice'];
 		$data = array(
-			'so_hd_id' => $so_id,
+			'tarik_barang_hd_id' => $ttb_id,
 			'nilai_invoice' => $nilai_invoice,
 			'dp_persen' => $dp_persen,
 			'tanggal' => $tanggal,

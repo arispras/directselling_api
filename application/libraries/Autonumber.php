@@ -1,9 +1,7 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 class Autonumber
 {
-	function __construct()
-	{
-	}
+	function __construct() {}
 	function pasien()
 	{
 		$startNumber = 1; /// Isi utk mulai 
@@ -60,10 +58,10 @@ class Autonumber
 		if ($kode_lokasi == 'DPAM') {
 			$kode_lokasi = 'MILL';
 		}
-		
+
 		$str_cek = '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
 		$sql_cek =	"select  max((SUBSTRING(no_transaksi,1,(LENGTH(no_transaksi)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from kln_rawat_jalan 	where no_transaksi LIKE '%".$str_cek."' ;";
+		  from kln_rawat_jalan 	where no_transaksi LIKE '%" . $str_cek . "' ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
 			$str = $lastnumber['last'];
@@ -71,13 +69,13 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
-	
 
-	function rawat_jalan_resep( $tanggal)
+
+	function rawat_jalan_resep($tanggal)
 	{
 		$startNumber = 1; /// Isi utk mulai 
 		$kode_menu = "RS";
@@ -92,10 +90,10 @@ class Autonumber
 		// if ($kode_lokasi == 'DPAM') {
 		// 	$kode_lokasi = 'MILL';
 		// }
-		
+
 		$str_cek = '/' . $kode_menu .  '/' . $month . $year;
 		$sql_cek =	"select  max((SUBSTRING(no_transaksi,1,(LENGTH(no_transaksi)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from kln_resep_ht 	where no_transaksi LIKE '%".$str_cek."' ;";
+		  from kln_resep_ht 	where no_transaksi LIKE '%" . $str_cek . "' ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
 			$str = $lastnumber['last'];
@@ -103,11 +101,11 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
-	function rawat_jalan_obat( $tanggal)
+	function rawat_jalan_obat($tanggal)
 	{
 		$startNumber = 1; /// Isi utk mulai 
 		$kode_menu = "PM";
@@ -122,10 +120,10 @@ class Autonumber
 		// if ($kode_lokasi == 'DPAM') {
 		// 	$kode_lokasi = 'MILL';
 		// }
-		
+
 		$str_cek = '/' . $kode_menu  . '/' . $month . $year;
 		$sql_cek =	"select  max((SUBSTRING(no_transaksi,1,(LENGTH(no_transaksi)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from kln_obat_rawat_jalan_ht 	where no_transaksi LIKE '%".$str_cek."' ;";
+		  from kln_obat_rawat_jalan_ht 	where no_transaksi LIKE '%" . $str_cek . "' ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
 			$str = $lastnumber['last'];
@@ -133,8 +131,8 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
 	function rawat_jalan_invoice($lokasi_id, $tanggal)
@@ -152,10 +150,10 @@ class Autonumber
 		if ($kode_lokasi == 'DPAM') {
 			$kode_lokasi = 'MILL';
 		}
-		
+
 		$str_cek = '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
 		$sql_cek =	"select  max((SUBSTRING(no_transaksi,1,(LENGTH(no_transaksi)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from kln_invoice_rawat_jalan_ht 	where no_transaksi LIKE '%".$str_cek."' ;";
+		  from kln_invoice_rawat_jalan_ht 	where no_transaksi LIKE '%" . $str_cek . "' ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
 			$str = $lastnumber['last'];
@@ -163,8 +161,8 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
 	function janji_temu($lokasi_id, $tanggal)
@@ -182,10 +180,10 @@ class Autonumber
 		if ($kode_lokasi == 'DPAM') {
 			$kode_lokasi = 'MILL';
 		}
-		
+
 		$str_cek = '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
 		$sql_cek =	"select  max((SUBSTRING(no_transaksi,1,(LENGTH(no_transaksi)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from kln_janji_temu	where no_transaksi LIKE '%".$str_cek."' ;";
+		  from kln_janji_temu	where no_transaksi LIKE '%" . $str_cek . "' ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
 			$str = $lastnumber['last'];
@@ -193,8 +191,8 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
 	function gbm_supplier()
@@ -265,7 +263,7 @@ class Autonumber
 		// return $ret_format_number;
 		$str_cek = '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
 		$sql_cek =	"select  max((SUBSTRING(no_pp,1,(LENGTH(no_pp)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from prc_pp_ht 	where no_pp LIKE '%".$str_cek."' ;";
+		  from prc_pp_ht 	where no_pp LIKE '%" . $str_cek . "' ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
 			$str = $lastnumber['last'];
@@ -273,8 +271,8 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
 
@@ -322,7 +320,7 @@ class Autonumber
 		$month = date('m', strtotime($tanggal));
 		$lokasi = $CI->db->query("select kode from gbm_organisasi where id  =" . $lokasi_id . " ")->row_array();
 		$kode_lokasi = $lokasi['kode'];
-		
+
 		$lastnumber = $CI->db->query("select  max(Left(no_so,4))as last from sls_so_ht
 		where DATE_FORMAT(tanggal,'%Y') ='" . $yyyy . "'  ")->row_array();
 		if (!empty($lastnumber['last'])) {
@@ -334,7 +332,7 @@ class Autonumber
 		}
 		$strnumber = sprintf("%04s", $snumber);
 		// $ret_format_number = $strnumber . '/' . $kode_menu . '-' . $kode_customer . '/' . $kode_lokasi . '/' . $month . $year;
-			$ret_format_number = $strnumber . '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
+		$ret_format_number = $strnumber . '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
 
 		return $ret_format_number;
 	}
@@ -351,7 +349,7 @@ class Autonumber
 		$month = date('m', strtotime($tanggal));
 		$lokasi = $CI->db->query("select kode from gbm_organisasi where id  =" . $lokasi_id . " ")->row_array();
 		$kode_lokasi = $lokasi['kode'];
-		
+
 		$lastnumber = $CI->db->query("select  max(Left(no_ttb,4))as last from sls_ttb_ht
 		where DATE_FORMAT(tanggal,'%Y') ='" . $yyyy . "'  ")->row_array();
 		if (!empty($lastnumber['last'])) {
@@ -363,11 +361,40 @@ class Autonumber
 		}
 		$strnumber = sprintf("%04s", $snumber);
 		// $ret_format_number = $strnumber . '/' . $kode_menu . '-' . $kode_customer . '/' . $kode_lokasi . '/' . $month . $year;
-				$ret_format_number = $strnumber . '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
+		$ret_format_number = $strnumber . '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
 
 		return $ret_format_number;
 	}
-		function lhi($lokasi_id, $tanggal)
+	function tarik_barang($lokasi_id, $tanggal)
+	{
+		$startNumber = 1; /// Isi utk mulai 
+		$kode_menu = "TRB";
+		$kode_lokasi = '';
+		$kode_customer = '';
+		$CI =   &get_instance();
+		// $yyyymm= date('Y-m', strtotime($tanggal));
+		$yyyy = date('Y', strtotime($tanggal));
+		$year = substr(date('Y', strtotime($tanggal)), 2, 2);
+		$month = date('m', strtotime($tanggal));
+		$lokasi = $CI->db->query("select kode from gbm_organisasi where id  =" . $lokasi_id . " ")->row_array();
+		$kode_lokasi = $lokasi['kode'];
+
+		$lastnumber = $CI->db->query("select  max(Left(no_tarik_barang,4))as last from sls_tarik_barang_ht
+		where DATE_FORMAT(tanggal,'%Y') ='" . $yyyy . "'  ")->row_array();
+		if (!empty($lastnumber['last'])) {
+			// $str = (substr($lastnumber['last'], -6));
+			$str = $lastnumber['last'];
+			$snumber = (int)$str + 1;
+		} else {
+			$snumber = $startNumber;
+		}
+		$strnumber = sprintf("%04s", $snumber);
+		// $ret_format_number = $strnumber . '/' . $kode_menu . '-' . $kode_customer . '/' . $kode_lokasi . '/' . $month . $year;
+		$ret_format_number = $strnumber . '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
+
+		return $ret_format_number;
+	}
+	function lhi($lokasi_id, $tanggal)
 	{
 		$startNumber = 1; /// Isi utk mulai 
 		$kode_menu = "LHI";
@@ -379,7 +406,7 @@ class Autonumber
 		$month = date('m', strtotime($tanggal));
 		$lokasi = $CI->db->query("select kode from gbm_organisasi where id  =" . $lokasi_id . " ")->row_array();
 		$kode_lokasi = $lokasi['kode'];
-			
+
 		$lastnumber = $CI->db->query("select  max(Left(no_lhi,4))as last from col_lhi_ht
 		where DATE_FORMAT(tanggal,'%Y') ='" . $yyyy . "'  ")->row_array();
 		if (!empty($lastnumber['last'])) {
@@ -391,12 +418,12 @@ class Autonumber
 		}
 		$strnumber = sprintf("%04s", $snumber);
 		// $ret_format_number = $strnumber . '/' . $kode_menu . '-' . $kode_customer . '/' . $kode_lokasi . '/' . $month . $year;
-				$ret_format_number = $strnumber . '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
+		$ret_format_number = $strnumber . '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
 
 		return $ret_format_number;
 	}
-	
-	function sales_order_invoice( $tanggal, $customer_id)
+
+	function sales_order_invoice($tanggal, $customer_id)
 	{
 		$startNumber = 1; /// Isi utk mulai 
 		$kode_menu = "SO";
@@ -408,10 +435,10 @@ class Autonumber
 		$year = substr(date('Y', strtotime($tanggal)), 2, 2);
 		$month = date('m', strtotime($tanggal));
 		$d = date('d', strtotime($tanggal));
-		$day =sprintf("%02s", $d);
+		$day = sprintf("%02s", $d);
 		$customer = $CI->db->query("select kode_customer from gbm_customer where id  =" . $customer_id . " ")->row_array();
 		$kode_customer = $customer['kode_customer'];
-		
+
 		$lastnumber = $CI->db->query("select  max(Left(a.no_invoice,4))as last from sls_so_invoice a inner join sls_so_ht b
 		on a.so_hd_id=b.id where b.customer_id  =" . $customer_id . " ")->row_array();
 		if (!empty($lastnumber['last'])) {
@@ -421,7 +448,7 @@ class Autonumber
 			$snumber = $startNumber;
 		}
 		$strnumber = sprintf("%04s", $snumber);
-		$ret_format_number = $strnumber . '/' . $year . '' . $month . '' . $day . '/' . $kode_customer ;
+		$ret_format_number = $strnumber . '/' . $year . '' . $month . '' . $day . '/' . $kode_customer;
 		return $ret_format_number;
 	}
 	function jurnal_auto($lokasi_id, $tanggal, $prefix)
@@ -454,7 +481,7 @@ class Autonumber
 		// return $ret_format_number;
 		$str_cek = '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
 		$sql_cek =	"select  max((SUBSTRING(no_jurnal,1,(LENGTH(no_jurnal)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from acc_jurnal_ht 	where no_jurnal LIKE '%".$str_cek."' ;";
+		  from acc_jurnal_ht 	where no_jurnal LIKE '%" . $str_cek . "' ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
 			$str = $lastnumber['last'];
@@ -462,10 +489,9 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%06s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%06s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
-		
 	}
 	function jurnal_upah_auto($lokasi_id, $tanggal, $prefix)
 	{
@@ -497,7 +523,7 @@ class Autonumber
 		// return $ret_format_number;
 		$str_cek = '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
 		$sql_cek =	"select  max((SUBSTRING(no_jurnal,1,(LENGTH(no_jurnal)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from acc_jurnal_upah_ht 	where no_jurnal LIKE '%".$str_cek."' ;";
+		  from acc_jurnal_upah_ht 	where no_jurnal LIKE '%" . $str_cek . "' ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
 			$str = $lastnumber['last'];
@@ -505,8 +531,8 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%06s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%06s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
 	function acc_jurnal_entry($lokasi_id, $tanggal)
@@ -538,7 +564,7 @@ class Autonumber
 		// return $ret_format_number;
 		$str_cek = '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
 		$sql_cek =	"select  max((SUBSTRING(no_jurnal,1,(LENGTH(no_jurnal)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from acc_jurnal_entry_ht 	where no_jurnal LIKE '%".$str_cek."' ;";
+		  from acc_jurnal_entry_ht 	where no_jurnal LIKE '%" . $str_cek . "' ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
 			$str = $lastnumber['last'];
@@ -546,8 +572,8 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
 	function acc_kasbank($lokasi_id, $tanggal)
@@ -579,7 +605,7 @@ class Autonumber
 		// return $ret_format_number;
 		$str_cek = '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
 		$sql_cek =	"select  max((SUBSTRING(no_transaksi,1,(LENGTH(no_transaksi)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from acc_kasbank_ht 	where no_transaksi LIKE '%".$str_cek."' ;";
+		  from acc_kasbank_ht 	where no_transaksi LIKE '%" . $str_cek . "' ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
 			$str = $lastnumber['last'];
@@ -587,11 +613,11 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
-	function acc_permintaan_dana( $tanggal)
+	function acc_permintaan_dana($tanggal)
 	{
 		$startNumber = 1; /// Isi utk mulai 
 		$kode_menu = "PDO";
@@ -629,8 +655,8 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
 	function acc_uangmuka($lokasi_id, $tanggal)
@@ -662,7 +688,7 @@ class Autonumber
 		// return $ret_format_number;
 		$str_cek = '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
 		$sql_cek =	"select  max((SUBSTRING(no_transaksi,1,(LENGTH(no_transaksi)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from acc_uang_muka 	where no_transaksi LIKE '%".$str_cek."' ;";
+		  from acc_uang_muka 	where no_transaksi LIKE '%" . $str_cek . "' ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
 			$str = $lastnumber['last'];
@@ -670,8 +696,8 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
 	function acc_uangmuka_realisasi($lokasi_id, $tanggal)
@@ -703,7 +729,7 @@ class Autonumber
 		// return $ret_format_number;
 		$str_cek = '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
 		$sql_cek =	"select  max((SUBSTRING(no_transaksi,1,(LENGTH(no_transaksi)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from acc_uang_muka_realisasi 	where no_transaksi LIKE '%".$str_cek."' ;";
+		  from acc_uang_muka_realisasi 	where no_transaksi LIKE '%" . $str_cek . "' ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
 			$str = $lastnumber['last'];
@@ -711,8 +737,8 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
 	function acc_ap_invoice($lokasi_id, $tanggal)
@@ -744,7 +770,7 @@ class Autonumber
 		// return $ret_format_number;
 		$str_cek = '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
 		$sql_cek =	"select  max((SUBSTRING(no_invoice,1,(LENGTH(no_invoice)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from acc_ap_invoice_ht 	where no_invoice LIKE '%".$str_cek."' ;";
+		  from acc_ap_invoice_ht 	where no_invoice LIKE '%" . $str_cek . "' ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
 			$str = $lastnumber['last'];
@@ -752,8 +778,8 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
 	function acc_ar_invoice($lokasi_id, $tanggal)
@@ -768,10 +794,10 @@ class Autonumber
 		$month = date('m', strtotime($tanggal));
 		$lokasi = $CI->db->query("select kode from gbm_organisasi where id  ='" . $lokasi_id . " '")->row_array();
 		$kode_lokasi = $lokasi['kode'];
-		
+
 		$str_cek = '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
 		$sql_cek =	"select  max((SUBSTRING(no_invoice,1,(LENGTH(no_invoice)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from acc_ar_invoice_ht 	where no_invoice LIKE '%".$str_cek."' ;";
+		  from acc_ar_invoice_ht 	where no_invoice LIKE '%" . $str_cek . "' ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
 			$str = $lastnumber['last'];
@@ -779,12 +805,12 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
 
-	function acc_tbs_invoice($lokasi_id, $tanggal,$supplier_id)
+	function acc_tbs_invoice($lokasi_id, $tanggal, $supplier_id)
 	{
 		$startNumber = 1; /// Isi utk mulai 
 		// $kode_menu = "INVTBS";
@@ -805,12 +831,12 @@ class Autonumber
 		//   from acc_tbs_invoice_ht 	where no_invoice LIKE '%".$str_cek."' ;";
 		$supplier = $CI->db->query("select kode_supplier from gbm_supplier where id  =" . $supplier_id . " ")->row_array();
 		$kode_supplier = $supplier['kode_supplier'];
-		
+
 		// $str_cek = '/' . $kode_menu . '/' . $kode_lokasi . '/'.$kode_supplier.'/' . $month . $year;
-		$str_cek = '/' . $kode_menu . '/'.$kode_supplier.'/' . $month . $year;
-		$str_cek2='/' . $kode_menu . '/'.$kode_supplier.'/';
+		$str_cek = '/' . $kode_menu . '/' . $kode_supplier . '/' . $month . $year;
+		$str_cek2 = '/' . $kode_menu . '/' . $kode_supplier . '/';
 		$sql_cek =	"select  max((SUBSTRING(no_invoice,1,(LENGTH(no_invoice)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from acc_tbs_invoice_ht 	where no_invoice LIKE '%".$str_cek2."%' and DATE_FORMAT(tanggal,'%Y') ='" . $yyyy . "' ;";
+		  from acc_tbs_invoice_ht 	where no_invoice LIKE '%" . $str_cek2 . "%' and DATE_FORMAT(tanggal,'%Y') ='" . $yyyy . "' ;";
 
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
@@ -819,11 +845,11 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
-	function acc_angkut_invoice($lokasi_id, $tanggal,$supplier_id)
+	function acc_angkut_invoice($lokasi_id, $tanggal, $supplier_id)
 	{
 		$startNumber = 1; /// Isi utk mulai 
 		// $kode_menu = "INVTBS";
@@ -848,10 +874,10 @@ class Autonumber
 			$kode_lokasi = 'MILL';
 		}
 		// $str_cek = '/' . $kode_menu . '/' . $kode_lokasi . '/'.$kode_supplier.'/' . $month . $year;
-		$str_cek = '/' . $kode_menu . '/'.$kode_supplier.'/' . $month . $year;
-		$str_cek2='/' . $kode_menu . '/'.$kode_supplier.'/';
+		$str_cek = '/' . $kode_menu . '/' . $kode_supplier . '/' . $month . $year;
+		$str_cek2 = '/' . $kode_menu . '/' . $kode_supplier . '/';
 		$sql_cek =	"select  max((SUBSTRING(no_invoice,1,(LENGTH(no_invoice)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from acc_angkut_invoice_ht 	where no_invoice LIKE '%".$str_cek2."%' and DATE_FORMAT(tanggal,'%Y') ='" . $yyyy . "' ;";
+		  from acc_angkut_invoice_ht 	where no_invoice LIKE '%" . $str_cek2 . "%' and DATE_FORMAT(tanggal,'%Y') ='" . $yyyy . "' ;";
 
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
@@ -860,8 +886,8 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
 
@@ -895,7 +921,7 @@ class Autonumber
 		// return $ret_format_number;
 		$str_cek = '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
 		$sql_cek =	"select  max((SUBSTRING(no_transaksi,1,(LENGTH(no_transaksi)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from inv_adj_ht 	where no_transaksi LIKE '%".$str_cek."' ;";
+		  from inv_adj_ht 	where no_transaksi LIKE '%" . $str_cek . "' ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
 			$str = $lastnumber['last'];
@@ -903,8 +929,8 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
 
@@ -939,7 +965,7 @@ class Autonumber
 		// return $ret_format_number;
 		$str_cek = '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
 		$sql_cek =	"select  max((SUBSTRING(no_transaksi,1,(LENGTH(no_transaksi)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from inv_penerimaan_tanpa_po_ht 	where no_transaksi LIKE '%".$str_cek."' ;";
+		  from inv_penerimaan_tanpa_po_ht 	where no_transaksi LIKE '%" . $str_cek . "' ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
 			$str = $lastnumber['last'];
@@ -947,8 +973,8 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
 
@@ -981,7 +1007,7 @@ class Autonumber
 		// return $ret_format_number;
 		$str_cek = '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
 		$sql_cek =	"select  max((SUBSTRING(no_transaksi,1,(LENGTH(no_transaksi)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from " . $table . " 	where no_transaksi LIKE '%".$str_cek."' ;";
+		  from " . $table . " 	where no_transaksi LIKE '%" . $str_cek . "' ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
 			$str = $lastnumber['last'];
@@ -989,8 +1015,8 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
 	function inv_pengiriman_so($lokasi_id, $tanggal)
@@ -1022,7 +1048,7 @@ class Autonumber
 		// return $ret_format_number;
 		$str_cek = '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
 		$sql_cek =	"select  max((SUBSTRING(no_transaksi,1,(LENGTH(no_transaksi)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from " . $table . " 	where no_transaksi LIKE '%".$str_cek."' ;";
+		  from " . $table . " 	where no_transaksi LIKE '%" . $str_cek . "' ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
 			$str = $lastnumber['last'];
@@ -1030,8 +1056,8 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
 
@@ -1064,7 +1090,7 @@ class Autonumber
 		// return $ret_format_number;
 		$str_cek = '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
 		$sql_cek =	"select  max((SUBSTRING(no_transaksi,1,(LENGTH(no_transaksi)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from " . $table . " 	where no_transaksi LIKE '%".$str_cek."' ;";
+		  from " . $table . " 	where no_transaksi LIKE '%" . $str_cek . "' ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
 			$str = $lastnumber['last'];
@@ -1072,8 +1098,8 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
 	function inv_pemakaian_barang($lokasi_id, $tanggal)
@@ -1094,7 +1120,7 @@ class Autonumber
 		}
 		$str_cek = '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
 		$sql_cek =	"select  max((SUBSTRING(no_transaksi,1,(LENGTH(no_transaksi)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from " . $table . " 	where no_transaksi LIKE '%".$str_cek."' ;";
+		  from " . $table . " 	where no_transaksi LIKE '%" . $str_cek . "' ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		// $lastnumber = $CI->db->query("select  max(Left(no_transaksi,4))as last from ".$table."
 		// where DATE_FORMAT(tanggal,'%Y') ='" . $yyyy . "'  ")->row_array();
@@ -1128,7 +1154,7 @@ class Autonumber
 		}
 		$str_cek = '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
 		$sql_cek =	"select  max((SUBSTRING(no_transaksi,1,(LENGTH(no_transaksi)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from " . $table . " 	where no_transaksi LIKE '%".$str_cek."' ;";
+		  from " . $table . " 	where no_transaksi LIKE '%" . $str_cek . "' ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
 			$str = $lastnumber['last'];
@@ -1136,8 +1162,8 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
 	function inv_permintaan_pindah_gudang($lokasi_id, $tanggal)
@@ -1158,7 +1184,7 @@ class Autonumber
 		}
 		$str_cek = '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
 		$sql_cek =	"select  max((SUBSTRING(no_transaksi,1,(LENGTH(no_transaksi)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from " . $table . " 	where no_transaksi LIKE '%".$str_cek."' ;";
+		  from " . $table . " 	where no_transaksi LIKE '%" . $str_cek . "' ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
 			$str = $lastnumber['last'];
@@ -1166,8 +1192,8 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
 	function inv_pindah_gudang($lokasi_id, $tanggal)
@@ -1188,7 +1214,7 @@ class Autonumber
 		}
 		$str_cek = '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
 		$sql_cek =	"select  max((SUBSTRING(no_transaksi,1,(LENGTH(no_transaksi)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from " . $table . " 	where no_transaksi LIKE '%".$str_cek."' ;";
+		  from " . $table . " 	where no_transaksi LIKE '%" . $str_cek . "' ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
 			$str = $lastnumber['last'];
@@ -1196,8 +1222,8 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
 	function inv_penerimaan_pindah_gudang($lokasi_id, $tanggal)
@@ -1218,7 +1244,7 @@ class Autonumber
 		}
 		$str_cek = '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
 		$sql_cek =	"select  max((SUBSTRING(no_transaksi,1,(LENGTH(no_transaksi)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from " . $table . " 	where no_transaksi LIKE '%".$str_cek."' ;";
+		  from " . $table . " 	where no_transaksi LIKE '%" . $str_cek . "' ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
 			$str = $lastnumber['last'];
@@ -1226,8 +1252,8 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
 
@@ -1249,7 +1275,7 @@ class Autonumber
 		}
 		$str_cek = '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
 		$sql_cek =	"select  max((SUBSTRING(no_transaksi,1,(LENGTH(no_transaksi)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from " . $table . " 	where no_transaksi LIKE '%".$str_cek."' ;";
+		  from " . $table . " 	where no_transaksi LIKE '%" . $str_cek . "' ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
 			$str = $lastnumber['last'];
@@ -1257,8 +1283,8 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
 	function est_bkm_pemeliharaan($lokasi_id, $tanggal)
@@ -1279,7 +1305,7 @@ class Autonumber
 		}
 		$str_cek = '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
 		$sql_cek =	"select  max((SUBSTRING(no_transaksi,1,(LENGTH(no_transaksi)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from " . $table . " 	where no_transaksi LIKE '%".$str_cek."' ;";
+		  from " . $table . " 	where no_transaksi LIKE '%" . $str_cek . "' ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
 			$str = $lastnumber['last'];
@@ -1287,8 +1313,8 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
 
@@ -1310,7 +1336,7 @@ class Autonumber
 		}
 		$str_cek = '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
 		$sql_cek =	"select  max((SUBSTRING(no_transaksi,1,(LENGTH(no_transaksi)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from " . $table . " 	where no_transaksi LIKE '%".$str_cek."' ;";
+		  from " . $table . " 	where no_transaksi LIKE '%" . $str_cek . "' ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
 			$str = $lastnumber['last'];
@@ -1318,8 +1344,8 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
 
@@ -1341,7 +1367,7 @@ class Autonumber
 		}
 		$str_cek = '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
 		$sql_cek =	"select  max((SUBSTRING(no_transaksi,1,(LENGTH(no_transaksi)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from " . $table . " 	where no_transaksi LIKE '%".$str_cek."' ;";
+		  from " . $table . " 	where no_transaksi LIKE '%" . $str_cek . "' ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
 			$str = $lastnumber['last'];
@@ -1349,8 +1375,8 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
 	function wrk_kegiatan_mill($lokasi_id, $tanggal)
@@ -1371,7 +1397,7 @@ class Autonumber
 		}
 		$str_cek = '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
 		$sql_cek =	"select  max((SUBSTRING(no_transaksi,1,(LENGTH(no_transaksi)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from " . $table . " 	where no_transaksi LIKE '%".$str_cek."' ;";
+		  from " . $table . " 	where no_transaksi LIKE '%" . $str_cek . "' ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
 			$str = $lastnumber['last'];
@@ -1379,8 +1405,8 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
 
@@ -1402,7 +1428,7 @@ class Autonumber
 		}
 		$str_cek = '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
 		$sql_cek =	"select  max((SUBSTRING(no_transaksi,1,(LENGTH(no_transaksi)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from " . $table . " 	where no_transaksi LIKE '%".$str_cek."' ;";
+		  from " . $table . " 	where no_transaksi LIKE '%" . $str_cek . "' ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
 			$str = $lastnumber['last'];
@@ -1410,8 +1436,8 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
 
@@ -1433,7 +1459,7 @@ class Autonumber
 		}
 		$str_cek = '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
 		$sql_cek =	"select  max((SUBSTRING(no_rekap,1,(LENGTH(no_rekap)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from " . $table . " 	where no_rekap LIKE '%".$str_cek."' ;";
+		  from " . $table . " 	where no_rekap LIKE '%" . $str_cek . "' ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
 			$str = $lastnumber['last'];
@@ -1441,8 +1467,8 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
 	function prc_rekap_angkut_old($lokasi_id, $tanggal)
@@ -1463,7 +1489,7 @@ class Autonumber
 		}
 		$str_cek = '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
 		$sql_cek =	"select  max((SUBSTRING(no_rekap,1,(LENGTH(no_rekap)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from " . $table . " 	where no_rekap LIKE '%".$str_cek."' ;";
+		  from " . $table . " 	where no_rekap LIKE '%" . $str_cek . "' ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
 			$str = $lastnumber['last'];
@@ -1471,11 +1497,11 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
-	function prc_rekap_angkut($lokasi_id, $tanggal,$supplier_id=null,$produk_id=null)
+	function prc_rekap_angkut($lokasi_id, $tanggal, $supplier_id = null, $produk_id = null)
 	{
 		$startNumber = 1; /// Isi utk mulai 
 		$table = "prc_rekap_angkut_hd";
@@ -1492,13 +1518,12 @@ class Autonumber
 		$kode_lokasi = $lokasi['kode'];
 		$produk = $CI->db->query("select * from inv_item where id  =" . $produk_id . " ")->row_array();
 		$kode_produk = $produk['kode'];
-		if ($kode_produk=='CPO'){
-			$kode_produk=='CPO';
-		}else if($kode_produk=='PK'){
-			$kode_produk=='PKO';
-		}else{
-			$kode_produk=='OTH';
-
+		if ($kode_produk == 'CPO') {
+			$kode_produk == 'CPO';
+		} else if ($kode_produk == 'PK') {
+			$kode_produk == 'PKO';
+		} else {
+			$kode_produk == 'OTH';
 		}
 
 		$supplier = $CI->db->query("select kode_supplier from gbm_supplier where id  =" . $supplier_id . " ")->row_array();
@@ -1507,12 +1532,12 @@ class Autonumber
 			$kode_lokasi = 'MILL';
 		}
 		// $str_cek = '/' . $kode_menu . '/'.$kode_supplier.'/' . $month . $year;
-		$str_cek = '/' . $kode_menu . '/'.$kode_produk.'/' .$kode_supplier.'/' . $month . $year;
+		$str_cek = '/' . $kode_menu . '/' . $kode_produk . '/' . $kode_supplier . '/' . $month . $year;
 		// $str_cek2='/' . $kode_menu . '/'.$kode_supplier.'/';
-		$str_cek2='/' . $kode_menu . '/'.$kode_produk.'/'.$kode_supplier.'/';
+		$str_cek2 = '/' . $kode_menu . '/' . $kode_produk . '/' . $kode_supplier . '/';
 		$sql_cek =	"select  max((SUBSTRING(no_rekap,1,(LENGTH(no_rekap)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from " . $table . " 	where no_rekap LIKE '%".$str_cek2."%' and DATE_FORMAT(tanggal,'%Y') ='" . $yyyy . "'
-		  and item_id=".$produk_id ." ;";
+		  from " . $table . " 	where no_rekap LIKE '%" . $str_cek2 . "%' and DATE_FORMAT(tanggal,'%Y') ='" . $yyyy . "'
+		  and item_id=" . $produk_id . " ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
 			$str = $lastnumber['last'];
@@ -1520,12 +1545,12 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
 
-	function prc_rekap($lokasi_id, $tanggal,$supplier_id=null)
+	function prc_rekap($lokasi_id, $tanggal, $supplier_id = null)
 	{
 		$startNumber = 1; /// Isi utk mulai 
 		$table = "prc_rekap_ht";
@@ -1545,10 +1570,10 @@ class Autonumber
 			$kode_lokasi = 'MILL';
 		}
 		// $str_cek = '/' . $kode_menu . '/' . $kode_lokasi . '/'.$kode_supplier.'/' . $month . $year;
-		$str_cek = '/' . $kode_menu . '/'.$kode_supplier.'/' . $month . $year;
-		$str_cek2='/' . $kode_menu . '/'.$kode_supplier.'/';
+		$str_cek = '/' . $kode_menu . '/' . $kode_supplier . '/' . $month . $year;
+		$str_cek2 = '/' . $kode_menu . '/' . $kode_supplier . '/';
 		$sql_cek =	"select  max((SUBSTRING(no_rekap,1,(LENGTH(no_rekap)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from " . $table . " 	where no_rekap LIKE '%".$str_cek2."%' and DATE_FORMAT(tanggal,'%Y') ='" . $yyyy . "' ;";
+		  from " . $table . " 	where no_rekap LIKE '%" . $str_cek2 . "%' and DATE_FORMAT(tanggal,'%Y') ='" . $yyyy . "' ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
 			$str = $lastnumber['last'];
@@ -1556,8 +1581,8 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
 
@@ -1579,7 +1604,7 @@ class Autonumber
 		}
 		$str_cek = '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
 		$sql_cek =	"select  max((SUBSTRING(no_transaksi,1,(LENGTH(no_transaksi)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from " . $table . " 	where no_transaksi LIKE '%".$str_cek."' ;";
+		  from " . $table . " 	where no_transaksi LIKE '%" . $str_cek . "' ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
 			$str = $lastnumber['last'];
@@ -1587,8 +1612,8 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
 	function pks_lab_pengolahan($lokasi_id, $tanggal)
@@ -1609,7 +1634,7 @@ class Autonumber
 		}
 		$str_cek = '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
 		$sql_cek =	"select  max((SUBSTRING(no_transaksi,1,(LENGTH(no_transaksi)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from " . $table . " 	where no_transaksi LIKE '%".$str_cek."' ;";
+		  from " . $table . " 	where no_transaksi LIKE '%" . $str_cek . "' ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
 			$str = $lastnumber['last'];
@@ -1617,8 +1642,8 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
 	function pks_produksi_harian($lokasi_id, $tanggal)
@@ -1639,7 +1664,7 @@ class Autonumber
 		}
 		$str_cek = '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
 		$sql_cek =	"select  max((SUBSTRING(no_transaksi,1,(LENGTH(no_transaksi)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from " . $table . " 	where no_transaksi LIKE '%".$str_cek."' ;";
+		  from " . $table . " 	where no_transaksi LIKE '%" . $str_cek . "' ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
 			$str = $lastnumber['last'];
@@ -1647,8 +1672,8 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
 	function pks_sounding($lokasi_id, $tanggal)
@@ -1669,7 +1694,7 @@ class Autonumber
 		}
 		$str_cek = '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
 		$sql_cek =	"select  max((SUBSTRING(no_transaksi,1,(LENGTH(no_transaksi)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from " . $table . " 	where no_transaksi LIKE '%".$str_cek."' ;";
+		  from " . $table . " 	where no_transaksi LIKE '%" . $str_cek . "' ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
 			$str = $lastnumber['last'];
@@ -1677,8 +1702,8 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
 	function pks_sjpp($lokasi_id, $tanggal)
@@ -1727,7 +1752,7 @@ class Autonumber
 		}
 		$str_cek = '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
 		$sql_cek =	"select  max((SUBSTRING(no_transaksi,1,(LENGTH(no_transaksi)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from " . $table . " 	where no_transaksi LIKE '%".$str_cek."' ;";
+		  from " . $table . " 	where no_transaksi LIKE '%" . $str_cek . "' ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
 			$str = $lastnumber['last'];
@@ -1735,8 +1760,8 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
 	function hrms_klaim_kendaraan($lokasi_id, $tanggal)
@@ -1757,7 +1782,7 @@ class Autonumber
 		}
 		$str_cek = '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
 		$sql_cek =	"select  max((SUBSTRING(no_transaksi,1,(LENGTH(no_transaksi)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from " . $table . " 	where no_transaksi LIKE '%".$str_cek."' ;";
+		  from " . $table . " 	where no_transaksi LIKE '%" . $str_cek . "' ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
 			$str = $lastnumber['last'];
@@ -1765,8 +1790,8 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
 	function hrms_perjalanan_dinas($lokasi_id, $tanggal)
@@ -1787,7 +1812,7 @@ class Autonumber
 		}
 		$str_cek = '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
 		$sql_cek =	"select  max((SUBSTRING(no_transaksi,1,(LENGTH(no_transaksi)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from " . $table . " 	where no_transaksi LIKE '%".$str_cek."' ;";
+		  from " . $table . " 	where no_transaksi LIKE '%" . $str_cek . "' ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
 			$str = $lastnumber['last'];
@@ -1795,8 +1820,8 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
 	function hrms_realisasi_perjalanan_dinas($lokasi_id, $tanggal)
@@ -1817,7 +1842,7 @@ class Autonumber
 		}
 		$str_cek = '/' . $kode_menu . '/' . $kode_lokasi . '/' . $month . $year;
 		$sql_cek =	"select  max((SUBSTRING(no_transaksi,1,(LENGTH(no_transaksi)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from " . $table . " 	where no_transaksi LIKE '%".$str_cek."' ;";
+		  from " . $table . " 	where no_transaksi LIKE '%" . $str_cek . "' ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
 			$str = $lastnumber['last'];
@@ -1825,8 +1850,8 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
 	function acc_permohonan_bayar($tanggal)
@@ -1847,7 +1872,7 @@ class Autonumber
 		// }
 		$str_cek = '/' . $kode_menu . '/' . $month . $year;
 		$sql_cek =	"select  max((SUBSTRING(no_transaksi,1,(LENGTH(no_transaksi)-LENGTH('" . $str_cek . "'))))*1) AS last
-		  from acc_permohonan_bayar_ht 	where no_transaksi LIKE '%".$str_cek."' ;";
+		  from acc_permohonan_bayar_ht 	where no_transaksi LIKE '%" . $str_cek . "' ;";
 		$lastnumber = $CI->db->query($sql_cek)->row_array();
 		if (!empty($lastnumber['last'])) {
 			$str = $lastnumber['last'];
@@ -1855,8 +1880,8 @@ class Autonumber
 		} else {
 			$snumber = $startNumber;
 		}
-		 $strnumber = sprintf("%04s", $snumber);
-		 $ret_format_number = $strnumber . $str_cek;
+		$strnumber = sprintf("%04s", $snumber);
+		$ret_format_number = $strnumber . $str_cek;
 		return $ret_format_number;
 	}
 	// function est_bkm_umum($lokasi_id, $tanggal)

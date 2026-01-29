@@ -42,7 +42,7 @@ class GbmCustomer extends BD_Controller
 		LEFT JOIN gbm_kelurahan h ON a.kelurahan_id = h.id
 		";
 		// $search = array('a.kode_customer', 'a.nama_customer','b.nama_kelompok');
-		$search = array('kode_customer', 'nama_customer', 'no_telpon','alamat', 'd.nama', 'e.nama', 'f.nama', 'g.nama', 'h.nama');
+		$search = array('kode_customer', 'nama_customer', 'no_telpon','a.alamat', 'd.nama', 'e.nama', 'f.nama', 'g.nama', 'h.nama');
 		$where  = null;
 
 		$isWhere = null;

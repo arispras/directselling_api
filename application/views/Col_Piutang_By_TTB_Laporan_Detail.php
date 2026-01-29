@@ -101,9 +101,9 @@
 					<tr>
 
 						<td center> <?= $no ?> </td>
-						<td left><?= $res['no_ttb'] ?></td>
-						<td center><?= tgl_indo($res['tanggal_ttb']) ?></td>
-						<td left><?= $res['nama_customer'] ?></td>
+						<td left><strong><?= $res['no_ttb'] ?></strong></td>
+						<td center><strong><?= tgl_indo($res['tanggal_ttb']) ?></strong></td>
+						<td left><strong><?= $res['nama_customer'] ?></strong></td>
 						<!-- <td right><?= format_number_report($res['nilai_ttb'], $format_laporan) ?></td>
 						<td right><?= format_number_report($res['dibayar'], $format_laporan) ?></td>
 						<td right><?= format_number_report($res['nilai_ttb'] - $res['dibayar'], $format_laporan) ?></td> -->
@@ -124,10 +124,10 @@
 							<td right><?= format_number_report(($v['nilai_angsuran'] - $v['dibayar']), $format_laporan) ?></td>
 						</tr>
 					<?php } ?>
-					<td colspan=7>Sub TOTAL</td>
-					<td right><?= format_number_report($res['nilai_ttb'], $format_laporan) ?></td>
-					<td right><?= format_number_report($res['dibayar'], $format_laporan) ?></td>
-					<td right><?= format_number_report($res['nilai_ttb'] - $res['dibayar'], $format_laporan) ?></td>
+					<td colspan=7><strong>SUB TOTAL</strong></td>
+					<td right><strong><?= format_number_report($res['nilai_ttb'], $format_laporan) ?></strong></td>
+					<td right><strong><?= format_number_report($res['dibayar'], $format_laporan) ?></strong></td>
+					<td right><strong><?= format_number_report($res['nilai_ttb'] - $res['dibayar'], $format_laporan) ?></strong></td>
 
 				<?php } ?>
 
