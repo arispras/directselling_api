@@ -757,57 +757,42 @@ class SlsTarikBarang extends BD_Controller
 		$id = (int)$segment_3;
 		$data = $this->post();
 		$data['diubah_oleh'] = $this->user_id;
-		$ttb = $this->SlsTarikBarangModel->retrieve($id);
-		if (empty($ttb)) {
+		$tb = $this->SlsTarikBarangModel->retrieve($id);
+		if (empty($tb)) {
 			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_OK);
 		}
-		$tenor = $ttb['tenor'];
-		$lokasi_id = $ttb['lokasi_id'];
-		$no_tarik_barang = $ttb['no_tarik_barang'];
-		$tgl_ttb = $ttb['tanggal'];
-		$collector_id = $ttb['collector_id'];
-		$customer_id = $ttb['customer_id'];
-		$nilai_angsuran = $ttb['total_nilai_angsuran'];
-		$tgl_tempo = $ttb['tanggal'];
-		$jenis = $ttb['jenis'];
-		$date = new DateTime($tgl_tempo);
-		$this->db->where('ttb_id', $id);
-		$this->db->delete('col_kuitansi_ht');
-		for ($i = 1; $i < ($tenor + 1); $i++) {
+		$tenor = $tb['tenor'];
+		$tenor_penarikan = $tb['tenor_penarikan'];
+		$ttb_id=$tb['sls_ttb_id'];
+		$kuitansi=$this->db->query("select * from col_kuitansi_ht 
+		where angsuran_ke >=".$tenor_penarikan." and ttb_id=".$ttb_id." order by angsuran_ke")->result_array();
 
-			$tanggal_tempo = $date->format('Y-m-d');
-			$angsuran_ke = $i;
-			$no_kuitansi = $no_tarik_barang . "." . sprintf("%02s", $angsuran_ke);
-			if ($angsuran_ke == 1) {
-				$nilai_angsuran = $ttb['total_dp'];
-			} else {
-				$nilai_angsuran = $ttb['total_nilai_angsuran'];
-			}
+		$lokasi_id = $tb['lokasi_id'];
+		$no_tarik_barang = $tb['no_tarik_barang'];
+		$customer_id = $tb['customer_id'];
+		$nilai_angsuran = $tb['total_nilai_angsuran'];
 
-			$this->db->insert("col_kuitansi_ht", array(
-				'ttb_id' => $id,
-				'lokasi_id' => $lokasi_id,
-				'no_kuitansi' => $no_kuitansi,
-				'angsuran_ke' => $angsuran_ke,
-				'nilai_angsuran' => $nilai_angsuran,
-				'nilai_angsuran_ori' => $nilai_angsuran,
-				'collector_id' => $collector_id,
-				'customer_id' => $customer_id,
-				'tanggal_tempo' => $tanggal_tempo,
-				'keterangan' => 'Cicilan TTB No. ' . $no_tarik_barang . ' Angsuran Ke-' . $angsuran_ke,
+		/* DELETE KUITANSI TARIK BARANG */
+		$this->db->where('tarik_barang_id', $id);
+			$this->db->delete('col_kuitansi_tarik_barang');
+		foreach ($kuitansi as $key => $k) {
+			/*  INSERT KUITANSI TARIK BARANG */			
+			$this->db->insert("col_kuitansi_tarik_barang", array(
+				'tarik_barang_id' => $id,
+				'kuitansi_id' => $k['id'],
+				'nilai_angsuran' => $nilai_angsuran
+			));
+			/* UPDATE NILAI KUITANSI */
+			$this->db->where('id', $k['id']);
+			$this->db->update("col_kuitansi_ht", array(
+				'nilai_angsuran' => $k['nilai_angsuran']-$nilai_angsuran,
 				'dibuat_oleh' => $this->user_id,
 				'dibuat_tanggal' => date('Y-m-d H:i:s')
 
-
 			));
-			if ($jenis == 'M') { // MINGGUAN
-				$date->modify('+7 days');
-			} else if ($jenis == 'M') { // BULANAN
-				$date->modify('+1 month');
-			} else {
-				$date->modify('+7 days');
-			}
 		}
+
+		
 
 		$res = $this->SlsTarikBarangModel->posting($id, $data);
 		if (!empty($res)) {

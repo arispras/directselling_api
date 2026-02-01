@@ -85,7 +85,7 @@ class SlsTTBModel extends CI_Model
 		$ht['tanggal'] = $input['tanggal'];
 		$ht['dibuat_tanggal'] = date('Y-m-d H:i:s');
 		$ht['dibuat_oleh'] = $input['dibuat_oleh'];
-		
+
 
 		$this->db->insert('sls_ttb_ht', $ht);
 		$id = $this->db->insert_id();
@@ -134,7 +134,7 @@ class SlsTTBModel extends CI_Model
 		$input['diubah_tanggal'] = date('Y-m-d H:i:s');
 		$this->db->where('id', $id);
 		$this->db->update('sls_ttb_ht', $ht);
-		
+
 
 		// hapus  detail
 		$this->db->where('ttb_hd_id', $id);
@@ -414,6 +414,68 @@ class SlsTTBModel extends CI_Model
 	public function posting($id,	$input)
 	{
 		$id = (int)$id;
+		/* cari gudang di bawah lokasi */
+		$gudang = $this->db->query("select b.* from sls_ttb_ht a
+		left join gbm_organisasi b on a.lokasi_id=b.parent_id  
+		 where b.tipe='GUDANG' and a.id=" . $id . ";")->row_array();
+
+		$data_transaksi = $this->db->query("select * from sls_ttb_ht a
+		inner join sls_ttb_dt b on a.id=b.ttb_hd_id  
+		 where a.id=" . $id . ";")->result_array();
+
+		// hapus  transaksi harian
+		$this->db->where('ref_id', $id);
+		$this->db->where('tipe', 'TTB');
+		$this->db->delete('inv_transaksi_harian');
+
+		foreach ($data_transaksi as $key => $value) {
+			/* cari stok dan value akhir */
+			$stok_akhir = $this->db->query("SELECT  SUM(qty_masuk-qty_keluar)AS qty,SUM(nilai_masuk-nilai_keluar)AS nilai from inv_transaksi_harian
+					where	item_id=" . $value['item_id'] . " and gudang_id=" . $gudang['id'] . " ")->row_array();
+			$stok_akhir_qty = 	$stok_akhir['qty'] = (!empty($stok_akhir['qty'])) ? $stok_akhir['qty'] : 0;
+			$stok_akhir_nilai = 	$stok_akhir['nilai'] = (!empty($stok_akhir['nilai'])) ? $stok_akhir['nilai'] : 0;
+
+			$item_dt = $this->db->query("select * from inv_item_dt  where gudang_id=" . $gudang['id'] . "
+			  and item_id=" . $value['item_id'] . "")->row_array();
+			$avg_price = $stok_akhir_nilai /	$stok_akhir_qty;
+			if ($item_dt) {
+				// $avg_price = $item_dt['nilai'] / $item_dt['qty'];
+				$this->db->where('item_id', $value['item_id']);
+				$this->db->where('gudang_id', $gudang['id']);
+				$this->db->update("inv_item_dt", array(
+					'item_id' => $value['item_id'],
+					'gudang_id' => $gudang['id'],
+					'qty' =>  $stok_akhir_qty - $value['qty'], //$item_dt['qty'] - $value['qty'],
+					'nilai' => 1//$stok_akhir_nilai - ($value['qty'] * $avg_price) // $item_dt['nilai'] - ($value['qty'] * $avg_price)
+				));
+			} else {
+				$this->db->insert("inv_item_dt", array(
+					'item_id' => $value['item_id'],
+					'gudang_id' => $gudang['id'],
+					'qty' => $stok_akhir_qty - $value['qty'],
+					'nilai' =>1// $stok_akhir_nilai - ($value['qty'] * $avg_price)
+				));
+			}
+			$this->db->insert("inv_transaksi_harian", array(
+				'ref_id' => $id,
+				'item_id' => $value['item_id'],
+				'gudang_id' => $gudang['id'],
+				'no_transaksi' => $value['no_ttb'],
+				'tipe ' => 'TTB',
+				'tanggal' => $value['tanggal'],
+				'tanggal_proses' => date('Y-m-d H:i:s'),
+				'qty_masuk' => 0,
+				'qty_keluar' =>  $value['qty'],
+				'nilai_masuk' => 0,
+				'nilai_keluar' => 1,//$avg_price * $value['qty'],
+				'blok_stasiun_id' =>  $value['blok_id'],
+				'kendaraan_id' =>  $value['traksi_id'],
+				'kegiatan_id' =>  $value['kegiatan_id'],
+
+			));
+		}
+
+
 		$data['status_ttb'] = 'kuitansi';
 		$data['is_posting'] = 1;
 		$data['diposting_tanggal'] = date('Y-m-d H:i:s');
@@ -422,6 +484,7 @@ class SlsTTBModel extends CI_Model
 		// $data['diubah_oleh'] = $input['diubah_oleh'];
 		$this->db->where('id', $id);
 		$this->db->update('sls_ttb_ht', $data);
+
 
 
 		return true;

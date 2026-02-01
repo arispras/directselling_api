@@ -77,11 +77,13 @@ class SlsTarikBarangModel extends CI_Model
 		$ht['catatan'] = $input['catatan'];
 		$ht['jenis'] = $input['jenis'];
 		$ht['tenor'] = $input['tenor'];
+		$ht['tenor_penarikan'] = $input['tenor_penarikan'];
 		$ht['sub_total'] = $input['sub_total'];
 		$ht['total_diskon'] = $input['total_diskon'];
 		$ht['total_dp'] = $input['total_dp'];
 		$ht['total_piutang'] = $input['total_piutang'];
 		$ht['total_nilai_angsuran'] = $input['total_nilai_angsuran'];
+		$ht['total_pendapatan_tarik_barang'] = $input['total_pendapatan_tarik_barang'];
 		$ht['tanggal'] = $input['tanggal'];
 		$ht['dibuat_tanggal'] = date('Y-m-d H:i:s');
 		$ht['dibuat_oleh'] = $input['dibuat_oleh'];
@@ -103,6 +105,7 @@ class SlsTarikBarangModel extends CI_Model
 				'total' => $value['jumlah'],
 				'nilai_piutang' => $value['nilai_piutang'],
 				'nilai_angsuran' => $value['nilai_angsuran'],
+				'nilai_pendapatan_tarik_barang' => $value['nilai_pendapatan_tarik_barang'],
 				'ket' => $value['ket'],
 			));
 		}
@@ -124,11 +127,13 @@ class SlsTarikBarangModel extends CI_Model
 		$ht['catatan'] = $input['catatan'];
 		$ht['jenis'] = $input['jenis'];
 		$ht['tenor'] = $input['tenor'];
+		$ht['tenor_penarikan'] = $input['tenor_penarikan'];
 		$ht['sub_total'] = $input['sub_total'];
 		$ht['total_diskon'] = $input['total_diskon'];
 		$ht['total_dp'] = $input['total_dp'];
 		$ht['total_piutang'] = $input['total_piutang'];
 		$ht['total_nilai_angsuran'] = $input['total_nilai_angsuran'];
+		$ht['total_pendapatan_tarik_barang'] = $input['total_pendapatan_tarik_barang'];
 		$ht['tanggal'] = $input['tanggal'];
 		$ht['diubah_oleh'] = $input['diubah_oleh'];
 		$input['diubah_tanggal'] = date('Y-m-d H:i:s');
@@ -153,6 +158,7 @@ class SlsTarikBarangModel extends CI_Model
 				'total' => $value['jumlah'],
 				'nilai_piutang' => $value['nilai_piutang'],
 				'nilai_angsuran' => $value['nilai_angsuran'],
+				'nilai_pendapatan_tarik_barang' => $value['nilai_pendapatan_tarik_barang'],
 				'ket' => $value['ket'],
 			));
 		}

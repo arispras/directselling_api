@@ -55,7 +55,7 @@
 					<td width="33%"><strong> <?= $header['nama_customer'] ?></strong></td>
 					<td width="15%">Ditarik Angsuran Ke</td>
 					<td width="2%">:</td>
-					<td width="33%"><strong> <?= ($header['tenor']) ?></strong></td>
+					<td width="33%"><strong> <?= ($header['tenor_penarikan']) ?></strong></td>
 				</tr>
 			</table>
 
@@ -99,9 +99,10 @@
 					<th>Harga</th>
 					<th>Diskon</th>
 					<th>DP</th>
-					<th>Jumlah</th>
+					<th>Nilai Tarik Barang</th>
 					<th>Piutang Ditarik</th>
-					<th>@Angsuran Ditarik</th>
+					<th>@Angs Ditarik</th>
+					<th>Pendapatan Tarik Barang</th>
 					<!-- <th>Keterangan</th> -->
 				</tr>
 			</thead>
@@ -111,12 +112,14 @@
 				$total_piutang = 0;
 				$total_angsuran = 0;
 				$total_diskon = 0;
+				$total_pendapatan_tarik_barang = 0;
 				$total_dp = 0;
 				$total_sub_total = 0;
 
 				foreach ($detail as $key => $val) {
 					$no = $no + 1;
 					$total_piutang += $val['nilai_piutang'];
+					$total_pendapatan_tarik_barang += $val['nilai_pendapatan_tarik_barang'];
 					$total_angsuran += $val['nilai_angsuran'];
 					$total_diskon += $val['diskon'];
 					$total_dp += $val['dp'];
@@ -124,16 +127,17 @@
 				?>
 					<tr>
 						<td center width="2%"><?= $no ?></td>
-						<td width="10%"><?= $val['kode_barang'] ?></td>
+						<td width="4%"><?= $val['kode_barang'] ?></td>
 						<td width="10%"><?= $val['nama_barang'] ?></td>
 						<td width="5%"><?= $val['uom'] ?></td>
-						<td center width="7%"><?= $val['qty'] ?></td>
-						<td center width="8%"><?= number_format($val['harga'], 0) ?></td>
-						<td center width="8%"><?= number_format($val['diskon'], 0) ?></td>
-						<td center width="8%"><?= number_format($val['dp'], 0) ?></td>
-						<td center width="10%"><?= number_format($val['total'], 0) ?></td>
-						<td center width="10%"><?= number_format($val['nilai_piutang'], 0) ?></td>
-						<td center width="10%"><?= number_format($val['nilai_angsuran'], 0) ?></td>
+						<td center width="5%"><?= $val['qty'] ?></td>
+						<td center width="6%"><?= number_format($val['harga'], 0) ?></td>
+						<td center width="6%"><?= number_format($val['diskon'], 0) ?></td>
+						<td center width="6%"><?= number_format($val['dp'], 0) ?></td>
+						<td center width="7%"><?= number_format($val['total'], 0) ?></td>
+						<td center width="7%"><?= number_format($val['nilai_piutang'], 0) ?></td>
+						<td center width="7%"><?= number_format($val['nilai_angsuran'], 0) ?></td>
+						<td center width="7%"><?= number_format($val['nilai_pendapatan_tarik_barang'], 0) ?></td>
 						<!-- <td width="10%"><?= $val['ket'] ?></td> -->
 					</tr>
 				<?php } ?>
@@ -146,6 +150,7 @@
 					<td center><?= number_format($total_sub_total, 0) ?></td>
 					<td center><?= number_format($total_piutang, 0) ?></td>
 					<td center><?= number_format($total_angsuran, 0) ?></td>
+					<td center><?= number_format($total_pendapatan_tarik_barang, 0) ?></td>
 				</tr>
 			</tfoot>
 		</table>
