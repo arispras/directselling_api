@@ -37,6 +37,16 @@
 					<td width="33%"><strong> <?= tgl_indo($header['tanggal_so']) ?></strong></td>
 				</tr>	
 			</table>
+			<table>
+				<tr>
+					<td width="15%">Tanggal Survey</td>
+					<td width="2%">:</td>
+					<td width="33%"><strong> <?= tgl_indo($header['tanggal_survey']) ?></strong></td>
+					<td width="15%">Tanggal Kirim</td>
+					<td width="2%">:</td>
+					<td width="33%"><strong> <?= tgl_indo($header['tanggal_kirim']) ?></strong></td>
+				</tr>	
+			</table>
 			
 			<table>
 				<tr>

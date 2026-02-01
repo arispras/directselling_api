@@ -24,7 +24,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |
 */
 // $config['base_url'] = 'http://app.thermosigma.com/API/'. empty($_SERVER["HTTP_NAMAPATH"])?'':$_SERVER["HTTP_NAMAPATH"];
-$config['base_url'] = 'https://klinik.antech-indonesia.com/klinik-api';
+$config['base_url'] = 'http://localhost/directselling_api';
 /*
 |--------------------------------------------------------------------------
 | Index File

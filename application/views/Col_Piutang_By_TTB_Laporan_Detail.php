@@ -2,7 +2,7 @@
 	<html>
 
 	<head>
-		<title>LHI Detail</title>
+		<title>PIUTANG DETAIL</title>
 		<?php function format_number_report($angka, $fmt_laporan)
 		{
 			$format_laporan     = $fmt_laporan;
@@ -40,7 +40,7 @@
 
 		<!-- <pre><?php print_r($so) ?></pre> -->
 
-		<h3 class="title">LHI DETAIL</h3>
+		<h3 class="title">PUTANG DETAIL BY Tanggal TTB</h3>
 		<br>
 
 		<div class="d-flex flex-between">
@@ -52,7 +52,7 @@
 				</tr>
 
 				<tr>
-					<td>Periode Tanggal</td>
+					<td>Periode Tanggal TTB</td>
 					<td>:</td>
 					<td><?= tgl_indo($filter_tgl_awal) . ' s/d ' . tgl_indo($filter_tgl_akhir) ?></td>
 				</tr>
@@ -95,7 +95,7 @@
 					<?php
 					$kuitansi = $res['kuitansi'];
 					$no = $no + 1;
-					$jum_dibayar += $res['dibayar'];
+					$jum_dibayar += $res['dibayar']?$res['dibayar']:0;
 					$jum_nilai_ttb += $res['nilai_ttb'];
 					?>
 					<tr>
@@ -121,13 +121,13 @@
 							<td center><?= $v['angsuran_ke'] ?></td>
 							<td right><?= format_number_report($v['nilai_angsuran'], $format_laporan) ?></td>
 							<td right><?= format_number_report($v['dibayar'], $format_laporan) ?></td>
-							<td right><?= format_number_report(($v['nilai_angsuran'] - $v['dibayar']), $format_laporan) ?></td>
+							<td right><?= format_number_report(($v['nilai_angsuran'] - ($v['dibayar']?$v['dibayar']:0)), $format_laporan) ?></td>
 						</tr>
 					<?php } ?>
 					<td colspan=7><strong>SUB TOTAL</strong></td>
 					<td right><strong><?= format_number_report($res['nilai_ttb'], $format_laporan) ?></strong></td>
 					<td right><strong><?= format_number_report($res['dibayar'], $format_laporan) ?></strong></td>
-					<td right><strong><?= format_number_report($res['nilai_ttb'] - $res['dibayar'], $format_laporan) ?></strong></td>
+					<td right><strong><?= format_number_report($res['nilai_ttb'] - ($res['dibayar']?$res['dibayar']:0), $format_laporan) ?></strong></td>
 
 				<?php } ?>
 

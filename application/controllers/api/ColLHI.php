@@ -994,13 +994,13 @@ class ColLHI extends BD_Controller
 		$lokasi = $this->db->query("select * from gbm_organisasi where id=" . $lokasi_id)->row_array();
 		if ($lokasi) {
 			$filter_lokasi = $lokasi['nama'];
-			$lokasi_id = "= " . $lokasi_id;
+			$lokasi_id = $lokasi_id;
 		} else {
 			$filter_lokasi = "Semua Lokasi";
 		}
 
 		$query = "select * from col_lhi_detail_vw where tanggal between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
-		and lokasi_id  " . $lokasi_id . "";
+		and lokasi_id = " . $lokasi_id . "";
 		$dataDtl = $this->db->query($query)->result_array();
 
 
@@ -1070,7 +1070,7 @@ class ColLHI extends BD_Controller
 		$lokasi = $this->db->query("select * from gbm_organisasi where id=" . $lokasi_id)->row_array();
 		if ($lokasi) {
 			$filter_lokasi = $lokasi['nama'];
-			$lokasi_id = "= " . $lokasi_id;
+			$lokasi_id =  $lokasi_id;
 		} else {
 			$filter_lokasi = "Semua Lokasi";
 		}
@@ -1078,7 +1078,7 @@ class ColLHI extends BD_Controller
 		$query = "SELECT lokasi_id,lokasi,tanggal, SUM(dibayar)AS dibayar, count(kuitansi_id)as jum_kuitansi,collector,no_lhi
 			FROM col_lhi_detail_vw
 			where tanggal between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
-			and lokasi_id  " . $lokasi_id . "
+			and lokasi_id = " . $lokasi_id . "
 			GROUP BY lokasi_id,lokasi,tanggal,collector,no_lhi
 			ORDER BY tanggal 
 		";

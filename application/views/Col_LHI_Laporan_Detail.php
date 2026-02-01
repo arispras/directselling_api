@@ -119,8 +119,7 @@
 					<td colspan=10></td>
 					<td right><?= format_number_report($jum_dibayar,$format_laporan) ?></td>
 					<td right></td>
-					<td right></td>				
-					<td right></td>
+					
 				</tr>
 
 			</tbody>

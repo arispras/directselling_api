@@ -1,20 +1,9 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 require 'vendor/autoload.php';
 
-use Dompdf\Adapter\CPDF;
-use Dompdf\Dompdf;
-use Dompdf\Exception;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
-use PhpOffice\PhpSpreadsheet\Shared\Date;
-use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
-use PhpOffice\PhpSpreadsheet\Cell\DataType;
-use PhpOffice\PhpSpreadsheet\Style\Border;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
-use PhpOffice\PhpSpreadsheet\IOFactory;
-use Carbon\Carbon;
-use Dompdf\Positioner\NullPositioner;
+use Dompdf\Dompdf;
+
 use Restserver\Libraries\REST_Controller;
 
 class SlsSo extends BD_Controller
@@ -1031,13 +1020,13 @@ class SlsSo extends BD_Controller
 		$lokasi = $this->db->query("select * from gbm_organisasi where id=" . $lokasi_id)->row_array();
 		if ($lokasi) {
 			$filter_lokasi = $lokasi['nama'];
-			$lokasi_id = "= " . $lokasi_id;
+			$lokasi_id = $lokasi_id;
 		} else {
 			$filter_lokasi = "Semua Lokasi";
 		}
 
 		$query = "select * from sls_so_detail_vw where tanggal between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
-		and lokasi_id  " . $lokasi_id . "";
+		and lokasi_id  =" . $lokasi_id . "";
 		$dataDtl = $this->db->query($query)->result_array();
 
 
@@ -1107,7 +1096,7 @@ class SlsSo extends BD_Controller
 		$lokasi = $this->db->query("select * from gbm_organisasi where id=" . $lokasi_id)->row_array();
 		if ($lokasi) {
 			$filter_lokasi = $lokasi['nama'];
-			$lokasi_id = "= " . $lokasi_id;
+			$lokasi_id =$lokasi_id;
 		} else {
 			$filter_lokasi = "Semua Lokasi";
 		}
@@ -1117,7 +1106,7 @@ class SlsSo extends BD_Controller
 			surveyor,sales,sales_supervisor,demo_booker
 			FROM sls_so_detail_vw
 			where tanggal between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
-			and lokasi_id  " . $lokasi_id . "
+			and lokasi_id = " . $lokasi_id . "
 			GROUP BY lokasi_id,lokasi,tanggal,surveyor,sales,sales_supervisor,demo_booker
 			ORDER BY tanggal 
 		";

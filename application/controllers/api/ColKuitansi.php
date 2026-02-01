@@ -1,20 +1,8 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 require 'vendor/autoload.php';
 
-use Dompdf\Adapter\CPDF;
 use Dompdf\Dompdf;
-use Dompdf\Exception;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
-use PhpOffice\PhpSpreadsheet\Shared\Date;
-use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
-use PhpOffice\PhpSpreadsheet\Cell\DataType;
-use PhpOffice\PhpSpreadsheet\Style\Border;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
-use PhpOffice\PhpSpreadsheet\IOFactory;
-use Carbon\Carbon;
-use Dompdf\Positioner\NullPositioner;
 use Restserver\Libraries\REST_Controller;
 
 class ColKuitansi extends BD_Controller

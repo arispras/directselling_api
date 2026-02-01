@@ -85,6 +85,7 @@ class SlsSoModel extends CI_Model
 		$ht['total_nilai_angsuran'] = $input['total_nilai_angsuran'];
 		$ht['tanggal'] = $input['tanggal'];
 		$ht['tanggal_survey'] = $input['tanggal_survey'];
+		$ht['tanggal_kirim'] = $input['tanggal_kirim'];
 		$ht['dibuat_tanggal'] = date('Y-m-d H:i:s');
 		$ht['dibuat_oleh'] = $input['dibuat_oleh'];
 
@@ -134,6 +135,7 @@ class SlsSoModel extends CI_Model
 		$ht['total_nilai_angsuran'] = $input['total_nilai_angsuran'];
 		$ht['tanggal'] = $input['tanggal'];
 		$ht['tanggal_survey'] = $input['tanggal_survey'];
+		$ht['tanggal_kirim'] = $input['tanggal_kirim'];
 		$ht['diubah_oleh'] = $input['diubah_oleh'];
 		$input['diubah_tanggal'] = date('Y-m-d H:i:s');
 		$this->db->where('id', $id);

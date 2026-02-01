@@ -40,7 +40,7 @@
 
 		<!-- <pre><?php print_r($so) ?></pre> -->
 
-		<h3 class="title">Piutang REKAP</h3>
+		<h3 class="title">PIUTANG REKAP BY TANGGAL TTB</h3>
 		<br>
 
 		<div class="d-flex flex-between">
@@ -52,7 +52,7 @@
 				</tr>
 
 				<tr>
-					<td>Periode Tanggal</td>
+					<td>Periode Tanggal TTB</td>
 					<td>:</td>
 					<td><?= tgl_indo($filter_tgl_awal) . ' s/d ' . tgl_indo($filter_tgl_akhir) ?></td>
 				</tr>
