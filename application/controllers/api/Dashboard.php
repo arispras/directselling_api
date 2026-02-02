@@ -70,19 +70,47 @@ class Dashboard extends Rest_Controller
 			}
 		}
 		
-		$retrieve = $this->db->query("SELECT sum(grand_total)as tot
-		FROM sls_so_ht 
+		$retrieve = $this->db->query("SELECT sum(total)as tot,sum(qty) as qty 
+		FROM sls_ttb_detail_vw
 		where DATE_FORMAT(tanggal,'%Y-%m') = '" . $t . "'")->row_array();
-		$total_nilai_so = $retrieve['tot'];
+		$total_nilai_penjualan= $retrieve['tot'];
+		$total_qty_penjualan= $retrieve['qty'];
 
-		$retrieve = $this->db->query("SELECT SUM(nilai)AS tot FROM sls_so_pembayaran a inner JOIN sls_so_ht b 
-			ON a.so_hd_id=b.id
-		where DATE_FORMAT(a.tanggal,'%Y-%m') = '" . $t . "'")->row_array();
+		$retrieve = $this->db->query("SELECT SUM(dibayar)AS tot FROM col_lhi_detail_vw 
+		where DATE_FORMAT(tanggal,'%Y-%m') = '" . $t . "'")->row_array();
 		$total_nilai_bayar = $retrieve['tot'];
 
 
-		$data = array('nilai_so' => $total_nilai_so, 'nilai_bayar' => $total_nilai_bayar);
+		$data = array('qty_penjualan'=>$total_qty_penjualan,'nilai_penjualan' => $total_nilai_penjualan, 'nilai_bayar' => $total_nilai_bayar);
 		$this->set_response($data, REST_Controller::HTTP_OK);
+	}
+	public function laporan_harian_get($param){
+		$t = date("Y-m");
+		$tgl_mulai =date("Y-m-d");
+		$tgl_akhir =date("Y-m-t");
+		if ($param) {
+			if ($param == 'bulan_ini') {
+				$t = date("Y-m");
+			} else if ($param == 'bulan_lalu') {
+				$t = date('Y-m', strtotime("first day of -1 month"));
+			} else {
+				$tgl_mulai = $param . "-01";
+				$date = new DateTime($tgl_mulai);
+				$date->modify('last day of this month');
+				$tgl_akhir= $date->format('Y-m-d'); 
+				
+			}
+		}
+		$query1 = "select sales_id,sales, sum(qty_actual)as actual,sum(qty_pdl)as pdl ,sum(qty_pdv)as pdv 
+		from sls_so_ttb_detail_vw  
+			where ((tanggal_so between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	)
+				or (tanggal_ttb between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	))
+			group by sales_id,sales
+			ORDER BY sales; 
+		";
+		$dataBySales = $this->db->query($query1)->result_array();
+		$this->set_response($dataBySales, REST_Controller::HTTP_OK);
+
 	}
 	public function sales_perbulan_get($param)
 	{
@@ -113,10 +141,9 @@ class Dashboard extends Rest_Controller
 		}
 
 
-		$retrieve = $this->db->query("SELECT c.nama_customer as name, grand_total as value FROM sls_so_ht a
-				inner join gbm_customer c ON a.customer_id=c.id  
-		  WHERE  DATE_FORMAT(a.tanggal ,'%Y-%m') ='" . $t . "'
-		  GROUP BY c.nama_customer
+		$retrieve = $this->db->query("SELECT  sales_id,sales as name, sum(qty) as value FROM sls_ttb_detail_vw
+		  WHERE  DATE_FORMAT(tanggal ,'%Y-%m') ='" . $t . "'
+		  GROUP BY sales,sales_id
 		  ")->result_array();
 
 		$this->set_response($retrieve, REST_Controller::HTTP_OK);
