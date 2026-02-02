@@ -52,11 +52,11 @@ class AccJurnalUnpost extends Rest_Controller
 			case "UANG_MUKA_REALISASI":
 				$retrieve = $this->uangmuka_realisasi($notransaksi, $lokasi_id);
 				break;
-			case "TBS_INVOICE":
-				$retrieve = $this->tbs_invoice($notransaksi, $lokasi_id);
+			case "TTB":
+				$retrieve = $this->TTB($notransaksi, $lokasi_id);
 				break;
-			case "ANGKUT_INVOICE":
-				$retrieve = $this->angkut_invoice($notransaksi, $lokasi_id);
+			case "TARIK_BARANG":
+				$retrieve = $this->TARIK_BARANG($notransaksi, $lokasi_id);
 				break;
 			case "PANEN":
 				$retrieve = $this->panen($notransaksi, $lokasi_id);
@@ -130,12 +130,6 @@ class AccJurnalUnpost extends Rest_Controller
 		}
 
 		$this->set_response(array("status" => $retrieve['status'],  "data" => $retrieve['data']), REST_Controller::HTTP_OK);
-
-		// if (!empty($retrieve)) {
-		// 	$this->set_response(array("status" => "OK", "res" => $retrieve, "data" => 'Unpost Berhasil'), REST_Controller::HTTP_OK);
-		// } else {
-		// 	$this->set_response(array("status" => "NOT OK", "res" => $retrieve, "data" => "Tidak ada Data"), REST_Controller::HTTP_OK);
-		// }
 	}
 	function kasbank($no_transaksi, $lokasi_id)
 	{
@@ -648,7 +642,7 @@ class AccJurnalUnpost extends Rest_Controller
 
 		/* Buka Posting */
 		$data = array(
-			'is_posting'=>0,
+			'is_posting' => 0,
 			'status' => 'CREATED',
 			'last_approve_position' => Null,
 			'last_approve_user' => Null,
@@ -663,13 +657,12 @@ class AccJurnalUnpost extends Rest_Controller
 		$retrieve_header = $this->db->query(" select  * from prc_po_ht where no_po='" . $no_transaksi . "' and status='RELEASE' ")->row_array();;
 		if (empty($retrieve_header)) {
 			return array("status" => "NOT OK", "data" => "Tidak ada Data Transaksi");
-			
 		}
 
 		/* Buka Posting */
 
 		$data = array(
-			'is_posting'=>0,
+			'is_posting' => 0,
 			'status' => 'CREATED',
 			'last_approve_position' => Null,
 			'last_approve_user' => Null,
@@ -722,6 +715,128 @@ class AccJurnalUnpost extends Rest_Controller
 		);
 		$this->db->where('id', $retrieve_header['id']);
 		$this->db->update('inv_pemakaian_ht', $data);
+		return array("status" => "OK", "data" => "Unposting Berhasil");
+	}
+	function TTB($no_transaksi, $lokasi_id)
+	{
+		$retrieve_header = $this->db->query(" select  * from sls_ttb_ht where no_tttb='" . $no_transaksi . "' and is_posting=1 and lokasi_id=" . $lokasi_id . "")->row_array();;
+		if (empty($retrieve_header)) {
+			return array("status" => "NOT OK", "data" => "Tidak ada Data Transaksi");
+		} else {
+			// $chk = cek_periode($retrieve_header['tanggal'], $retrieve_header['lokasi_id']);
+			// if ($chk['status'] == false) {
+			// 	return array("status" => "NOT OK", "data" => $chk['message']);
+			// }
+		}
+		/* cari gudang di bawah lokasi */
+		$gudang = $this->db->query("select b.* from sls_ttb_ht a
+		left join gbm_organisasi b on a.lokasi_id=b.parent_id  
+		 where b.tipe='GUDANG' and a.id=" . $retrieve_header['id'] . ";")->row_array();
+
+		$gudang_id = $gudang['gudang_id'];
+
+		$data_transaksi = $this->db->query("select * from inv_transaksi_harian 
+		 where ref_id=" . $retrieve_header['id'] . " and tipe='TTB' ;")->result_array();
+
+		/* balikan stok */
+		foreach ($data_transaksi as $key => $value) {
+			$item_dt = $this->db->query("select * from inv_item_dt  where gudang_id=" . $gudang_id . "
+			  and item_id=" . $value['item_id'] . "")->row_array();
+			if ($item_dt) {
+				$this->db->where('item_id', $value['item_id']);
+				$this->db->where('gudang_id', $gudang_id);
+				$this->db->update("inv_item_dt", array(
+					'item_id' => $value['item_id'],
+					'gudang_id' => $gudang_id,
+					'qty' => $item_dt['qty'] + $value['qty_keluar'],
+					'nilai' => $item_dt['nilai'] + ($value['nilai_keluar'])
+				));
+			}
+		}
+		// hapus  transaksi harian
+		$this->db->where('ref_id', $retrieve_header['id']);
+		$this->db->where('tipe', 'TTB');
+		$this->db->delete('inv_transaksi_harian');
+		/* Hapus jurnal */
+		$this->AccJurnalModel->delete_by_ref_id_and_modul($retrieve_header['id'], 'TTB');
+
+		/* HAPUS KUITANSI */
+		$this->db->where('ttb_id', $retrieve_header['id']);
+		$this->db->delete('col_kuitansi_ht');
+
+		/* Buka Posting */
+		$data = array(
+			'is_posting' => 0,
+		);
+		$this->db->where('id', $retrieve_header['id']);
+		$this->db->update('sls_ttb_ht', $data);
+		return array("status" => "OK", "data" => "Unposting Berhasil");
+	}
+	function TARIK_BARANG($no_transaksi, $lokasi_id)
+	{
+		$retrieve_header = $this->db->query(" select  * from sls_tarik_barang_ht where no_tarik_barang='" . $no_transaksi . "' and is_posting=1 and lokasi_id=" . $lokasi_id . "")->row_array();;
+		if (empty($retrieve_header)) {
+			return array("status" => "NOT OK", "data" => "Tidak ada Data Transaksi");
+		} else {
+			// $chk = cek_periode($retrieve_header['tanggal'], $retrieve_header['lokasi_id']);
+			// if ($chk['status'] == false) {
+			// 	return array("status" => "NOT OK", "data" => $chk['message']);
+			// }
+		}
+		// $gudang_id = $retrieve_header['gudang_id'];
+
+		// $data_transaksi = $this->db->query("select * from inv_transaksi_harian 
+		//  where ref_id=" . $retrieve_header['id'] . " and tipe='TARIK_BARANG' ;")->result_array();
+
+		// /* balikan stok */
+		// foreach ($data_transaksi as $key => $value) {
+		// 	$item_dt = $this->db->query("select * from inv_item_dt  where gudang_id=" . $gudang_id . "
+		// 	  and item_id=" . $value['item_id'] . "")->row_array();
+		// 	if ($item_dt) {
+		// 		$this->db->where('item_id', $value['item_id']);
+		// 		$this->db->where('gudang_id', $gudang_id);
+		// 		$this->db->update("inv_item_dt", array(
+		// 			'item_id' => $value['item_id'],
+		// 			'gudang_id' => $gudang_id,
+		// 			'qty' => $item_dt['qty'] + $value['qty_keluar'],
+		// 			'nilai' => $item_dt['nilai'] + ($value['nilai_keluar'])
+		// 		));
+		// 	}
+		// }
+		// hapus  transaksi harian
+		// $this->db->where('ref_id', $retrieve_header['id']);
+		// $this->db->where('tipe', 'TTB');
+		// $this->db->delete('inv_transaksi_harian');
+		/* Hapus jurnal */
+		// $this->AccJurnalModel->delete_by_ref_id_and_modul($retrieve_header['id'], 'TTB');
+
+		$kuitansi = $this->db->query("sselect a.nilai_angsuran as nilai_angsuran_tarik_barang,b.nilai_angsuran,a.kuitansi_id from col_kuitansi_tarik_barang a 
+		inner join col_kuitansi_ht b on a.kuitansi_id=b.id
+		where  a.tarik_barang_id=" . $retrieve_header['id'] . " ")->result_array();
+
+		
+		foreach ($kuitansi as $key => $k) {
+		
+			/* UPDATE KEMBALIKAN NILAI KUITANSI */
+			$this->db->where('id', $k['kuitansi_id']);
+			$this->db->update("col_kuitansi_ht", array(
+				'nilai_angsuran' => $k['nilai_angsuran'] + $k['nilai_angsuran_tarik_barang'],
+				'dibuat_oleh' => $this->user_id,
+				'dibuat_tanggal' => date('Y-m-d H:i:s')
+
+			));
+		}
+
+		/* DELETE KUITANSI TARIK BARANG */
+		$this->db->where('tarik_barang_id', $retrieve_header['id']);
+		$this->db->delete('col_kuitansi_tarik_barang');
+
+		/* Buka Posting */
+		$data = array(
+			'is_posting' => 0,
+		);
+		$this->db->where('id', $retrieve_header['id']);
+		$this->db->update('sls_tarik_barang_ht', $data);
 		return array("status" => "OK", "data" => "Unposting Berhasil");
 	}
 	function inv_pindah_gudang($no_transaksi, $lokasi_id)
@@ -865,10 +980,10 @@ class AccJurnalUnpost extends Rest_Controller
 		if (empty($retrieve_header)) {
 			return array("status" => "NOT OK", "data" => "Tidak ada Data Transaksi");
 		} else {
-			$chk = cek_periode($retrieve_header['tanggal'], $retrieve_header['lokasi_id']);
-			if ($chk['status'] == false) {
-				return array("status" => "NOT OK", "data" => $chk['message']);
-			}
+			// $chk = cek_periode($retrieve_header['tanggal'], $retrieve_header['lokasi_id']);
+			// if ($chk['status'] == false) {
+			// 	return array("status" => "NOT OK", "data" => $chk['message']);
+			// }
 		}
 		$gudang_id = $retrieve_header['gudang_id'];
 
@@ -1000,10 +1115,10 @@ class AccJurnalUnpost extends Rest_Controller
 		if (empty($retrieve_header)) {
 			return array("status" => "NOT OK", "data" => "Tidak ada Data Transaksi");
 		} else {
-			$chk = cek_periode($retrieve_header['tanggal'], $retrieve_header['lokasi_id']);
-			if ($chk['status'] == false) {
-				return array("status" => "NOT OK", "data" => $chk['message']);
-			}
+			// $chk = cek_periode($retrieve_header['tanggal'], $retrieve_header['lokasi_id']);
+			// if ($chk['status'] == false) {
+			// 	return array("status" => "NOT OK", "data" => $chk['message']);
+			// }
 		}
 		$gudang_id = $retrieve_header['gudang_id'];
 
