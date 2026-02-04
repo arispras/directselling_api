@@ -43,7 +43,7 @@ class Dashboard extends Rest_Controller
 	}
 	public function tagihan_customer_get()
 	{
-		
+
 		$retrieve = $this->db->query("SELECT c.nama_customer,no_so,tanggal , grand_total as nilai_so,
 		IFNULL (b.bayar,0)AS bayar,grand_total-IFNULL(b.bayar,0)as sisa FROM sls_so_ht a
 				inner join gbm_customer c ON a.customer_id=c.id  LEFT JOIN (SELECT so_hd_id, SUM(nilai)AS bayar FROM sls_so_pembayaran
@@ -69,39 +69,51 @@ class Dashboard extends Rest_Controller
 				$d2 = new DateTime($t2);
 			}
 		}
-		
+
 		$retrieve = $this->db->query("SELECT sum(total)as tot,sum(qty) as qty 
 		FROM sls_ttb_detail_vw
 		where DATE_FORMAT(tanggal,'%Y-%m') = '" . $t . "'")->row_array();
-		$total_nilai_penjualan= $retrieve['tot'];
-		$total_qty_penjualan= $retrieve['qty'];
+		$total_nilai_penjualan = $retrieve['tot'];
+		$total_qty_penjualan = $retrieve['qty'];
 
 		$retrieve = $this->db->query("SELECT SUM(dibayar)AS tot FROM col_lhi_detail_vw 
 		where DATE_FORMAT(tanggal,'%Y-%m') = '" . $t . "'")->row_array();
 		$total_nilai_bayar = $retrieve['tot'];
 
 
-		$data = array('qty_penjualan'=>$total_qty_penjualan,'nilai_penjualan' => $total_nilai_penjualan, 'nilai_bayar' => $total_nilai_bayar);
+		$data = array('qty_penjualan' => $total_qty_penjualan, 'nilai_penjualan' => $total_nilai_penjualan, 'nilai_bayar' => $total_nilai_bayar);
 		$this->set_response($data, REST_Controller::HTTP_OK);
 	}
-	public function laporan_harian_get($param){
+	public function laporan_harian_get($param)
+	{
 		$t = date("Y-m");
-		$tgl_mulai =date("Y-m-d");
-		$tgl_akhir =date("Y-m-t");
+		$tgl_mulai = date("Y-m-d");
+		$tgl_akhir = date("Y-m-t");
 		if ($param) {
 			if ($param == 'bulan_ini') {
 				$t = date("Y-m");
+				$tgl_mulai = $t . "-01";
+				$date = new DateTime($tgl_mulai);
+				$date->modify('last day of this month');
+				$tgl_akhir = $date->format('Y-m-d');
 			} else if ($param == 'bulan_lalu') {
 				$t = date('Y-m', strtotime("first day of -1 month"));
+				$tgl_mulai = $t . "-01";
+				$date = new DateTime($tgl_mulai);
+				$date->modify('last day of this month');
+				$tgl_akhir = $date->format('Y-m-d');
 			} else {
 				$tgl_mulai = $param . "-01";
 				$date = new DateTime($tgl_mulai);
 				$date->modify('last day of this month');
-				$tgl_akhir= $date->format('Y-m-d'); 
-				
+				$tgl_akhir = $date->format('Y-m-d');
 			}
 		}
-		$query1 = "select sales_id,sales, sum(qty_actual)as actual,sum(qty_pdl)as pdl ,sum(qty_pdv)as pdv 
+
+		$query1 = "select sales_id,sales, 
+		CAST(IFNULL(SUM(qty_actual),0) AS UNSIGNED) AS actual,
+		CAST(IFNULL(SUM(qty_pdl),0) AS UNSIGNED) AS pdl,
+		CAST(IFNULL(SUM(qty_pdv),0) AS UNSIGNED) AS pdv
 		from sls_so_ttb_detail_vw  
 			where ((tanggal_so between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	)
 				or (tanggal_ttb between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	))
@@ -109,8 +121,12 @@ class Dashboard extends Rest_Controller
 			ORDER BY sales; 
 		";
 		$dataBySales = $this->db->query($query1)->result_array();
+		foreach ($dataBySales as &$row) {
+			$row['actual'] = (int) $row['actual'];
+			$row['pdl']    = (int) $row['pdl'];
+			$row['pdv']    = (int) $row['pdv'];
+		}
 		$this->set_response($dataBySales, REST_Controller::HTTP_OK);
-
 	}
 	public function sales_perbulan_get($param)
 	{

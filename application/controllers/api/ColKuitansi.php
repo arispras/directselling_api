@@ -1037,7 +1037,23 @@ class ColKuitansi extends BD_Controller
 
 		// 	
 		$query = $query . " order by customer_id,tanggal_tempo,no_kuitansi";
-		$data_kuitansi = $this->db->query($query)->result_array();
+		$data_kuitansi_normal = $this->db->query($query)->result_array();
+		$data_kuitansi = [];	
+		foreach ($data_kuitansi_normal as $key => $k) {
+			$query = " SELECT sum(nilai_angsuran) as sisa_angsuran_berikutnya
+		    from col_kuitansi_vw where ttb_id=" . $k['ttb_id'] .	" and angsuran_ke > " . $k['angsuran_ke'] . " ";
+			$sisa_angsuran = $this->db->query($query)->row_array();
+			// var_dump($sisa_angsuran);exit();
+
+			$kuitansi_1 = $k;
+			$kuitansi_2 = $k;
+			$kuitansi_1['sisa_angsuran_berikutnya'] = $sisa_angsuran['sisa_angsuran_berikutnya'];
+			$kuitansi_2['sisa_angsuran_berikutnya'] = $sisa_angsuran['sisa_angsuran_berikutnya'];
+			$kuitansi_1['tipe'] = 'customer';
+			$kuitansi_2['tipe'] = 'akunting/finance';
+			$data_kuitansi[] = $kuitansi_1;	
+			$data_kuitansi[] = $kuitansi_2;		
+		}
 
 
 
@@ -1083,12 +1099,30 @@ body {
     margin-bottom: 3mm;
 }
 
+/* NOMOR URUT - SIMPLE */
+				.nomor-urut {
+					position: absolute;
+					top: 1mm;
+					right: 5mm;
+					font-size: 9pt;
+					color: #000; /* BLACK FOR DOT MATRIX */
+					font-weight: bold;
+				}
+
 .nama-perusahaan {
     font-weight: bold;
     font-size: 11pt;
 }
 
 .alamat-perusahaan {
+    font-size: 8pt;
+}
+.lembar-kuitansi {
+    font-size: 8pt;
+	font-weight: bold;
+	text-align: center;
+}
+	.sisa-angsuran {
     font-size: 8pt;
 }
 
@@ -1121,25 +1155,25 @@ body {
 .nilai-section {
     border: 1px solid #000;
     padding: 2mm;
-    margin-top: 3mm;
+    /* margin-top: 3mm; */
     text-align: center;
 }
 
 .nilai-uang {
-    font-size: 13pt;
+    font-size: 11pt;
     font-weight: bold;
 }
 
 /* TTD */
 .ttd-table {
     width: 100%;
-    margin-top: 6mm;
+    margin-top: 1mm; 
     font-size: 8pt;
     text-align: center;
 }
 
 .ttd-table td {
-    padding-top: 12mm;
+    /* padding-top: 12mm; */
 }
 </style>
 </head>
@@ -1165,8 +1199,9 @@ body {
 						$d = $data_kuitansi[$idx];
 						$rupiah = 'Rp ' . number_format($d['nilai_angsuran'], 0, ',', '.');
 
-						$html .= '
+						$html .= ' 
                 <div class="kuitansi">
+				
                     <div class="header">
                         <div class="nama-perusahaan">' . $lokasi['nama_pt'] . '</div>
                         <div class="alamat-perusahaan">
@@ -1179,20 +1214,24 @@ body {
 
                     <table class="detail-table">
                         <tr><td style="width: 20%;" class="label">No</td><td>: ' . $d['no_kuitansi'] . '</td></tr>
-                        <tr><td style="width: 20%;"class="label">Tanggal</td><td>: ' . tgl_indo($d['tanggal_tempo']) . '</td></tr>
+                        <tr><td style="width: 20%;"class="label">Tanggal</td><td>: ' . get_indo_hari(date('w', strtotime($d['tanggal_tempo']))).",". tgl_indo($d['tanggal_tempo']) . '</td></tr>
                         <tr><td style="width: 20%;"class="label">Customer</td><td>: ' . $d['nama_customer'] . '</td></tr>
                         <tr><td style="width: 20%;"class="label">Alamat</td><td>: ' . $d['alamat'] . '</td></tr>
+						<tr><td style="width: 20%;"class="label">'. ($d['jenis']=='M'?'Minggu':'Bulan') .' Ke</td><td>: ' . $d['angsuran_ke'] . ' Sisa ' . ((int)$d['tenor'] - (int)$d['angsuran_ke']) . ($d['jenis']=='M'?' Minggu':' Bulan').'</td></tr>
                     </table>
 
                     <div class="nilai-section">
-                        <div>Telah diterima uang sejumlah</div>
+                        <div class="isa-angsuran">Telah diterima uang sejumlah</div>
                         <div class="nilai-uang">' . $rupiah . '</div>
-                        <div>' . terbilang($d['nilai_angsuran']) . ' Rupiah</div>
+                        <div class="sisa-angsuran">' . terbilang($d['nilai_angsuran']) . ' Rupiah</div>
+						 <div class="sisa-angsuran">Sisa Angsuran: Rp.' . (number_format($d['sisa_angsuran_berikutnya'], 0, ',', '.')) . '</div>
                     </div>
+					<br>
+					
 
                     <table class="ttd-table">
                         <tr>
-                            <td>ADMIN</td>
+                            <td>AKUNTING</td>
                             <td>COLLECTOR</td>
                             <td>CUSTOMER</td>
                         </tr>
@@ -1202,6 +1241,7 @@ body {
                             <td>(________)</td>
                         </tr>
                     </table>
+					 <div class="lembar-kuitansi">lembar ' . $d['tipe'] .  '</div>
                 </div>';
 					}
 

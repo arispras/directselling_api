@@ -947,7 +947,7 @@ class SlsTarikBarang extends BD_Controller
 		$data['filter_tgl_akhir'] = $tgl_akhir;
 		$data['format_laporan'] = $format_laporan;
 
-		$html = $this->load->view('sls_tarik_barang_Laporan_Detail', $data, true);
+		$html = $this->load->view('Sls_Tarik_Barang_Laporan_Detail', $data, true);
 
 		// $filename = 'report_' . time();
 		// $this->pdfgenerator->generate($html, $filename, true, 'A4', 'landscape');
@@ -1013,11 +1013,11 @@ class SlsTarikBarang extends BD_Controller
 
 		$query = "SELECT lokasi_id,lokasi,tanggal,SUM(qty)AS qty,SUM(diskon)AS diskon,SUM(dp)AS dp,
 			SUM(total)AS total,SUM(nilai_piutang)as nilai_piutang,SUM(nilai_angsuran)AS nilai_angsuran,
-			surveyor,sales,sales_supervisor,demo_booker
+			SUM(nilai_pendapatan_tarik_barang)AS nilai_pendapatan_tarik_barang
 			FROM sls_tarik_barang_detail_vw
 			where tanggal between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
 			and lokasi_id  " . $lokasi_id . "
-			GROUP BY lokasi_id,lokasi,tanggal,surveyor,sales,sales_supervisor,demo_booker
+			GROUP BY lokasi_id,lokasi,tanggal
 			ORDER BY tanggal 
 		";
 		$dataDtl = $this->db->query($query)->result_array();
@@ -1030,7 +1030,7 @@ class SlsTarikBarang extends BD_Controller
 		$data['filter_tgl_akhir'] = $tgl_akhir;
 		$data['format_laporan'] = $format_laporan;
 
-		$html = $this->load->view('sls_tarik_barang_Laporan_Rekap', $data, true);
+		$html = $this->load->view('Sls_Tarik_Barang_Laporan_Rekap', $data, true);
 
 		// $filename = 'report_' . time();
 		// $this->pdfgenerator->generate($html, $filename, true, 'A4', 'landscape');
