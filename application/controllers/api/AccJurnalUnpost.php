@@ -719,7 +719,7 @@ class AccJurnalUnpost extends Rest_Controller
 	}
 	function TTB($no_transaksi, $lokasi_id)
 	{
-		$retrieve_header = $this->db->query(" select  * from sls_ttb_ht where no_tttb='" . $no_transaksi . "' and is_posting=1 and lokasi_id=" . $lokasi_id . "")->row_array();;
+		$retrieve_header = $this->db->query(" select  * from sls_ttb_ht where no_ttb='" . $no_transaksi . "' and is_posting=1 and lokasi_id=" . $lokasi_id . "")->row_array();;
 		if (empty($retrieve_header)) {
 			return array("status" => "NOT OK", "data" => "Tidak ada Data Transaksi");
 		} else {
@@ -729,7 +729,7 @@ class AccJurnalUnpost extends Rest_Controller
 			// }
 		}
 		/* cari gudang di bawah lokasi */
-		$gudang = $this->db->query("select b.* from sls_ttb_ht a
+		$gudang = $this->db->query("select b.*,b.id as gudang_id from sls_ttb_ht a
 		left join gbm_organisasi b on a.lokasi_id=b.parent_id  
 		 where b.tipe='GUDANG' and a.id=" . $retrieve_header['id'] . ";")->row_array();
 
