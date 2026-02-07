@@ -852,10 +852,12 @@ class SlsTTB extends BD_Controller
 			));
 			if ($jenis == 'M') { // MINGGUAN
 				$date->modify('+7 days');
+			}elseif ($jenis == '2M') { // 2 MINGGUAN
+				$date->modify('+14 days');
 			} else if ($jenis == 'M') { // BULANAN
 				$date->modify('+1 month');
 			} else {
-				$date->modify('+7 days');
+				$date->modify('+1 month');
 			}
 		}
 
