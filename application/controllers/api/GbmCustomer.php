@@ -45,8 +45,46 @@ class GbmCustomer extends BD_Controller
 		$search = array('kode_customer', 'nama_customer', 'no_telpon','a.alamat', 'd.nama', 'e.nama', 'f.nama', 'g.nama', 'h.nama');
 		$where  = null;
 
-		$isWhere = null;
-		// $isWhere = 'artikel.deleted_at IS NULL';
+		$isWhere = "1=1";
+		
+			$isWhere = $isWhere . " and  a.lokasi_id in
+			(select location_id from fwk_users_location where user_id=" . $this->user_id . ")";
+		
+
+		$data = $this->M_DatatablesModel->get_tables_query($query, $search, $where, $isWhere, $post);
+		$this->set_response($data, REST_Controller::HTTP_OK);
+	}
+	public function list_lookup_post($lokasi_id)
+	{
+		$post = $this->post();
+
+		// $query  = "select a.*,b.nama_kelompok from gbm_customer a left join gbm_customer_kelompok b on a.kelompok_id=b.id";
+		$query  = "SELECT a.*,d.nama as lokasi,e.nama as provinsi,f.nama as kabupaten,
+		g.nama as kecamatan,h.nama as kelurahan,
+		b.user_full_name AS dibuat,
+		c.user_full_name AS diubah 
+		from gbm_customer a
+		LEFT JOIN fwk_users b ON a.dibuat_oleh = b.id
+		LEFT JOIN fwk_users c ON a.diubah_oleh = c.id
+		LEFT JOIN gbm_organisasi d ON a.lokasi_id = d.id
+		LEFT JOIN gbm_provinsi e ON a.provinsi_id = e.id
+		LEFT JOIN gbm_kabupaten f ON a.kabupaten_id = f.id
+		LEFT JOIN gbm_kecamatan g ON a.kecamatan_id = g.id	
+		LEFT JOIN gbm_kelurahan h ON a.kelurahan_id = h.id
+		";
+		// $search = array('a.kode_customer', 'a.nama_customer','b.nama_kelompok');
+		$search = array('kode_customer', 'nama_customer', 'no_telpon','a.alamat', 'd.nama', 'e.nama', 'f.nama', 'g.nama', 'h.nama');
+		$where  = null;
+
+		$isWhere = "1=1";
+		
+		if ($lokasi_id != 'null' && !empty($lokasi_id)) {
+			$isWhere = $isWhere . " and a.lokasi_id =" . $lokasi_id . "";
+		} else {
+			$isWhere = $isWhere . " and  a.lokasi_id in
+			(select location_id from fwk_users_location where user_id=" . $this->user_id . ")";
+		}
+		
 
 		$data = $this->M_DatatablesModel->get_tables_query($query, $search, $where, $isWhere, $post);
 		$this->set_response($data, REST_Controller::HTTP_OK);
@@ -82,6 +120,17 @@ class GbmCustomer extends BD_Controller
 			$this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
 		} else {
 			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
+		}
+	}
+	function getAllByLokasiId_get($lokasi_id)
+	{
+
+		$retrieve = $this->db->query("SELECT id,nama_customer FROM gbm_customer where lokasi_id=" . $lokasi_id ." order by nama_customer")->result_array();
+
+		if (!empty($retrieve)) {
+			$this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
+		} else {
+			$this->set_response(array("status" => "NOT OK", "data" => []), REST_Controller::HTTP_OK);
 		}
 	}
 	function create_post()

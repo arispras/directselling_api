@@ -58,7 +58,7 @@ class GbmCustomerModel extends CI_Model
 		$kabupaten_id    =  $arrdata['kabupaten_id']['id'];
 		$kecamatan_id    =  $arrdata['kecamatan_id']['id'];
 		$kelurahan_id    =  $arrdata['kelurahan_id']['id'];
-		$lokasi_id    =  $arrdata['lokasi_id']['id'];
+		$lokasi_id    =  $arrdata['lokasi_id'];
 		$dibuat_oleh    =  $arrdata['dibuat_oleh'];
 		$dibuat_tanggal    =  date('Y-m-d H:i:s');
 
@@ -114,7 +114,7 @@ class GbmCustomerModel extends CI_Model
 		$kabupaten_id    =  $arrdata['kabupaten_id']['id'];
 		$kecamatan_id    =  $arrdata['kecamatan_id']['id'];
 		$kelurahan_id    =  $arrdata['kelurahan_id']['id'];
-		$lokasi_id    =  $arrdata['lokasi_id']['id'];
+		$lokasi_id    =  $arrdata['lokasi_id'];
 		$diubah_oleh    =  $arrdata['diubah_oleh'];
 		$diubah_tanggal    =  date('Y-m-d H:i:s');
 

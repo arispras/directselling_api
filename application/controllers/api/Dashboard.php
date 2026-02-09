@@ -3,13 +3,18 @@
 use PhpOffice\PhpSpreadsheet\Calculation\MathTrig\Floor;
 use Restserver\Libraries\REST_Controller;
 
-class Dashboard extends Rest_Controller
+class Dashboard extends BD_Controller
 {
+	public $user_id;
+	public $theCredential;
 	function __construct()
 	{
 		parent::__construct();
 
 		$this->load->model('M_DatatablesModel');
+		$this->auth();
+		$this->theCredential = $this->user_data;
+		$this->user_id = $this->user_data->id;
 	}
 
 	public function list_post()
@@ -52,7 +57,7 @@ class Dashboard extends Rest_Controller
 				")->result_array();
 		$this->set_response($retrieve, REST_Controller::HTTP_OK);
 	}
-	public function total_sales_get($param)
+	public function total_sales_get($param, $lokasi_id)
 	{
 		$t = date("Y-m");
 		if ($param) {
@@ -70,21 +75,35 @@ class Dashboard extends Rest_Controller
 			}
 		}
 
-		$retrieve = $this->db->query("SELECT sum(total)as tot,sum(qty) as qty 
-		FROM sls_ttb_detail_vw
-		where DATE_FORMAT(tanggal,'%Y-%m') = '" . $t . "'")->row_array();
+		$query = "SELECT sum(total)as tot,sum(qty) as qty 
+		FROM sls_ttb_detail_vw where DATE_FORMAT(tanggal,'%Y-%m') = '" . $t . "'";
+		if (!empty($lokasi_id) && $lokasi_id != 'null') {
+			$query .= " and lokasi_id=" . $lokasi_id;
+		}else {
+			$query = $query . " and  lokasi_id in
+			(select location_id from fwk_users_location where user_id=" . $this->user_id . ")";
+		}
+		$retrieve = $this->db->query($query)->row_array();
+
+
 		$total_nilai_penjualan = $retrieve['tot'];
 		$total_qty_penjualan = $retrieve['qty'];
 
-		$retrieve = $this->db->query("SELECT SUM(dibayar)AS tot FROM col_lhi_detail_vw 
-		where DATE_FORMAT(tanggal,'%Y-%m') = '" . $t . "'")->row_array();
+		$query = "SELECT  SUM(dibayar)AS tot FROM col_lhi_detail_vw where DATE_FORMAT(tanggal,'%Y-%m') = '" . $t . "'";
+		if (!empty($lokasi_id) && $lokasi_id != 'null') {
+			$query .= " and lokasi_id=" . $lokasi_id;
+		}else {
+			$query = $query . " and  lokasi_id in
+			(select location_id from fwk_users_location where user_id=" . $this->user_id . ")";
+		}
+		$retrieve = $this->db->query($query)->row_array();
 		$total_nilai_bayar = $retrieve['tot'];
 
 
 		$data = array('qty_penjualan' => $total_qty_penjualan, 'nilai_penjualan' => $total_nilai_penjualan, 'nilai_bayar' => $total_nilai_bayar);
 		$this->set_response($data, REST_Controller::HTTP_OK);
 	}
-	public function laporan_harian_get($param)
+	public function laporan_harian_get($param, $lokasi_id)
 	{
 		$t = date("Y-m");
 		$tgl_mulai = date("Y-m-d");
@@ -117,9 +136,17 @@ class Dashboard extends Rest_Controller
 		from sls_so_ttb_detail_vw  
 			where ((tanggal_so between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	)
 				or (tanggal_ttb between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	))
-			group by sales_id,sales
-			ORDER BY sales; 
+			
 		";
+		if (!empty($lokasi_id) && $lokasi_id != 'null') {
+			$query1 .= " and lokasi_id=" . $lokasi_id;
+		}else {
+			$query1 = $query1 . " and  lokasi_id in
+			(select location_id from fwk_users_location where user_id=" . $this->user_id . ")";
+		}
+
+		$query1 .= " group by sales_id,sales
+			ORDER BY sales; ";
 		$dataBySales = $this->db->query($query1)->result_array();
 		foreach ($dataBySales as &$row) {
 			$row['actual'] = (int) $row['actual'];
@@ -128,7 +155,7 @@ class Dashboard extends Rest_Controller
 		}
 		$this->set_response($dataBySales, REST_Controller::HTTP_OK);
 	}
-	public function sales_perbulan_get($param)
+	public function sales_perbulan_get($param, $lokasi_id)
 	{
 
 		$t = date("Y-m");
@@ -156,11 +183,19 @@ class Dashboard extends Rest_Controller
 			}
 		}
 
+		$query = "SELECT  sales_id,sales as name, sum(qty) as value FROM sls_ttb_detail_vw
+		  WHERE  DATE_FORMAT(tanggal ,'%Y-%m') ='" . $t . "'";
 
-		$retrieve = $this->db->query("SELECT  sales_id,sales as name, sum(qty) as value FROM sls_ttb_detail_vw
-		  WHERE  DATE_FORMAT(tanggal ,'%Y-%m') ='" . $t . "'
-		  GROUP BY sales,sales_id
-		  ")->result_array();
+		if (!empty($lokasi_id) && $lokasi_id != 'null') {
+			$query .= " and lokasi_id=" . $lokasi_id;
+		}else {
+			$query = $query . " and  lokasi_id in
+			(select location_id from fwk_users_location where user_id=" . $this->user_id . ")";
+		}
+		$query .= " GROUP BY sales,sales_id
+		  ORDER BY sales";
+
+		$retrieve = $this->db->query($query)->result_array();
 
 		$this->set_response($retrieve, REST_Controller::HTTP_OK);
 	}
