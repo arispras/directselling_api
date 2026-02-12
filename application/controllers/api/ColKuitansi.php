@@ -1634,6 +1634,191 @@ body {
 			$dompdf->stream($filename . ".pdf", array("Attachment" => 0));
 		}
 	}
+	function getLaporanSaldoRekapPiutangByTTB_post()
+	{
+
+		$format_laporan =  $this->post('format_laporan', true);
+
+
+		$data = [];
+
+		$input = $this->post();
+
+		$lokasi_id = $input['lokasi_id'];
+		$tgl_mulai = $input['tgl_mulai'];
+		$tgl_akhir = $input['tgl_akhir'];
+		$format_laporan = $input['format_laporan'];
+
+		$lokasi = $this->db->query("select * from gbm_organisasi where id=" . $lokasi_id)->row_array();
+		if ($lokasi) {
+			$filter_lokasi = $lokasi['nama'];
+			$lokasi_id = "= " . $lokasi_id;
+		} else {
+			$filter_lokasi = "Semua Lokasi";
+		}
+		$query = "select * from sls_ttb_header_vw where tanggal between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
+		and lokasi_id  " . $lokasi_id . " order by tanggal";
+		$dataDtl = $this->db->query($query)->result_array();
+		
+		$res=[];
+
+		foreach ($dataDtl as $key => $val) {
+			$x=$val;
+			$nilai_tb=0;
+			$nilai_dibayar=0;
+			$nilai_anguran_terakhir=0;
+			$queryTB=" select sum(sub_total)as nilai_tb from sls_tarik_barang_ht where sls_ttb_id= ". $val['id']."";
+			$tb=$this->db->query($queryTB)->row_array();
+			
+			if ($tb['nilai_tb']){
+				$nilai_tb=$tb['nilai_tb'];
+			}
+			$queryBayar=" select sum(dibayar)as dibayar from col_lhi_detail_vw where ttb_id= ". $val['id']."";
+			$bayar=$this->db->query($queryBayar)->row_array();
+			
+			if ($bayar['dibayar']){
+				$nilai_dibayar=$bayar['dibayar'];
+			}
+			$queryPiutangKuitansi=" select sum(nilai_angsuran)as nilai_anguran_terakhir from col_kuitansi_vw where angsuran_ke>1 and ttb_id= ". $val['id']."";
+			
+			$piutang=$this->db->query($queryPiutangKuitansi)->row_array();
+			
+			
+			if ($piutang['nilai_anguran_terakhir']){
+				$nilai_angsuran_terakhir=$piutang['nilai_anguran_terakhir'];
+			}
+			
+			$dataDtl[$key]['nilai_tb']=$nilai_tb;
+			$dataDtl[$key]['nilai_dibayar']=$nilai_dibayar; 
+			$dataDtl[$key]['nilai_angsuran_terakhir']=$nilai_angsuran_terakhir;
+			$dataDtl[$key]['sisa_piutang']=$nilai_angsuran_terakhir-$nilai_dibayar; // total kuitansi setelah pengurangan TB dikurang duit sdh masuk.
+		}
+
+		
+		$data['data'] = 	$dataDtl;
+
+		$data['filter_lokasi'] = 	$filter_lokasi;
+		$data['filter_tgl_awal'] = 	$tgl_mulai;
+		$data['filter_tgl_akhir'] = $tgl_akhir;
+		$data['format_laporan'] = $format_laporan;
+
+		$html = $this->load->view('Col_Saldo_Piutang_By_TTB', $data, true);
+
+		// $filename = 'report_' . time();
+		// $this->pdfgenerator->generate($html, $filename, true, 'A4', 'landscape');
+		// echo $html;
+		if ($format_laporan == 'xls') {
+			echo $html;
+		} else if ($format_laporan == 'view') {
+			echo $html;
+		} else {
+			$filename = 'report_' . time();
+			// $this->pdfgenerator->generate($html, $filename, true, 'A4', 'landscape');
+			$dompdf = new DOMPDF;
+			$dompdf->loadHtml($html);
+			$dompdf->setPaper('A4', 'landscape');
+			$dompdf->render();
+			$filename = 'report_' . time();
+			$x          = 400;
+			$y          = 570;
+			$text       = "{PAGE_NUM} of {PAGE_COUNT}";
+			$font       = null; // $dompdf->getFontMetrics()->get_font('Helvetica', 'normal');
+			$size       = 10;
+			$color      = array(0, 0, 0);
+			$word_space = 0.0;
+			$char_space = 0.0;
+			$angle      = 0.0;
+
+			$dompdf->getCanvas()->page_text(
+				$x,
+				$y,
+				$text,
+				$font,
+				$size,
+				$color,
+				$word_space,
+				$char_space,
+				$angle
+			);
+			$dompdf->stream($filename . ".pdf", array("Attachment" => 0));
+		}
+	}
+	function getLaporanHistoryPiutang_post()
+	{
+
+		$format_laporan =  $this->post('format_laporan', true);
+
+
+		$data = [];
+
+		$input = $this->post();
+
+		$lokasi_id = $input['lokasi_id'];
+		$tgl_mulai = $input['tgl_mulai'];
+		$tgl_akhir = $input['tgl_akhir'];
+		$format_laporan = $input['format_laporan'];
+
+		$lokasi = $this->db->query("select * from gbm_organisasi where id=" . $lokasi_id)->row_array();
+		if ($lokasi) {
+			$filter_lokasi = $lokasi['nama'];
+			$lokasi_id = "= " . $lokasi_id;
+		} else {
+			$filter_lokasi = "Semua Lokasi";
+		}
+
+		$query = "select * from col_piutang_by_ttb_vw where tanggal_ttb between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
+		and lokasi_id  " . $lokasi_id . " order by tanggal_ttb";
+		$dataDtl = $this->db->query($query)->result_array();
+
+
+		$data['data'] = 	$dataDtl;
+
+		$data['filter_lokasi'] = 	$filter_lokasi;
+		$data['filter_tgl_awal'] = 	$tgl_mulai;
+		$data['filter_tgl_akhir'] = $tgl_akhir;
+		$data['format_laporan'] = $format_laporan;
+
+		$html = $this->load->view('Col_Piutang_By_TTB_Laporan', $data, true);
+
+		// $filename = 'report_' . time();
+		// $this->pdfgenerator->generate($html, $filename, true, 'A4', 'landscape');
+		// echo $html;
+		if ($format_laporan == 'xls') {
+			echo $html;
+		} else if ($format_laporan == 'view') {
+			echo $html;
+		} else {
+			$filename = 'report_' . time();
+			// $this->pdfgenerator->generate($html, $filename, true, 'A4', 'landscape');
+			$dompdf = new DOMPDF;
+			$dompdf->loadHtml($html);
+			$dompdf->setPaper('A4', 'landscape');
+			$dompdf->render();
+			$filename = 'report_' . time();
+			$x          = 400;
+			$y          = 570;
+			$text       = "{PAGE_NUM} of {PAGE_COUNT}";
+			$font       = null; // $dompdf->getFontMetrics()->get_font('Helvetica', 'normal');
+			$size       = 10;
+			$color      = array(0, 0, 0);
+			$word_space = 0.0;
+			$char_space = 0.0;
+			$angle      = 0.0;
+
+			$dompdf->getCanvas()->page_text(
+				$x,
+				$y,
+				$text,
+				$font,
+				$size,
+				$color,
+				$word_space,
+				$char_space,
+				$angle
+			);
+			$dompdf->stream($filename . ".pdf", array("Attachment" => 0));
+		}
+	}
 
 	function laporanso_by_vendor_post()
 	{

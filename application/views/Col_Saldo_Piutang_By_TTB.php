@@ -2,7 +2,7 @@
 	<html>
 
 	<head>
-		<title>SALDO REKAP</title>
+		<title>SALDO PIUTANG</title>
 	<?php	function format_number_report($angka,$fmt_laporan)
 	{
 		$format_laporan     =$fmt_laporan;
@@ -40,7 +40,7 @@
 
 		<!-- <pre><?php print_r($so) ?></pre> -->
 
-		<h3 class="title">PIUTANG REKAP BY TANGGAL TTB</h3>
+		<h3 class="title">SALDO REKAP PIUTANG</h3>
 		<br>
 
 		<div class="d-flex flex-between">
@@ -69,9 +69,12 @@
 					<th style="width:9%">No TTB</th>
 					<th style="width:12%">Tanggal</th>
 					<th style="width:12%">Customer</th>
-					<th style="width:12%">Nilai</th>
+					<th style="width:12%">Nilai TTB</th>
+					<th style="width:12%">Angs.I (DP)</th>
 					<th style="width:12%">Dibayar</th>
-					<th style="width:12%">Sisa</th>
+					<th style="width:12%">Nilai Tarik Barang</th>
+					<th style="width:12%">Pendapatan Lain</th>
+					<th style="width:12%">Sisa Piutang</th>
 
 				</tr>
 
@@ -82,9 +85,14 @@
 				$jum_dibayar = 0;
 				$jum_qty = 0;
 				$jum_dp = 0;
-				$jum_total= 0;
+				$jum_sub_total= 0;
+
 				$jum_nilai_ttb = 0;
+				$jum_nilai_tb = 0;
 				$jum_nilai_angsuran = 0;
+				$jum_pendapatan_lain = 0;
+				$jum_total_dp=0;
+				$jum_sisa_piutang=0;
 				
 				
 				?>
@@ -94,16 +102,25 @@
 						<tr>
 							<?php
 							$no = $no + 1;
-							$jum_dibayar += $res['dibayar'];
-							$jum_nilai_ttb += $res['nilai_ttb'];
+							$sisa_piutang_ttb=$res['sub_total']-$res['total_dp']-$res['nilai_dibayar']-$res['nilai_tb'];
+							$jum_dibayar += $res['nilai_dibayar'];
+							$jum_sub_total += $res['sub_total'];
+							$jum_nilai_tb += $res['nilai_tb'];
+							$pendapatan_lain=$res['sisa_piutang']-$sisa_piutang_ttb;
+							$jum_pendapatan_lain+=$pendapatan_lain;
+							$jum_sisa_piutang+=$res['sisa_piutang'];
+							$jum_total_dp+=$res['total_dp'];
 							?>
 							<td center> <?= $no ?> </td>
 							<td left><?= $res['no_ttb'] ?></td>
-							<td center><?=  tgl_indo($res['tanggal_ttb']) ?></td>
+							<td center><?=  tgl_indo($res['tanggal']) ?></td>
 							<td left><?= $res['nama_customer'] ?></td>
-							<td right><?= format_number_report($res['nilai_ttb'],$format_laporan) ?></td>
-							<td right><?= format_number_report($res['dibayar'],$format_laporan) ?></td>
-							<td right><?= format_number_report($res['nilai_ttb'] - $res['dibayar'],$format_laporan) ?></td>
+							<td right><?= format_number_report($res['sub_total'],$format_laporan) ?></td>
+							<td right><?= format_number_report($res['total_dp'],$format_laporan) ?></td>							
+							<td right><?= format_number_report($res['nilai_dibayar'],$format_laporan) ?></td>
+							<td right><?= format_number_report($res['nilai_tb'],$format_laporan) ?></td>
+							<td right><?= format_number_report($pendapatan_lain,$format_laporan) ?></td>						
+							<td right><?= format_number_report($res['sisa_piutang'],$format_laporan) ?></td>
 							
 								
 						</tr>
@@ -112,9 +129,13 @@
 	
 				<tr>
 					<td colspan="4"></td>
-					<td right><b><?= format_number_report($jum_nilai_ttb,$format_laporan) ?></b></td>
+					<td right><b><?= format_number_report($jum_sub_total,$format_laporan) ?></b></td>
+					<td right><b><?= format_number_report($jum_total_dp,$format_laporan) ?></b></td>	
 					<td right><b><?= format_number_report($jum_dibayar,$format_laporan) ?></b></td>	
-					<td right><b><?= format_number_report($jum_nilai_ttb - $jum_dibayar,$format_laporan) ?></b></td>	
+					
+					<td right><b><?= format_number_report($jum_nilai_tb,$format_laporan) ?></b></td>	
+					<td right><b><?= format_number_report($jum_pendapatan_lain,$format_laporan) ?></b></td>	
+					<td right><b><?= format_number_report($jum_sisa_piutang,$format_laporan) ?></b></td>	
 					
 				</tr>
 
