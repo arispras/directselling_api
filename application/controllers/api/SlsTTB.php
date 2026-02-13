@@ -170,74 +170,9 @@ class SlsTTB extends BD_Controller
 		// var_dump($data['data']);
 		$this->set_response($data, REST_Controller::HTTP_OK);
 	}
-	public function listByUserApprove_post()
-	{
-		$post = $this->post();
-
-		$query  = "SELECT a.*, b.nama AS lokasi,d.nama_customer as nama_customer,e.no_quotation,e.no_referensi 
-		from sls_ttb_ht a left join gbm_organisasi b on a.lokasi_id=b.id 
-				inner join fwk_users c on a.last_approve_user=c.employee_id
-				inner join gbm_customer d on a.customer_id=d.id
-				left join prc_quotation e on a.quotation_id=e.id";
-		$search = array('no_ttb', 'a.tanggal', 'a.catatan', 'd.nama_customer', 'e.no_quotation', 'e.no_referensi');
-
-		$where  = null;
-
-		$isWhere = null;
-		$isWhere = "a.proses_approval=1 and a.status not in ('REJECTED','RELEASE') and c.id=" . $this->user_id;
-
-		$data = $this->M_DatatablesModel->get_tables_query($query, $search, $where, $isWhere, $post);
-		if (count($data['data']) > 0) {
-			for ($i = 0; $i < (count($data['data'])); $i++) {
-				$so = $data['data'][$i];
-				$queryPP = "SELECT DISTINCT  c.id AS pp_id, c.no_pp FROM sls_so_dt a INNER JOIN prc_pp_dt b 
-				ON a.pp_dt_id=b.id INNER JOIN prc_pp_ht c ON b.pp_hd_id=c.id
-				where a.so_hd_id=" . $so['id'] . "";
-				$pp = $this->db->query($queryPP)->result_array();
-				$data['data'][$i]['pp_detail'] = $pp;
-			}
-		}
-		$this->set_response($data, REST_Controller::HTTP_OK);
-	}
-	public function listByUserApproveMobile_post()
-	{
-		$post = $this->post();
-
-		$query  = "SELECT a.*, b.nama AS lokasi,d.nama_customer as nama_customer,e.no_quotation,e.no_referensi from sls_ttb_ht a left join gbm_organisasi b on a.lokasi_id=b.id 
-				inner join fwk_users c on a.last_approve_user=c.employee_id
-				inner join gbm_customer d on a.customer_id=d.id
-				left join prc_quotation e on a.quotation_id=e.id
-		where a.proses_approval=1 and a.status not in ('REJECTED','RELEASE') and c.id=" . $this->user_id . "";
-
-		$data = $this->db->query($query)->result_array();
-		// if (count($data['data']) > 0) {
-		// 	for ($i = 0; $i < (count($data['data'])); $i++) {
-		// 		$so = $data['data'][$i];
-		// 		$queryPP = "SELECT DISTINCT  c.id AS pp_id, c.no_pp FROM sls_so_dt a INNER JOIN prc_pp_dt b 
-		// 		ON a.pp_dt_id=b.id INNER JOIN prc_pp_ht c ON b.pp_hd_id=c.id
-		// 		where a.so_hd_id=" . $so['id'] . "";
-		// 		$pp = $this->db->query($queryPP)->result_array();
-		// 		$data['data'][$i]['pp_detail'] = $pp;
-		// 	}
-		// }
-		$this->set_response($data, REST_Controller::HTTP_OK);
-	}
-	public function countByUserApprove_post()
-	{
-
-		if ($this->user_id) {
-			$query  = "SELECT COUNT(*)as jumlah from sls_ttb_ht a left join gbm_organisasi b on a.lokasi_id=b.id 
-				inner join fwk_users c on a.last_approve_user=c.employee_id
-				where a.proses_approval=1 and a.status not in ('REJECTED','RELEASE') and c.id=" . $this->user_id;
-
-			$retrieve =	$this->db->query($query)->row_array();
-			$this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
-			return;
-		} else {
-			$this->set_response(array("status" => "OK", "data" => []), REST_Controller::HTTP_OK);
-			return;
-		}
-	}
+	
+	
+	
 	function index_get($segment_3 = '')
 	{
 		$id = $segment_3;
@@ -250,17 +185,7 @@ class SlsTTB extends BD_Controller
 			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
 		}
 	}
-	function pembayaran_by_so_get($segment_3 = '')
-	{
-		$id = $segment_3;
-		$retrieve = $this->SlsTTBModel->retrieve_pembayaran_by_so($id);
-
-		if (!empty($retrieve)) {
-			$this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
-		} else {
-			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
-		}
-	}
+	
 	function invoice_by_so_get($segment_3 = '')
 	{
 		$id = $segment_3;
@@ -315,6 +240,18 @@ class SlsTTB extends BD_Controller
 			$this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
 		} else {
 			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
+		}
+	}
+	function getAllByLokasi_get($lokasi_id)
+	{
+
+		$retrieve = $this->db->query("select a.*,b.nama_customer from sls_ttb_ht a inner join gbm_customer b
+		on a.customer_id=b.id where a.lokasi_id=".$lokasi_id." order by no_ttb")->result_array();
+
+		if (!empty($retrieve)) {
+			$this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
+		} else {
+			$this->set_response(array("status" => "OK", "data" =>[]), REST_Controller::HTTP_OK);
 		}
 	}
 

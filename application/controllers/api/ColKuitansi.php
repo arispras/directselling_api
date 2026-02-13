@@ -1038,7 +1038,7 @@ class ColKuitansi extends BD_Controller
 		// 	
 		$query = $query . " order by customer_id,tanggal_tempo,no_kuitansi";
 		$data_kuitansi_normal = $this->db->query($query)->result_array();
-		$data_kuitansi = [];	
+		$data_kuitansi = [];
 		foreach ($data_kuitansi_normal as $key => $k) {
 			$query = " SELECT sum(nilai_angsuran) as sisa_angsuran_berikutnya
 		    from col_kuitansi_vw where ttb_id=" . $k['ttb_id'] .	" and angsuran_ke > " . $k['angsuran_ke'] . " ";
@@ -1051,8 +1051,8 @@ class ColKuitansi extends BD_Controller
 			$kuitansi_2['sisa_angsuran_berikutnya'] = $sisa_angsuran['sisa_angsuran_berikutnya'];
 			$kuitansi_1['tipe'] = 'customer';
 			$kuitansi_2['tipe'] = 'akunting/finance';
-			$data_kuitansi[] = $kuitansi_1;	
-			$data_kuitansi[] = $kuitansi_2;		
+			$data_kuitansi[] = $kuitansi_1;
+			$data_kuitansi[] = $kuitansi_2;
 		}
 
 
@@ -1214,10 +1214,10 @@ body {
 
                     <table class="detail-table">
                         <tr><td style="width: 20%;" class="label">No</td><td>: ' . $d['no_kuitansi'] . '</td></tr>
-                        <tr><td style="width: 20%;"class="label">Tanggal</td><td>: ' . get_indo_hari(date('w', strtotime($d['tanggal_tempo']))).",". tgl_indo($d['tanggal_tempo']) . '</td></tr>
+                        <tr><td style="width: 20%;"class="label">Tanggal</td><td>: ' . get_indo_hari(date('w', strtotime($d['tanggal_tempo']))) . "," . tgl_indo($d['tanggal_tempo']) . '</td></tr>
                         <tr><td style="width: 20%;"class="label">Customer</td><td>: ' . $d['nama_customer'] . '</td></tr>
                         <tr><td style="width: 20%;"class="label">Alamat</td><td>: ' . $d['alamat'] . '</td></tr>
-						<tr><td style="width: 20%;"class="label">'. ($d['jenis']=='M'?'Minggu':'Bulan') .' Ke</td><td>: ' . $d['angsuran_ke'] . ' Sisa ' . ((int)$d['tenor'] - (int)$d['angsuran_ke']) . ($d['jenis']=='M'?' Minggu':' Bulan').'</td></tr>
+						<tr><td style="width: 20%;"class="label">' . ($d['jenis'] == 'M' ? 'Minggu' : 'Bulan') . ' Ke</td><td>: ' . $d['angsuran_ke'] . ' Sisa ' . ((int)$d['tenor'] - (int)$d['angsuran_ke']) . ($d['jenis'] == 'M' ? ' Minggu' : ' Bulan') . '</td></tr>
                     </table>
 
                     <div class="nilai-section">
@@ -1501,9 +1501,9 @@ body {
 		$query = "select * from col_piutang_by_ttb_vw where tanggal_ttb between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
 		and lokasi_id  " . $lokasi_id . "";
 		$dataDtl = $this->db->query($query)->result_array();
-		
+
 		foreach ($dataDtl as $key => $d) {
-		
+
 			$queryKuitansi = "select * from col_piutang_by_ttb_detail_vw where ttb_id=" . $d['ttb_id'] . " order by angsuran_ke";
 			$kuitansi = $this->db->query($queryKuitansi)->result_array();
 			$dataDtl[$key]['kuitansi'] = $kuitansi;
@@ -1659,42 +1659,42 @@ body {
 		$query = "select * from sls_ttb_header_vw where tanggal between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
 		and lokasi_id  " . $lokasi_id . " order by tanggal";
 		$dataDtl = $this->db->query($query)->result_array();
-		
-		$res=[];
+
+		$res = [];
 
 		foreach ($dataDtl as $key => $val) {
-			$x=$val;
-			$nilai_tb=0;
-			$nilai_dibayar=0;
-			$nilai_anguran_terakhir=0;
-			$queryTB=" select sum(sub_total)as nilai_tb from sls_tarik_barang_ht where sls_ttb_id= ". $val['id']."";
-			$tb=$this->db->query($queryTB)->row_array();
-			
-			if ($tb['nilai_tb']){
-				$nilai_tb=$tb['nilai_tb'];
+			$x = $val;
+			$nilai_tb = 0;
+			$nilai_dibayar = 0;
+			$nilai_anguran_terakhir = 0;
+			$queryTB = " select sum(sub_total)as nilai_tb from sls_tarik_barang_ht where sls_ttb_id= " . $val['id'] . "";
+			$tb = $this->db->query($queryTB)->row_array();
+
+			if ($tb['nilai_tb']) {
+				$nilai_tb = $tb['nilai_tb'];
 			}
-			$queryBayar=" select sum(dibayar)as dibayar from col_lhi_detail_vw where ttb_id= ". $val['id']."";
-			$bayar=$this->db->query($queryBayar)->row_array();
-			
-			if ($bayar['dibayar']){
-				$nilai_dibayar=$bayar['dibayar'];
+			$queryBayar = " select sum(dibayar)as dibayar from col_lhi_detail_vw where ttb_id= " . $val['id'] . "";
+			$bayar = $this->db->query($queryBayar)->row_array();
+
+			if ($bayar['dibayar']) {
+				$nilai_dibayar = $bayar['dibayar'];
 			}
-			$queryPiutangKuitansi=" select sum(nilai_angsuran)as nilai_anguran_terakhir from col_kuitansi_vw where angsuran_ke>1 and ttb_id= ". $val['id']."";
-			
-			$piutang=$this->db->query($queryPiutangKuitansi)->row_array();
-			
-			
-			if ($piutang['nilai_anguran_terakhir']){
-				$nilai_angsuran_terakhir=$piutang['nilai_anguran_terakhir'];
+			$queryPiutangKuitansi = " select sum(nilai_angsuran)as nilai_anguran_terakhir from col_kuitansi_vw where angsuran_ke>1 and ttb_id= " . $val['id'] . "";
+
+			$piutang = $this->db->query($queryPiutangKuitansi)->row_array();
+
+
+			if ($piutang['nilai_anguran_terakhir']) {
+				$nilai_angsuran_terakhir = $piutang['nilai_anguran_terakhir'];
 			}
-			
-			$dataDtl[$key]['nilai_tb']=$nilai_tb;
-			$dataDtl[$key]['nilai_dibayar']=$nilai_dibayar; 
-			$dataDtl[$key]['nilai_angsuran_terakhir']=$nilai_angsuran_terakhir;
-			$dataDtl[$key]['sisa_piutang']=$nilai_angsuran_terakhir-$nilai_dibayar; // total kuitansi setelah pengurangan TB dikurang duit sdh masuk.
+
+			$dataDtl[$key]['nilai_tb'] = $nilai_tb;
+			$dataDtl[$key]['nilai_dibayar'] = $nilai_dibayar;
+			$dataDtl[$key]['nilai_angsuran_terakhir'] = $nilai_angsuran_terakhir;
+			$dataDtl[$key]['sisa_piutang'] = $nilai_angsuran_terakhir - $nilai_dibayar; // total kuitansi setelah pengurangan TB dikurang duit sdh masuk.
 		}
 
-		
+
 		$data['data'] = 	$dataDtl;
 
 		$data['filter_lokasi'] = 	$filter_lokasi;
@@ -1754,8 +1754,9 @@ body {
 		$input = $this->post();
 
 		$lokasi_id = $input['lokasi_id'];
-		$tgl_mulai = $input['tgl_mulai'];
-		$tgl_akhir = $input['tgl_akhir'];
+		$ttb_id = $input['ttb_id'];
+		// $tgl_mulai = $input['tgl_mulai'];
+		// $tgl_akhir = $input['tgl_akhir'];
 		$format_laporan = $input['format_laporan'];
 
 		$lokasi = $this->db->query("select * from gbm_organisasi where id=" . $lokasi_id)->row_array();
@@ -1766,19 +1767,96 @@ body {
 			$filter_lokasi = "Semua Lokasi";
 		}
 
-		$query = "select * from col_piutang_by_ttb_vw where tanggal_ttb between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
-		and lokasi_id  " . $lokasi_id . " order by tanggal_ttb";
-		$dataDtl = $this->db->query($query)->result_array();
+		$arrHasil = [];
+
+		$query = "select * from sls_ttb_header_vw where id =  " . $ttb_id . "";
+		$ttb = $this->db->query($query)->row_array();
+		$data['tipe'] = 'ttb';
+		$data['keterangan'] = 'Penjualan';
+		$data['nomor'] =$ttb['no_ttb'];
+		$data['tanggal'] = $ttb['tanggal'];
+		$data['nilai'] = $ttb['sub_total'];
+		$arrHasil[] = $data;
+
+		$data['tipe'] = 'dp';
+		$data['nomor'] =$ttb['no_ttb'];
+		$data['keterangan'] = 'Angsuran 1 (DP)';
+		$data['tanggal'] = $ttb['tanggal'];
+		$data['nilai'] = $ttb['total_dp'];
+		$arrHasil[] = $data;
+
+		$queryTB = " select * from sls_tarik_barang_ht where sls_ttb_id= " . $ttb_id . "";
+		$tb = $this->db->query($queryTB)->result_array();
+		foreach ($tb as $key => $t) {
+			$data['tipe'] = 'tarik_barang';
+			$data['keterangan'] = 'Tarik Barang';
+			$data['nomor'] =$t['no_tarik_barang'];
+			$data['tanggal'] = $t['tanggal'];
+			$data['nilai'] = $t['sub_total'];
+			$arrHasil[] = $data;
+		}
 
 
-		$data['data'] = 	$dataDtl;
+		$queryBayar = " select  * from col_lhi_detail_vw where ttb_id= " . $ttb_id . "";
+		$bayar = $this->db->query($queryBayar)->result_array();
 
+		foreach ($bayar as $key => $b) {
+			$data['tipe'] = 'lhi';
+			$data['keterangan'] = 'Pembayaran';
+			$data['nomor'] =$b['no_lhi'];
+			$data['tanggal'] = $b['tanggal'];
+			$data['nilai'] = $b['dibayar'];
+			$arrHasil[] = $data;
+		}
+
+		usort($arrHasil, function ($a, $b) {
+			return strtotime($a['tanggal']) - strtotime($b['tanggal']);
+		});
+
+		
+			/* ---------------------- */
+			$rekap=[];
+			$nilai_tb = 0;
+			$nilai_dibayar = 0;
+			$nilai_anguran_terakhir = 0;
+			$queryTB = " select sum(sub_total)as nilai_tb from sls_tarik_barang_ht where sls_ttb_id= " . $ttb_id . "";
+			$tb = $this->db->query($queryTB)->row_array();
+
+			if ($tb['nilai_tb']) {
+				$nilai_tb = $tb['nilai_tb'];
+			}
+			$queryBayar = " select sum(dibayar)as dibayar from col_lhi_detail_vw where ttb_id= " . $ttb_id . "";
+			$bayar = $this->db->query($queryBayar)->row_array();
+
+			if ($bayar['dibayar']) {
+				$nilai_dibayar = $bayar['dibayar'];
+			}
+			$queryPiutangKuitansi = " select sum(nilai_angsuran)as nilai_anguran_terakhir from col_kuitansi_vw where angsuran_ke>1 and ttb_id= " . $ttb_id . "";
+
+			$piutang = $this->db->query($queryPiutangKuitansi)->row_array();
+
+
+			if ($piutang['nilai_anguran_terakhir']) {
+				$nilai_angsuran_terakhir = $piutang['nilai_anguran_terakhir'];
+			}
+
+			$rekap['nilai_tb'] = $nilai_tb;
+			$rekap['nilai_dibayar'] = $nilai_dibayar;
+			$rekap['nilai_angsuran_terakhir'] = $nilai_angsuran_terakhir;
+			$rekap['sisa_piutang'] = $nilai_angsuran_terakhir - $nilai_dibayar; // total kuitansi setelah pengurangan TB dikurang duit sdh masuk.
+			/* --- REKAP -------- */
+
+		$data['data'] = 	$arrHasil;
+		$data['header'] = 	$ttb;
+		$data['rekap'] = 	$rekap;
+
+		
 		$data['filter_lokasi'] = 	$filter_lokasi;
-		$data['filter_tgl_awal'] = 	$tgl_mulai;
-		$data['filter_tgl_akhir'] = $tgl_akhir;
+		// $data['filter_tgl_awal'] = 	$tgl_mulai;
+		// $data['filter_tgl_akhir'] = $tgl_akhir;
 		$data['format_laporan'] = $format_laporan;
 
-		$html = $this->load->view('Col_Piutang_By_TTB_Laporan', $data, true);
+		$html = $this->load->view('Col_History_Piutang_By_TTB', $data, true);
 
 		// $filename = 'report_' . time();
 		// $this->pdfgenerator->generate($html, $filename, true, 'A4', 'landscape');
