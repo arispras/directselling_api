@@ -124,7 +124,7 @@ class InvLaporan extends Rest_Controller
 			if ($tampil_stok_nol == true) {
 				$res[] = $item;
 			} else {
-				if ($stok > 0) {
+				if ($stok != 0) {
 					$res[] = $item;
 				}
 			}
@@ -410,9 +410,7 @@ class InvLaporan extends Rest_Controller
 			<tr>
                     <th width="4%" rowspan="2">No.</th>
                     <th rowspan="2">Keterangan</th>                 
-					<th rowspan="2">Kegiatan</th>
-					<th rowspan="2">Blok/Mesin</th>
-					<th rowspan="2">Kendaraan/AB/Mesin</th>
+					
 					<th rowspan="2">No Bukti</th>
                     <th rowspan="2">Tgl</th>
                     <th colspan="2" style="text-align: center;">Transaksi</th>
@@ -439,9 +437,7 @@ class InvLaporan extends Rest_Controller
                     <td>
                         Saldo awal
                     </td>
-                    <td>
-                    </td>
-					<td>
+                   
                     </td>
 					<td>
                     </td>
@@ -453,9 +449,7 @@ class InvLaporan extends Rest_Controller
                     <td>
 
                     </td>
-                    <td>
-
-                    </td>
+                   
 
                     <td style="text-align: right;">
 
@@ -488,18 +482,7 @@ class InvLaporan extends Rest_Controller
 						' . $m['ket'] . ' 
 						
 						</td>
-						<td>
-						' . $m['nama_kegiatan'] . ' 
 						
-						</td>
-						<td>
-						' . $m['nama_afdeling'] . '-' . $m['nama_blok'] . ' 
-						
-						</td>
-						<td>
-						' . $m['nama_kendaraan'] . ' 
-						
-						</td>
 						<td>
 						' . $m['no_bukti'] . ' 
 						
@@ -534,15 +517,7 @@ class InvLaporan extends Rest_Controller
                         &nbsp;
 
                     </td>
-                    <td>
-                        &nbsp;
-                    </td>
-                    <td>
-                        &nbsp;
-                    </td>
-                    <td>
-                        &nbsp;
-                    </td>
+                    
 					<td>
 					&nbsp;
 					</td>
@@ -699,9 +674,6 @@ class InvLaporan extends Rest_Controller
 			<tr>
                     <th width="4%" rowspan="2">No.</th>
                     <th rowspan="2">Keterangan</th>                 
-					<th rowspan="2">Kegiatan</th>
-					<th rowspan="2">Blok/Mesin</th>
-					<th rowspan="2">Kendaraan/AB/Mesin</th>
 					<th rowspan="2">No Bukti</th>
                     <th rowspan="2">Tgl</th>
                     <th colspan="2" style="text-align: center;">Transaksi</th>
@@ -728,12 +700,7 @@ class InvLaporan extends Rest_Controller
                     <td>
                         Saldo awal
                     </td>
-                    <td>
-                    </td>
-					<td>
-                    </td>
-					<td>
-                    </td>
+                   
 					<td>
                     </td>
                     <td>
@@ -777,18 +744,7 @@ class InvLaporan extends Rest_Controller
 						' . $m['ket'] . ' 
 						
 						</td>
-						<td>
-						' . $m['nama_kegiatan'] . ' 
 						
-						</td>
-						<td>
-						' . $m['nama_afdeling'] . '-' . $m['nama_blok'] . ' 
-						
-						</td>
-						<td>
-						' . $m['nama_kendaraan'] . ' 
-						
-						</td>
 						<td>
 						' . $m['no_bukti'] . ' 
 						
@@ -832,15 +788,7 @@ class InvLaporan extends Rest_Controller
                     <td>
                         &nbsp;
                     </td>
-					<td>
-					&nbsp;
-					</td>
-					<td>
-						&nbsp;
-					</td>
-					<td>
-						&nbsp;
-					</td>
+					
 
                     <td style="text-align: right;">
                        ' . $this->format_number_report($jummasuk,2) . '
