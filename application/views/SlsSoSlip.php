@@ -44,7 +44,7 @@
 					<h1 left style="font-size:20px"><?= strtoupper(get_company()['nama']) ?></h1>
 					<!-- <table>
 						<tr>
-							<td>Jl Sukarno Hatta No 12 No 12, Bandung Jawa Barat 14450</td>
+							<td></td>
 						</tr>
 						<tr>
 							<td>Telp +6221 668 4055 Ext. 334 (Hendy)</td>

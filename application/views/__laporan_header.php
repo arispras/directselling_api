@@ -16,7 +16,7 @@
 
     <!-- <div class="kop-nama">PT. Karya Bella Vita</div>
     <div class="kop-info"> Jl. Pluit Putra Raya No. 6 Pluit, Penjaringan Jakarta Utara 14450</div>
-    <div class="kop-info">Telp : (021) 6684055</div> -->
+    <div class="kop-info"></div> -->
 		<div class="kop-nama"><?= get_company()['nama'] ?></div>
     <div class="kop-info"> <?= get_company()['alamat'] ?></div>
     <div class="kop-info">Telp : <?= get_company()['telp'] ?></div>

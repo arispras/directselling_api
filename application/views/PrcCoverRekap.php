@@ -5,7 +5,7 @@
 
 		<?php require '__laporan_style.php' ?>
 		<div></div>
-		<h1 left class="title">KLINIK ANNAJAH </h1>
+		<h1 left class="title">SAHABAT </h1>
 	</head>
 
 	<body>

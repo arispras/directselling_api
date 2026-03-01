@@ -30,7 +30,7 @@
 
 			<div style="border: 2px solid black" center>
 				<h1 bold>LAPORAN HARIAN PRODUKSI MILL</h1>
-				<!-- <h1 bold>KLINIK ANNAJAH</h1> -->
+				<!-- <h1 bold>SAHABAT</h1> -->
 			</div>
 			
 			<div style="padding:2% 5%;">

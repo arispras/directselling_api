@@ -10,7 +10,7 @@
 	<body>
 
 		<!-- <div>
-			<h1 center>KLINIK ANNAJAH</h1>
+			<h1 center>SAHABAT</h1>
 		</div> -->
 		<?php require '__laporan_header.php' ?>
 

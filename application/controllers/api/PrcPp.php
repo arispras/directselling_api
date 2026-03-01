@@ -698,9 +698,9 @@ class PrcPp extends BD_Controller //Rest_Controller
   	<div class="span12">
 	  <br>
 	<div class="kop-print">
-	  <div class="kop-nama">KLINIK ANNAJAH</div>
-	  <div class="kop-info"> Jl Sukarno Hatta No 12 No 12, Bandung Jawa Barat 14450</div>
-	  <div class="kop-info">Telp : (021) 6684055</div>
+	  <div class="kop-nama">SAHABAT</div>
+	  <div class="kop-info"> </div>
+	  <div class="kop-info"></div>
 	</div>
 	  <hr class="kop-print-hr">
   	</div>

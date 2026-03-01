@@ -12,9 +12,9 @@
     <img src="data:image/png;base64, <?= $logo ?>" alt="image" width="20%" height="auto">
     <?php } ?>
 
-    <!-- <div class="kop-nama">KLINIK ANNAJAH</div>
-    <div class="kop-info"> Jl Sukarno Hatta No 12 No 12, Bandung Jawa Barat 14450</div>
-    <div class="kop-info">Telp : (021) 6684055</div> -->
+    <!-- <div class="kop-nama">SAHABAT</div>
+    <div class="kop-info"> </div>
+    <div class="kop-info"></div> -->
 		<div class="kop-nama"><?= get_company()['nama'] ?></div>
     <div class="kop-info"> <?= get_company()['alamat'] ?></div>
     <div class="kop-info">Telp : <?= get_company()['telp'] ?></div>

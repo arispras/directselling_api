@@ -27,7 +27,7 @@
 					<td>Kepada Yth.</td>
 				</tr>
 				<tr><td>Pimpinan</td></tr>
-				<tr><td>KLINIK ANNAJAH</td></tr>
+				<tr><td>SAHABAT</td></tr>
 				<tr><td>Di Tempat</td></tr>
 				
 			</table>
@@ -42,7 +42,7 @@
 			
 		</div>
 		<p>Dengan Hormat,</p>
-		<p>Dengan ini kami mengajukan biaya sewa <?= $header['nm_kendaraan'] ?> (<?= $header['kd_kendaraan'] ?>) KLINIK ANNAJAH sebagai berikut :</p>
+		<p>Dengan ini kami mengajukan biaya sewa <?= $header['nm_kendaraan'] ?> (<?= $header['kd_kendaraan'] ?>) SAHABAT sebagai berikut :</p>
 		
 
 		<table class="table-bg border">
