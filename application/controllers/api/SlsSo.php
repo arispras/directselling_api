@@ -34,6 +34,28 @@ class SlsSo extends BD_Controller
 		$this->user_id = $this->user_data->id;
 	}
 
+	public function list_mobile_post($page_no, $limit)
+	{
+		$post = $this->post();
+		$searchText = $post['searchText'];
+
+		$query  = "SELECT * from sls_so_header_vw a
+	   where 1=1 ";
+		if (!empty($searchText) && (!$searchText == '')) {
+			$query  = $query . " and (
+			a.nama_customer like '%" . $searchText . "%'
+			or a.no_so like '%" . $searchText . "%'
+			or a.sales like '%" . $searchText . "%'
+			or DATE_FORMAT(tanggal,'%Y-%m-%d') like '%" . $searchText . "%'
+			)";
+		}
+		
+		$query  = $query . " order by a.id desc
+		LIMIT " . $limit . " OFFSET " . $page_no . "
+		";
+		$data = $this->db->query($query)->result_array();
+		$this->set_response($data, REST_Controller::HTTP_OK);
+	}
 	public function list_post()
 	{
 		$post = $this->post();
@@ -404,6 +426,56 @@ class SlsSo extends BD_Controller
 			$this->db->insert('fwk_user_audit', $audit);
 			/* end audit trail */
 			$this->set_response(array("status" => "OK", "data" => $input['no_so']), REST_Controller::HTTP_CREATED);
+		} else {
+			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
+		}
+	}
+	function simpan_header_post()
+	{
+		$input = $this->post();
+		$input['diubah_oleh'] = $this->user_id;
+		$input['dibuat_oleh'] = $this->user_id;
+		$this->load->library('Autonumber');
+		$input['no_so'] = $this->autonumber->sales_order($input['lokasi_id'], $input['tanggal']);
+		$input['kode_customer'] = $this->autonumber->gbm_customer();
+		$res =  $this->SlsSoModel->create_header($input);
+		// $this->set_response(array("status" => "OK", "data" => $input['no_so']), REST_Controller::HTTP_OK);
+		if (!empty($res)) {
+			/* start audit trail */
+			$audit = array('user_id' => $this->user_id, 'desc' => json_encode($this->post()), 'entity' => 'sls_so', 'action' => 'new', 'entity_id' => $res, 'key_text' => $input['no_so']);
+			$this->db->insert('fwk_user_audit', $audit);
+			/* end audit trail */
+			$this->set_response(array("status" => "OK", "data" => array("no_so"=>$input['no_so'],"id"=>$res)), REST_Controller::HTTP_CREATED);
+		} else {
+			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
+		}
+	}
+	function update_header_post($id)
+	{
+		$input = $this->post();
+		$input['diubah_oleh'] = $this->user_id;
+		$id = (int)$id;
+		$so = $this->SlsSoModel->retrieve($id);
+		if (empty($so)) {
+			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_OK);
+			return;
+		}
+		if (($so['id'])) {
+			$adaTTb = $this->db->query("SELECT * FROM sls_ttb_ht where sls_so_id=" . $so['id'])->row_array();
+			if (count($adaTTb) > 0) {
+				$this->set_response(array("status" => "NOT OK", "data" => "Sudah Ada TTB, Tidak Bisa di ubah"), REST_Controller::HTTP_OK);
+				return;
+			}
+		}
+
+		$res =  $this->SlsSoModel->update_header($id,$input);
+		// $this->set_response(array("status" => "OK", "data" => $input['no_so']), REST_Controller::HTTP_OK);
+		if (!empty($res)) {
+			/* start audit trail */
+			$audit = array('user_id' => $this->user_id, 'desc' => json_encode($this->post()), 'entity' => 'sls_so', 'action' => 'new', 'entity_id' => $res, 'key_text' => $input['no_so']);
+			$this->db->insert('fwk_user_audit', $audit);
+			/* end audit trail */
+			$this->set_response(array("status" => "OK", "data" => array("no_so"=>$input['no_so'],"id"=>$res)), REST_Controller::HTTP_CREATED);
 		} else {
 			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
 		}

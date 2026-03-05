@@ -113,6 +113,7 @@ class SlsSoModel extends CI_Model
 
 		return $id;
 	}
+	
 	public function update($id, $input)
 	{
 		$id = (int)$id;
@@ -166,7 +167,108 @@ class SlsSoModel extends CI_Model
 
 		return true;
 	}
+public function create_header($input)
+	{
 
+		$kode_customer  =  $input['kode_customer'];
+		$nama_customer    =  $input['nama_customer'];
+		$no_ktp    =  $input['no_ktp'];
+		$koordinat    =  $input['koordinat'];
+		$alamat    =  $input['alamat'];
+		$no_telpon    =  $input['no_telpon'];
+		$provinsi_id    =  $input['provinsi_id']['id'];
+		$kabupaten_id    =  $input['kabupaten_id']['id'];
+		$kecamatan_id    =  $input['kecamatan_id']['id'];
+		$kelurahan_id    =  $input['kelurahan_id']['id'];
+		$lokasi_id    =  $input['lokasi_id'];
+		$dibuat_oleh    =  $input['dibuat_oleh'];
+		$dibuat_tanggal    =  date('Y-m-d H:i:s');
+
+
+		$data = array(
+			'lokasi_id' => $lokasi_id,
+			'kode_customer'    => $kode_customer,		
+			'nama_customer' => $nama_customer,
+			'alamat' => $alamat,
+			'no_telpon' => $no_telpon,
+			'no_ktp' => $no_ktp,
+			'provinsi_id'    => $provinsi_id,		
+			'kabupaten_id' => $kabupaten_id,
+			'kecamatan_id' => $kecamatan_id,
+			'kelurahan_id' => $kelurahan_id,
+			'koordinat' => $koordinat,
+			'dibuat_oleh' => $dibuat_oleh,
+			'dibuat_tanggal' => $dibuat_tanggal
+
+		);
+		$this->db->insert('gbm_customer', $data);
+		$customer_id = $this->db->insert_id();
+
+		$ht['lokasi_id'] = $input['lokasi_id'];
+		$ht['status_so'] = $input['status_so'];
+
+		$ht['customer_id'] = $customer_id;
+		$ht['sales_id'] = $input['sales_id'];
+		$ht['surveyor_id'] = $input['surveyor_id'];
+		// $ht['sales_supervisor_id'] = $input['sales_supervisor_id']['id'];
+		// $ht['demo_booker_id'] = $input['demo_booker_id']['id'];
+		$ht['koordinat'] = $input['koordinat'];
+		$ht['no_so'] = $input['no_so'];
+		$ht['catatan'] = $input['catatan'];
+		$ht['jenis'] = 'B';
+		$ht['tenor'] = $input['tenor'];
+		$ht['sub_total'] =0;
+		$ht['total_diskon'] =0;
+		$ht['total_dp'] =0;
+		$ht['total_piutang'] =0;
+		$ht['total_nilai_angsuran'] = 0;
+		$ht['tanggal'] = $input['tanggal'];
+		$ht['tanggal_survey'] = $input['tanggal'];
+		$ht['tanggal_kirim'] = $input['tanggal'];
+		$ht['dibuat_tanggal'] = date('Y-m-d H:i:s');
+		$ht['dibuat_oleh'] = $input['dibuat_oleh'];
+
+
+
+		$this->db->insert('sls_so_ht', $ht);
+		$id = $this->db->insert_id();
+		return $id;
+	}
+	public function update_header($id, $input)
+	{
+		$id = (int)$id;
+		
+		// $ht['lokasi_id'] = $input['lokasi_id'];
+		$ht['status_so'] = $input['status_so'];
+
+		// $ht['customer_id'] = $customer_id;
+		// $ht['sales_id'] = $input['sales_id'];
+		// $ht['surveyor_id'] = $input['surveyor_id'];
+		// $ht['sales_supervisor_id'] = $input['sales_supervisor_id']['id'];
+		// $ht['demo_booker_id'] = $input['demo_booker_id']['id'];
+
+		// $ht['no_so'] = $input['no_so'];
+		$ht['catatan'] = $input['catatan'];
+		$ht['koordinat'] = $input['koordinat'];
+		$ht['jenis'] = 'B';
+		$ht['tenor'] = $input['tenor'];
+		// $ht['sub_total'] =0;
+		// $ht['total_diskon'] =0;
+		// $ht['total_dp'] =0;
+		// $ht['total_piutang'] =0;
+		// $ht['total_nilai_angsuran'] = 0;
+		$ht['tanggal'] = $input['tanggal'];
+		$ht['tanggal_survey'] = $input['tanggal'];
+		$ht['tanggal_kirim'] = $input['tanggal'];
+
+		$ht['diubah_oleh'] = $input['diubah_oleh'];
+		$input['diubah_tanggal'] = date('Y-m-d H:i:s');
+		$this->db->where('id', $id);
+		$this->db->update('sls_so_ht', $ht);
+
+
+		return true;
+	}
 	public function revisi($id, $input)
 	{
 		$id = (int)$id;

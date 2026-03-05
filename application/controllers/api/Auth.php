@@ -82,7 +82,52 @@ class Auth extends BD_Controller
 			$this->response($respon, REST_Controller::HTTP_OK);
 		}
 	}
+	public function login_mobile_post()
+	{
+		$u = $this->post('username'); //Username Posted
+		$p = $this->post('password'); //Pasword Posted
+		// $q = array('username' => $u); //For where query condition
+		$kunci = $this->config->item('thekey');
+		// $invalidLogin = ['status' => 'Invalid Login']; //Respon if login invalid
+		// $val = $this->M_main->get_user($q)->row(); //Model to get single data row from database base on username
+		$res = $this->AuthModel->Login($u, $p);
+		
+		//  var_dump($res);
+		if ($res['status'] == 'OK') {
+			$data = array();
+			$token['id'] = $res['data']['id'];
+			$token['username'] = $u;
+			$date = new DateTime();
+			$token['iat'] = $date->getTimestamp();
+			$token['exp'] = $date->getTimestamp() + 60 * 60 * 1000; //To here is to generate token
+					// $login_id = $this->AuthModel->create_log($res['data']['id']);
+			// $token['login_id'] = $login_id; // id login_log (bukan uer_id)
+			$data['token'] = JWT::encode($token, $kunci);
+			$data['data'] = $res['data'];
+			$data['status'] = "OK";
+			// $role=$this->KaryawanModel->retrieve_role( $res['data']['uniqid']);
+			// $data['role'] =$role;
+			$data['nama_company'] = get_pengaturan('nama-company', 'value');
+			$data['logo_company'] = get_pengaturan('logo-company', 'value'); //get_logo_config();
+			$data['alamat'] = get_pengaturan('alamat', 'value');
+			$data['telp'] = get_pengaturan('telp', 'value');
+			$data['whatsapp'] = get_pengaturan('whatsapp', 'value');
+			// $menu = $this->UserAccessModel->retrieveMenuByUserId($res['data']['id']);
+			// $data['menu'] = $menu;
+			$this->set_response($data, REST_Controller::HTTP_OK); //This is the respon if success
 
+			// }
+			// elseif($res['status']=='NOT_AKTIF') {
+			// 	$respon=array("status"=>"NOT_AKTIF","data"=>null,"message"=>"User Not Aktif ");
+			// 	$this->response($respon, REST_Controller::HTTP_OK);
+		} elseif ($res['status'] == 'NOT_FOUND') {
+			$respon = array("status" => "NOT_FOUND", "data" => null, "message" => "Periksa kembali username/password anda ");
+			$this->response($respon, REST_Controller::HTTP_OK);
+		} elseif ($res['status'] == 'NOT_AKTIF') {
+			$respon = array("status" => "NOT_AKTIF", "data" => null, "message" => "User Tidak aktif ");
+			$this->response($respon, REST_Controller::HTTP_OK);
+		}
+	}
 	function logout_post()
 	{
 		$this->auth();
