@@ -343,9 +343,10 @@ public function create_header($input)
 
 	public function retrieve_detail($hdid)
 	{
-		// $this->db->select('est_spat_dt.*,gbm_organisasi.kode as kode_blok,gbm_organisasi.nama as nama_blok');
-		$this->db->select('sls_so_dt.*');
+		
+		$this->db->select('sls_so_dt.*, m_item.nama as nama_item, m_item.kode as kode_item');
 		$this->db->from('sls_so_dt');
+		$this->db->join('inv_item m_item', 'sls_so_dt.item_id = m_item.id');
 		$this->db->where('so_hd_id', $hdid);
 		$res = $this->db->get();
 		return $res->result_array();
