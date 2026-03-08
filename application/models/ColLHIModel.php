@@ -181,7 +181,6 @@ class ColLHIModel extends CI_Model
 				$this->db->where('id', $value['kuitansi_id']);
 				$this->db->update('col_kuitansi_ht', $kui);
 			}
-
 		}
 		return true;
 	}
@@ -212,7 +211,24 @@ class ColLHIModel extends CI_Model
 		return $res->result_array();
 	}
 
+	public function update_detail($id, $input)
+	{
+		$id = (int)$id;
 
+		$dibayar  =  $input['dibayar'];
+
+
+
+		$data = array(
+			'dibayar' => $dibayar
+		);
+
+		$this->db->where('id', $id);
+		$this->db->update('col_lhi_dt', $data);
+
+
+		return true;
+	}
 
 	public function reject($id, $input)
 	{

@@ -480,6 +480,37 @@ class SlsSo extends BD_Controller
 			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
 		}
 	}
+	function simpan_detail_post()
+	{
+		$input = $this->post();
+		
+		$res =  $this->SlsSoModel->create_detail($input);
+		if (!empty($res)) {
+			/* start audit trail */
+			$audit = array('user_id' => $this->user_id, 'desc' => json_encode($this->post()), 'entity' => 'sls_so', 'action' => 'new', 'entity_id' => $res, 'key_text' => $input['no_so']);
+			$this->db->insert('fwk_user_audit', $audit);
+			/* end audit trail */
+			$this->set_response(array("status" => "OK", "data" => array("no_so"=>$input['no_so'],"id"=>$res)), REST_Controller::HTTP_CREATED);
+		} else {
+			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
+		}
+	}
+	function update_detail_post($id)
+	{
+		$input = $this->post();
+		
+		$res =  $this->SlsSoModel->update_detail($id,$input);
+		if (!empty($res)) {
+			/* start audit trail */
+			$audit = array('user_id' => $this->user_id, 'desc' => json_encode($this->post()), 'entity' => 'sls_so_dt', 'action' => 'new', 'entity_id' => $res, 'key_text' => $input['no_so']);
+			$this->db->insert('fwk_user_audit', $audit);
+			/* end audit trail */
+			$this->set_response(array("status" => "OK", "data" => array("item_id"=>$input['item_id'],"id"=>$res)), REST_Controller::HTTP_CREATED);
+		} else {
+			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
+		}
+	}
+
 	function simpan_pembayaran_post()
 	{
 		$input = $this->post();
@@ -756,6 +787,24 @@ class SlsSo extends BD_Controller
 		if (!empty($res)) {
 			/* start audit trail */
 			$audit = array('user_id' => $this->user_id, 'desc' => json_encode(array('id' => $id)), 'entity' => 'sls_so', 'action' => 'delete', 'entity_id' => $id, 'key_text' => $so['no_so']);
+			$this->db->insert('fwk_user_audit', $audit);
+			/* end audit trail */
+			$this->set_response(array("status" => "OK", "data" => $res), REST_Controller::HTTP_CREATED);
+		} else {
+			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
+		}
+	}
+	function hapus_detail_post($segment_3 = '')
+	{
+
+		$id = (int)$segment_3;
+		
+
+		$res =  $this->SlsSoModel->delete_detail($id);
+		// $this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
+		if (!empty($res)) {
+			/* start audit trail */
+			$audit = array('user_id' => $this->user_id, 'desc' => json_encode(array('id' => $id)), 'entity' => 'sls_so_detail', 'action' => 'delete', 'entity_id' => $id);
 			$this->db->insert('fwk_user_audit', $audit);
 			/* end audit trail */
 			$this->set_response(array("status" => "OK", "data" => $res), REST_Controller::HTTP_CREATED);

@@ -176,10 +176,10 @@ public function create_header($input)
 		$koordinat    =  $input['koordinat'];
 		$alamat    =  $input['alamat'];
 		$no_telpon    =  $input['no_telpon'];
-		$provinsi_id    =  $input['provinsi_id']['id'];
-		$kabupaten_id    =  $input['kabupaten_id']['id'];
-		$kecamatan_id    =  $input['kecamatan_id']['id'];
-		$kelurahan_id    =  $input['kelurahan_id']['id'];
+		$provinsi_id    =  $input['provinsi_id'];
+		$kabupaten_id    =  $input['kabupaten_id'];
+		$kecamatan_id    =  $input['kecamatan_id'];
+		$kelurahan_id    =  $input['kelurahan_id'];
 		$lokasi_id    =  $input['lokasi_id'];
 		$dibuat_oleh    =  $input['dibuat_oleh'];
 		$dibuat_tanggal    =  date('Y-m-d H:i:s');
@@ -234,6 +234,26 @@ public function create_header($input)
 		$id = $this->db->insert_id();
 		return $id;
 	}
+	public function create_detail($input)
+	{
+
+		$qty  =  $input['qty'];
+		$item_id    =  $input['item_id'];
+		$so_hd_id    =  $input['so_hd_id'];
+
+
+		$data = array(
+			'qty' => $qty,
+			'item_id' => $item_id,
+			'so_hd_id' => $so_hd_id
+
+		);
+		$this->db->insert('sls_so_dt', $data);
+		$id = $this->db->insert_id();
+
+		
+		return $id;
+	}
 	public function update_header($id, $input)
 	{
 		$id = (int)$id;
@@ -269,6 +289,35 @@ public function create_header($input)
 
 		return true;
 	}
+	public function update_detail($id, $input)
+	{
+		$id = (int)$id;
+		
+		$qty  =  $input['qty'];
+		$item_id    =  $input['item_id'];
+
+
+		$data = array(
+			'qty' => $qty,
+			'item_id' => $item_id,
+
+		);
+		
+		$this->db->where('id', $id);
+		$this->db->update('sls_so_dt', $data);
+
+
+		return true;
+	}
+	public function delete_detail($id)
+	{
+		$id = (int)$id;
+
+		$this->db->where('id', $id);
+		$this->db->delete('sls_so_dt');
+		return true;
+	}
+
 	public function revisi($id, $input)
 	{
 		$id = (int)$id;

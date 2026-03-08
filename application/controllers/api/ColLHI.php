@@ -25,7 +25,29 @@ class ColLHI extends BD_Controller
 		$this->theCredential = $this->user_data;
 		$this->user_id = $this->user_data->id;
 	}
+	public function list_mobile_post($page_no, $limit)
+	{
+		$post = $this->post();
+		$searchText = $post['searchText'];
 
+		$query  = "SELECT a.*,b.nama AS lokasi,c.nama as nama_collector from col_lhi_ht a 
+		left join gbm_organisasi b on a.lokasi_id=b.id
+		left join karyawan c on a.collector_id=c.id WHERE 1=1 ";
+		if (!empty($searchText) && (!$searchText == '')) {
+			$query  = $query . " and (
+			c.nama like '%" . $searchText . "%'
+			or a.no_lhi like '%" . $searchText . "%'
+			or a.b.nama like '%" . $searchText . "%'
+			or DATE_FORMAT(a.tanggal,'%Y-%m-%d') like '%" . $searchText . "%'
+			)";
+		}
+
+		$query  = $query . " order by a.id desc
+		LIMIT " . $limit . " OFFSET " . $page_no . "
+		";
+		$data = $this->db->query($query)->result_array();
+		$this->set_response($data, REST_Controller::HTTP_OK);
+	}
 	public function list_post()
 	{
 		$post = $this->post();
@@ -98,7 +120,21 @@ class ColLHI extends BD_Controller
 		}
 	}
 
+	function update_detail_post($id)
+	{
+		$input = $this->post();
 
+		$res =  $this->ColLHIModel->update_detail($id, $input);
+		if (!empty($res)) {
+			/* start audit trail */
+			$audit = array('user_id' => $this->user_id, 'desc' => json_encode($this->post()), 'entity' => 'col_lhi_dt', 'action' => 'new', 'entity_id' => $res, 'key_text' => $input['no_lhi']);
+			$this->db->insert('fwk_user_audit', $audit);
+			/* end audit trail */
+			$this->set_response(array("status" => "OK", "data" => array("id" => $input['id'], "data" => $res)), REST_Controller::HTTP_CREATED);
+		} else {
+			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
+		}
+	}
 	function getLHIKuitansiBlmLunas_post()
 	{
 		$collector_id = $this->post('collector_id');
