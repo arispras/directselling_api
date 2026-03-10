@@ -37,7 +37,7 @@ class ColLHI extends BD_Controller
 			$query  = $query . " and (
 			c.nama like '%" . $searchText . "%'
 			or a.no_lhi like '%" . $searchText . "%'
-			or a.b.nama like '%" . $searchText . "%'
+			or b.nama like '%" . $searchText . "%'
 			or DATE_FORMAT(a.tanggal,'%Y-%m-%d') like '%" . $searchText . "%'
 			)";
 		}
@@ -105,6 +105,20 @@ class ColLHI extends BD_Controller
 			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
 		}
 	}
+
+	function detail_lhi_get($segment_3 = '')
+	{
+		$id = $segment_3;
+		$retrieve = $this->ColLHIModel->retrieve($id);
+		$retrieve['detail'] = $this->ColLHIModel->retrieve_lhi_detail($id);
+
+		if (!empty($retrieve)) {
+			$this->set_response(array("status" => "OK", "data" => $retrieve), REST_Controller::HTTP_OK);
+		} else {
+			$this->set_response(array("status" => "NOT OK", "data" => "Tidak ada Data"), REST_Controller::HTTP_NOT_FOUND);
+		}
+	}
+
 
 
 
@@ -1036,7 +1050,7 @@ class ColLHI extends BD_Controller
 		}
 
 		$query = "select * from col_lhi_detail_vw where tanggal between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
-		and lokasi_id = " . $lokasi_id . "";
+		and lokasi_id = " . $lokasi_id . " order by tanggal";
 		$dataDtl = $this->db->query($query)->result_array();
 
 
@@ -1111,7 +1125,7 @@ class ColLHI extends BD_Controller
 			$filter_lokasi = "Semua Lokasi";
 		}
 
-		$query = "SELECT lokasi_id,lokasi,tanggal, SUM(dibayar)AS dibayar, count(kuitansi_id)as jum_kuitansi,collector,no_lhi
+		$query = "SELECT lokasi_id,lokasi,tanggal, sum(sisa_akhir)as sisa_akhir, sum(sisa_angsuran)as sisa_angsuran,SUM(dibayar)AS dibayar, count(kuitansi_id)as jum_kuitansi,collector,no_lhi
 			FROM col_lhi_detail_vw
 			where tanggal between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
 			and lokasi_id = " . $lokasi_id . "

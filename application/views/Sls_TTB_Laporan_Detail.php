@@ -68,10 +68,10 @@
 					<th style="width:2%">No</th>
 					<th style="width:9%">NoTTB</th>
 					<th style="width:9%">Tanggal</th>
-					<th style="width:6%">No SO</th>
+					<!-- <th style="width:6%">No SO</th> -->
 					<th style="width:12%">Customer</th>
-					<th style="width:12%">Surveyor</th>
-					<th style="width:12%">Sales SPV</th>
+					<!-- <th style="width:12%">Surveyor</th>
+					<th style="width:12%">Sales SPV</th> -->
 					<th style="width:12%">Sales</th>
 					<th style="width:12%">Demo Booker</th>
 					<th style="width:5%">Kode Item</th>
@@ -116,10 +116,10 @@
 							<td center> <?= $no ?> </td>
 							<td left> <?= $res['no_ttb'] ?></td>
 							<td center><?=  tgl_indo($res['tanggal']) ?></td>
-							<td center><?= $res['no_so'] ?></td>
+							<!-- <td center><?= $res['no_so'] ?></td> -->
 							<td left><?= $res['nama_customer'] ?></td>
-							<td left><?= $res['surveyor'] ?></td>
-							<td left><?= $res['sales_supervisor'] ?></td>
+							<!-- <td left><?= $res['surveyor'] ?></td>
+							<td left><?= $res['sales_supervisor'] ?></td> -->
 							<td left><?= $res['sales'] ?></td>
 							<td left><?= $res['demo_booker'] ?></td>
 							<td center><?= $res['kode_item'] ?></td>
@@ -137,7 +137,7 @@
 
 	
 				<tr>
-					<td colspan=11></td>
+					<td colspan=8></td>
 					<td right><?= format_number_report($jum_qty,$format_laporan) ?></td>
 					<td right></td>
 					<td right><?= format_number_report($jum_diskon,$format_laporan) ?></td>

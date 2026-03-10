@@ -29,7 +29,7 @@
 			<p>No : <strong> <?= $header['no_lhi'] ?></strong></p>
 			<p>Tanggal :<strong> <?= tgl_indo($header['tanggal']) ?></strong></p>
 			<p>Collector :<strong> <?= ($header['collector']) ?></strong></p>
-			
+
 			<!-- <div id="pageCounter" class="page">
 				<page size="A4"></page>
 				<div id="pageNumbers" class="page">
@@ -50,30 +50,41 @@
 						<th>Tgl Tempo</th>
 						<th>Sisa Angsuran</th>
 						<th>Dibayar</th>
-						<th>Tanggal Janji</th>					
+						<th>Tanggal Janji</th>
 						<!-- <th>Catatan</th> -->
 					</tr>
 				</thead>
 				<tbody>
-					<?php $no = 0 ?>
+					<?php
+					$no = 0;
+					$jum_sisa_angsuran = 0; ?>
 					<?php foreach ($detail as $key => $val) { ?>
-						<?php $no = $no + 1 ?>
+						<?php $no = $no + 1;
+						$jum_sisa_angsuran = $jum_sisa_angsuran + $val['sisa_angsuran'];
+						?>
 						<tr>
 							<td center width="2%"><?= $no ?></td>
 							<td width="10%"><?= $val['no_kuitansi'] ?></td>
 							<td width="10%"><?= $val['nama_customer'] ?></td>
 							<td width="3%"><?= $val['angsuran_ke'] ?></td>
-							<td width="10%"><?=  tgl_indo($val['tanggal_tempo']) ?></td>
-							<td center width="8%"><?= number_format( $val['sisa_angsuran'],0 )?></td>							
-							<td center width="9%"></td>						
+							<td width="10%"><?= tgl_indo($val['tanggal_tempo']) ?></td>
+							<td center width="8%"><?= number_format($val['sisa_angsuran'], 0) ?></td>
 							<td center width="9%"></td>
-							
+							<td center width="9%"></td>
+
 						</tr>
 					<?php } ?>
+					<tr>
+						<td colspan="5">Jumlah</td>
+						<td center width="8%"><?= number_format($jum_sisa_angsuran, 0) ?></td>
+						<td center></td>
+						<td center></td>
+
+					</tr>
 				</tbody>
 				<tfoot></tfoot>
 			</table>
-		
+
 			<br><br>
 
 			<table>
@@ -96,7 +107,7 @@
 				</tr>
 			</table>
 			<br>
-		
+
 
 	</body>
 

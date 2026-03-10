@@ -201,12 +201,21 @@ class ColLHIModel extends CI_Model
 
 	public function retrieve_detail($hdid)
 	{
-		// $this->db->select('est_spat_dt.*,gbm_organisasi.kode as kode_blok,gbm_organisasi.nama as nama_blok');
+
 		$this->db->select('a.*, b.no_kuitansi,b.angsuran_ke, b.tanggal_tempo,a.tanggal_janji as tanggal_janji ,c.nama_customer');
 		$this->db->from('col_lhi_dt a');
 		$this->db->join('col_kuitansi_ht b', 'a.kuitansi_id = b.id', "left");
 		$this->db->join('gbm_customer c', 'b.customer_id = c.id', "left");
 		$this->db->where('a.lhi_id', $hdid);
+		$res = $this->db->get();
+		return $res->result_array();
+	}
+	public function retrieve_lhi_detail($hdid)
+	{
+
+		$this->db->select('*');
+		$this->db->from('col_lhi_detail_vw ');
+		$this->db->where('id', $hdid);
 		$res = $this->db->get();
 		return $res->result_array();
 	}

@@ -70,7 +70,9 @@
 					<th style="width:12%">Tanggal</th>
 					<th style="width:12%">Collector</th>
 					<th style="width:12%">Jum Kuitansi</th>
+					<th style="width:12%">Sisa Angsuran</th>
 					<th style="width:12%">Dibayar</th>
+					<th style="width:12%">Sisa</th>
 
 				</tr>
 
@@ -81,9 +83,9 @@
 				$jum_dibayar = 0;
 				$jum_qty = 0;
 				$jum_dp = 0;
-				$jum_total= 0;
+				$jum_sisa= 0;
 				$jum_nilai_piutang = 0;
-				$jum_nilai_angsuran = 0;
+				$jum_sisa_angsuran = 0;
 				
 				
 				?>
@@ -94,6 +96,9 @@
 							<?php
 							$no = $no + 1;
 							$jum_dibayar += $res['dibayar'];
+							$jum_sisa_angsuran += $res['sisa_angsuran'];
+							$sisa=$res['sisa_angsuran']-$res['dibayar'];
+							$jum_sisa+=$sisa;
 							
 							?>
 							<td center> <?= $no ?> </td>
@@ -101,7 +106,9 @@
 							<td center><?=  tgl_indo($res['tanggal']) ?></td>
 							<td left><?= $res['collector'] ?></td>
 							<td left><?= $res['jum_kuitansi'] ?></td>
+							<td right><?= format_number_report($res['sisa_angsuran'],$format_laporan) ?></td>
 							<td right><?= format_number_report($res['dibayar'],$format_laporan) ?></td>
+							<td right><?= format_number_report($sisa,$format_laporan) ?></td>
 								
 						</tr>
 					<?php } ?>
@@ -109,7 +116,9 @@
 	
 				<tr>
 					<td colspan="5"></td>
+					<td right><?= format_number_report($jum_sisa_angsuran,$format_laporan) ?></td>
 					<td right><?= format_number_report($jum_dibayar,$format_laporan) ?></td>
+					<td right><?= format_number_report($jum_sisa,$format_laporan) ?></td>
 					
 				</tr>
 
