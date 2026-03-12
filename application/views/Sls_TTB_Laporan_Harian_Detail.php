@@ -76,6 +76,7 @@
 					<th style="width:5%">PDV</th>
 					<th style="width:5%">PDL</th>
 					<th style="width:5%">Actual</th>
+					<th style="width:5%">Batal</th>
 					<th style="width:5%">Jumlah</th>
 
 				</tr>
@@ -87,10 +88,12 @@
 				$jum_pdv = 0;
 				$jum_pdl = 0;
 				$jum_aktual = 0;
+				$jum_batal = 0;
 				$jum_total = 0;
 				$tot_pdv = 0;
 				$tot_pdl = 0;
 				$tot_aktual = 0;
+				$tot_batal = 0;
 				$tot_total = 0;
 
 				?>
@@ -102,6 +105,7 @@
 					$jum_pdv = 0;
 					$jum_pdl = 0;
 					$jum_aktual = 0;
+					$jum_batal = 0;
 					$jum_total = 0;
 
 					?>
@@ -115,12 +119,14 @@
 							$jum_pdv += $res['qty_pdv'];
 							$jum_pdl += $res['qty_pdl'];
 							$jum_aktual += $res['qty_actual'];
-							$total = $res['qty_pdv'] + $res['qty_pdl'] + $res['qty_actual'];
+							$jum_batal += $res['qty_batal'];
+							$total = $res['qty_pdv'] + $res['qty_pdl'] + $res['qty_actual']+ $res['qty_batal'];
 							$jum_total += $total;
 
 							$tot_pdv += $res['qty_pdv'];
 							$tot_pdl += $res['qty_pdl'];
 							$tot_aktual += $res['qty_actual'];
+							$tot_batal += $res['qty_batal'];
 							$tot_total += $total;
 
 							?>
@@ -136,6 +142,7 @@
 							<td right><?= format_number_report($res['qty_pdv'], $format_laporan) ?></td>
 							<td right><?= format_number_report($res['qty_pdl'], $format_laporan) ?></td>
 							<td right><?= format_number_report($res['qty_actual'], $format_laporan) ?></td>
+							<td right><?= format_number_report($res['qty_batal'], $format_laporan) ?></td>
 							<td right><?= format_number_report($total, $format_laporan) ?></td>
 
 						</tr>
@@ -145,6 +152,7 @@
 						<td right><strong><?= format_number_report($jum_pdv, $format_laporan) ?></strong></td>
 						<td right><strong><?= format_number_report($jum_pdl, $format_laporan) ?></strong></td>
 						<td right><strong><?= format_number_report($jum_aktual, $format_laporan) ?></strong></td>
+						<td right><strong><?= format_number_report($jum_batal, $format_laporan) ?></strong></td>
 						<td right><strong><?= format_number_report($jum_total, $format_laporan) ?></strong></td>
 
 					</tr>
@@ -156,6 +164,7 @@
 					<td right><strong><?= format_number_report($tot_pdv, $format_laporan) ?></strong></td>
 					<td right><strong><?= format_number_report($tot_pdl, $format_laporan) ?></strong></td>
 					<td right><strong><?= format_number_report($tot_aktual, $format_laporan) ?></strong></td>
+					<td right><strong><?= format_number_report($tot_batal, $format_laporan) ?></strong></td>
 					<td right><strong><?= format_number_report($tot_total, $format_laporan) ?></strong></td>
 
 				</tr>
@@ -185,6 +194,7 @@
 					<th style="width:5%">PDV</th>
 					<th style="width:5%">PDL</th>
 					<th style="width:5%">Actual</th>
+					<th style="width:5%">Batal</th>
 					<th style="width:5%">Jumlah</th>
 
 				</tr>
@@ -196,10 +206,12 @@
 				$jum_pdv = 0;
 				$jum_pdl = 0;
 				$jum_aktual = 0;
+				$jum_batal = 0;
 				$jum_total = 0;
 				$tot_pdv = 0;
 				$tot_pdl = 0;
 				$tot_aktual = 0;
+				$tot_batal = 0;
 				$tot_total = 0;
 
 				?>
@@ -211,6 +223,7 @@
 					$jum_pdv = 0;
 					$jum_pdl = 0;
 					$jum_aktual = 0;
+					$jum_batal = 0;
 					$jum_total = 0;
 
 					?>
@@ -224,12 +237,14 @@
 							$jum_pdv += $res['qty_pdv'];
 							$jum_pdl += $res['qty_pdl'];
 							$jum_aktual += $res['qty_actual'];
-							$total = $res['qty_pdv'] + $res['qty_pdl'] + $res['qty_actual'];
+							$jum_batal += $res['qty_batal'];
+							$total = $res['qty_pdv'] + $res['qty_pdl'] + $res['qty_actual'] + $res['qty_batal'];
 							$jum_total += $total;
 
 							$tot_pdv += $res['qty_pdv'];
 							$tot_pdl += $res['qty_pdl'];
 							$tot_aktual += $res['qty_actual'];
+							$tot_batal += $res['qty_batal'];
 							$tot_total += $total;
 
 							?>
@@ -245,6 +260,7 @@
 							<td right><?= format_number_report($res['qty_pdv'], $format_laporan) ?></td>
 							<td right><?= format_number_report($res['qty_pdl'], $format_laporan) ?></td>
 							<td right><?= format_number_report($res['qty_actual'], $format_laporan) ?></td>
+							<td right><?= format_number_report($res['qty_batal'], $format_laporan) ?></td>
 							<td right><?= format_number_report($total, $format_laporan) ?></td>
 
 						</tr>
@@ -254,6 +270,7 @@
 						<td right><strong><?= format_number_report($jum_pdv, $format_laporan) ?></strong></td>
 						<td right><strong><?= format_number_report($jum_pdl, $format_laporan) ?></strong></td>
 						<td right><strong><?= format_number_report($jum_aktual, $format_laporan) ?></strong></td>
+						<td right><strong><?= format_number_report($jum_batal, $format_laporan) ?></strong></td>
 						<td right><strong><?= format_number_report($jum_total, $format_laporan) ?></strong></td>
 
 					</tr>
@@ -264,6 +281,7 @@
 					<td right><strong><?= format_number_report($tot_pdv, $format_laporan) ?></strong></td>
 					<td right><strong><?= format_number_report($tot_pdl, $format_laporan) ?></strong></td>
 					<td right><strong><?= format_number_report($tot_aktual, $format_laporan) ?></strong></td>
+					<td right><strong><?= format_number_report($tot_batal, $format_laporan) ?></strong></td>
 					<td right><strong><?= format_number_report($tot_total, $format_laporan) ?></strong></td>
 
 				</tr>

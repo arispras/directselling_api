@@ -70,6 +70,7 @@
 					<th style="width:9%">PDV</th>
 					<th style="width:6%">PDL</th>
 					<th style="width:9%">AKTUAL</th>
+					<th style="width:9%">BATAL</th>
 					<th style="width:6%">JUMLAH</th>
 
 				</tr>
@@ -80,10 +81,12 @@
 				$no = 0;
 				$jum_pdv = 0;
 				$jum_pdl = 0;
+				$jum_batal = 0;
 				$jum_aktual = 0;
 				$jum_total = 0;
 				$tot_pdv = 0;
 				$tot_pdl = 0;
+				$tot_batal = 0;
 				$tot_aktual = 0;
 				$tot_total = 0;
 
@@ -95,12 +98,14 @@
 					$no = $no + 1;
 					$jum_pdv += $res['pdv'];
 					$jum_pdl += $res['pdl'];
+					$jum_batal += $res['batal'];
 					$jum_aktual += $res['actual'];
-					$total = $res['pdv'] + $res['pdl'] + $res['actual'];
+					$total = $res['pdv'] + $res['pdl'] + $res['actual'] + $res['batal'];
 					$jum_total += $total;
 
 					$tot_pdv += $res['pdv'];
 					$tot_pdl += $res['pdl'];
+					$tot_batal += $res['batal'];
 					$tot_aktual += $res['actual'];
 					$tot_total += $total;
 
@@ -111,6 +116,7 @@
 						<td right><?= format_number_report($res['pdv'], $format_laporan) ?></td>
 						<td right><?= format_number_report($res['pdl'], $format_laporan) ?></td>
 						<td right><?= format_number_report($res['actual'], $format_laporan) ?></td>
+						<td right><?= format_number_report($res['batal'], $format_laporan) ?></td>
 						<td right><?= format_number_report($total, $format_laporan) ?></td>
 
 					</tr>
@@ -120,6 +126,7 @@
 					<td right><strong><?= format_number_report($jum_pdv, $format_laporan) ?></strong></td>
 					<td right><strong><?= format_number_report($jum_pdl, $format_laporan) ?></strong></td>
 					<td right><strong><?= format_number_report($jum_aktual, $format_laporan) ?></strong></td>
+					<td right><strong><?= format_number_report($jum_batal, $format_laporan) ?></strong></td>
 					<td right><strong><?= format_number_report($jum_total, $format_laporan) ?></strong></td>
 
 				</tr>
@@ -141,6 +148,7 @@
 					<th style="width:9%">PDV</th>
 					<th style="width:6%">PDL</th>
 					<th style="width:9%">AKTUAL</th>
+					<th style="width:9%">BATAL</th>
 					<th style="width:6%">JUMLAH</th>
 
 				</tr>
@@ -152,10 +160,12 @@
 				$jum_pdv = 0;
 				$jum_pdl = 0;
 				$jum_aktual = 0;
+				$jum_batal = 0;
 				$jum_total = 0;
 				$tot_pdv = 0;
 				$tot_pdl = 0;
 				$tot_aktual = 0;
+				$tot_batal = 0;
 				$tot_total = 0;
 
 				?>
@@ -168,12 +178,14 @@
 					$jum_pdv += $res['pdv'];
 					$jum_pdl += $res['pdl'];
 					$jum_aktual += $res['actual'];
-					$total = $res['pdv'] + $res['pdl'] + $res['actual'];
+					$jum_batal += $res['batal'];
+					$total = $res['pdv'] + $res['pdl'] + $res['actual'] + $res['batal'];
 					$jum_total += $total;
 
 					$tot_pdv += $res['pdv'];
 					$tot_pdl += $res['pdl'];
 					$tot_aktual += $res['actual'];
+					$tot_batal += $res['batal'];
 					$tot_total += $total;
 
 					?>
@@ -183,6 +195,7 @@
 						<td right><?= format_number_report($res['pdv'], $format_laporan) ?></td>
 						<td right><?= format_number_report($res['pdl'], $format_laporan) ?></td>
 						<td right><?= format_number_report($res['actual'], $format_laporan) ?></td>
+						<td right><?= format_number_report($res['batal'], $format_laporan) ?></td>
 						<td right><?= format_number_report($total, $format_laporan) ?></td>
 
 					</tr>
@@ -192,6 +205,7 @@
 					<td right><strong><?= format_number_report($jum_pdv, $format_laporan) ?></strong></td>
 					<td right><strong><?= format_number_report($jum_pdl, $format_laporan) ?></strong></td>
 					<td right><strong><?= format_number_report($jum_aktual, $format_laporan) ?></strong></td>
+					<td right><strong><?= format_number_report($jum_batal, $format_laporan) ?></strong></td>
 					<td right><strong><?= format_number_report($jum_total, $format_laporan) ?></strong></td>
 
 				</tr>

@@ -1242,7 +1242,8 @@ class SlsTTB extends BD_Controller
 			$filter_lokasi = "Semua Lokasi";
 		}
 
-		$query1 = "select sales_id,sales, sum(qty_actual)as actual,sum(qty_pdl)as pdl ,sum(qty_pdv)as pdv 
+		$query1 = "select sales_id,sales, sum(qty_actual)as actual,sum(qty_pdl)as pdl ,sum(qty_pdv)as pdv,
+		sum(qty_batal)as batal
 		from sls_so_ttb_detail_vw  
 			where ((tanggal_so between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	)
 				or (tanggal_ttb between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	))
@@ -1254,7 +1255,8 @@ class SlsTTB extends BD_Controller
 
 
 
-		$query2 = "select sales_supervisor_id,sales_supervisor, sum(qty_actual)as actual,sum(qty_pdl)as pdl ,sum(qty_pdv)as pdv 
+		$query2 = "select sales_supervisor_id,sales_supervisor, sum(qty_actual)as actual,
+		sum(qty_pdl)as pdl ,sum(qty_pdv)as pdv ,sum(qty_batal)as batal
 		from sls_so_ttb_detail_vw  
 			where ((tanggal_so between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	)
 				or (tanggal_ttb between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	))

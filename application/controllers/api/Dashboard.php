@@ -132,7 +132,8 @@ class Dashboard extends BD_Controller
 		$query1 = "select sales_id,sales, 
 		CAST(IFNULL(SUM(qty_actual),0) AS UNSIGNED) AS actual,
 		CAST(IFNULL(SUM(qty_pdl),0) AS UNSIGNED) AS pdl,
-		CAST(IFNULL(SUM(qty_pdv),0) AS UNSIGNED) AS pdv
+		CAST(IFNULL(SUM(qty_pdv),0) AS UNSIGNED) AS pdv,
+		CAST(IFNULL(SUM(qty_batal),0) AS UNSIGNED) AS batal
 		from sls_so_ttb_detail_vw  
 			where ((tanggal_so between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	)
 				or (tanggal_ttb between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	))
@@ -152,6 +153,7 @@ class Dashboard extends BD_Controller
 			$row['actual'] = (int) $row['actual'];
 			$row['pdl']    = (int) $row['pdl'];
 			$row['pdv']    = (int) $row['pdv'];
+			$row['batal']  = (int) $row['batal'];
 		}
 		$this->set_response($dataBySales, REST_Controller::HTTP_OK);
 	}
