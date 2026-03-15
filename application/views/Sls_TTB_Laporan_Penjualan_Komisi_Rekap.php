@@ -202,6 +202,78 @@
 			</tbody>
 			<tfoot></tfoot>
 		</table>
+		<br>
+		<br>
+		<hr>
+
+		<h3>DEMO BOOKER </h3>
+		<table class="table-bg border">
+			<thead>
+				<tr>
+					<th style="width:2%">No</th>
+					<th style="width:12%">Demo Booker</th>
+					<th style="width:9%">Qty</th>
+					<th style="width:9%">Bonus</th>
+					<th style="width:6%">Komisi</th>
+					<th style="width:9%">JumlahBonus</th>
+					<th style="width:6%">JumlahKomisi</th>
+					<th style="width:6%">Total</th>
+
+				</tr>
+
+			</thead>
+			<tbody>
+				<?php
+				$no = 0;
+				$jum_qty = 0;
+				$jum_komisi = 0;
+				$jum_bonus = 0;
+				$jum_total = 0;
+				$tot_qty = 0;
+				$tot_bonus = 0;
+				$tot_komisi = 0;
+				$tot_total = 0;
+
+				?>
+
+				<?php foreach ($dataByDemoBooker as $key => $res) { ?>
+
+					<?php
+					$no = $no + 1;
+					$jum_qty += $res['qty'];
+					$jum_komisi += $res['jumlah_komisi'];
+					$jum_bonus += $res['jumlah_bonus'];
+					$jum_total += $res['jumlah_komisi_bonus'];
+
+
+
+					?>
+					<tr>
+						<td center> <?= $no ?> </td>
+						<td left><?= $res['demo_booker'] ?></td>
+						<td right><?= format_number_report($res['qty'], $format_laporan) ?></td>
+						<td right><?= format_number_report($res['bonus'], $format_laporan) ?></td>
+						<td right><?= format_number_report($res['komisi'], $format_laporan) ?></td>
+						<td right><?= format_number_report($res['jumlah_bonus'], $format_laporan) ?></td>
+						<td right><?= format_number_report($res['jumlah_komisi'], $format_laporan) ?></td>
+						<td right><?= format_number_report($res['jumlah_komisi_bonus'], $format_laporan) ?></td>
+
+					</tr>
+				<?php } ?>
+				<tr>
+					<td colspan=2><strong>Total</strong></td>
+					<td right><strong><?= format_number_report($jum_qty, $format_laporan) ?></strong></td>
+					<td><strong></strong></td>
+					<td><strong></strong></td>
+					<td right><strong><?= format_number_report($jum_bonus, $format_laporan) ?></strong></td>
+					<td right><strong><?= format_number_report($jum_komisi, $format_laporan) ?></strong></td>
+					<td right><strong><?= format_number_report($jum_total, $format_laporan) ?></strong></td>
+
+				</tr>
+
+			</tbody>
+			<tfoot></tfoot>
+		</table>
 
 
 

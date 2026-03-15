@@ -1219,6 +1219,170 @@ class SlsTTB extends BD_Controller
 			$dompdf->stream($filename . ".pdf", array("Attachment" => 0));
 		}
 	}
+	function getReportPenjualanPerTanggal_post()
+	{
+
+		$format_laporan =  $this->post('format_laporan', true);
+
+
+		$data = [];
+
+		$input = $this->post();
+
+		$lokasi_id = $input['lokasi_id'];
+		$tgl_mulai = $input['tgl_mulai'];
+		$tgl_akhir = $input['tgl_akhir'];
+		$format_laporan = $input['format_laporan'];
+
+		$lokasi = $this->db->query("select * from gbm_organisasi where id=" . $lokasi_id)->row_array();
+		if ($lokasi) {
+			$filter_lokasi = $lokasi['nama'];
+			$lokasi_id =  $lokasi_id;
+		} else {
+			$filter_lokasi = "Semua Lokasi";
+		}
+
+		$query = "SELECT lokasi_id,lokasi,tanggal,SUM(qty)AS qty,SUM(diskon)AS diskon,SUM(dp)AS dp,
+			SUM(total)AS total,SUM(nilai_piutang)as nilai_piutang,SUM(nilai_angsuran)AS nilai_angsuran
+			FROM sls_ttb_detail_vw
+			where tanggal between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
+			and lokasi_id  =" . $lokasi_id . "
+			GROUP BY lokasi_id,lokasi,tanggal
+			ORDER BY tanggal 
+		";
+		$dataDtl = $this->db->query($query)->result_array();
+
+
+		$data['data'] = 	$dataDtl;
+
+		$data['filter_lokasi'] = 	$filter_lokasi;
+		$data['filter_tgl_awal'] = 	$tgl_mulai;
+		$data['filter_tgl_akhir'] = $tgl_akhir;
+		$data['format_laporan'] = $format_laporan;
+
+		$html = $this->load->view('Sls_TTB_Laporan_Rekap_Per_Tanggal', $data, true);
+
+		// $filename = 'report_' . time();
+		// $this->pdfgenerator->generate($html, $filename, true, 'A4', 'landscape');
+		// echo $html;
+		if ($format_laporan == 'xls') {
+			echo $html;
+		} else if ($format_laporan == 'view') {
+			echo $html;
+		} else {
+			$filename = 'report_' . time();
+			// $this->pdfgenerator->generate($html, $filename, true, 'A4', 'landscape');
+			$dompdf = new DOMPDF;
+			$dompdf->loadHtml($html);
+			$dompdf->setPaper('A4', 'landscape');
+			$dompdf->render();
+			$filename = 'report_' . time();
+			$x          = 400;
+			$y          = 570;
+			$text       = "{PAGE_NUM} of {PAGE_COUNT}";
+			$font       = null; // $dompdf->getFontMetrics()->get_font('Helvetica', 'normal');
+			$size       = 10;
+			$color      = array(0, 0, 0);
+			$word_space = 0.0;
+			$char_space = 0.0;
+			$angle      = 0.0;
+
+			$dompdf->getCanvas()->page_text(
+				$x,
+				$y,
+				$text,
+				$font,
+				$size,
+				$color,
+				$word_space,
+				$char_space,
+				$angle
+			);
+			$dompdf->stream($filename . ".pdf", array("Attachment" => 0));
+		}
+	}
+	function getReportPenjualanPerBarang_post()
+	{
+
+		$format_laporan =  $this->post('format_laporan', true);
+
+
+		$data = [];
+
+		$input = $this->post();
+
+		$lokasi_id = $input['lokasi_id'];
+		$tgl_mulai = $input['tgl_mulai'];
+		$tgl_akhir = $input['tgl_akhir'];
+		$format_laporan = $input['format_laporan'];
+
+		$lokasi = $this->db->query("select * from gbm_organisasi where id=" . $lokasi_id)->row_array();
+		if ($lokasi) {
+			$filter_lokasi = $lokasi['nama'];
+			$lokasi_id =  $lokasi_id;
+		} else {
+			$filter_lokasi = "Semua Lokasi";
+		}
+
+		$query = "SELECT lokasi_id,lokasi,kode_item,nama_item,uom,SUM(qty)AS qty,SUM(diskon)AS diskon,SUM(dp)AS dp,
+			SUM(total)AS total,SUM(nilai_piutang)as nilai_piutang,SUM(nilai_angsuran)AS nilai_angsuran
+			FROM sls_ttb_detail_vw
+			where tanggal between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
+			and lokasi_id  =" . $lokasi_id . "
+			GROUP BY lokasi_id,lokasi,kode_item,nama_item,uom
+			ORDER BY nama_item 
+		";
+		$dataDtl = $this->db->query($query)->result_array();
+
+
+		$data['data'] = 	$dataDtl;
+
+		$data['filter_lokasi'] = 	$filter_lokasi;
+		$data['filter_tgl_awal'] = 	$tgl_mulai;
+		$data['filter_tgl_akhir'] = $tgl_akhir;
+		$data['format_laporan'] = $format_laporan;
+
+		$html = $this->load->view('Sls_TTB_Laporan_Rekap_Per_Barang', $data, true);
+
+		// $filename = 'report_' . time();
+		// $this->pdfgenerator->generate($html, $filename, true, 'A4', 'landscape');
+		// echo $html;
+		if ($format_laporan == 'xls') {
+			echo $html;
+		} else if ($format_laporan == 'view') {
+			echo $html;
+		} else {
+			$filename = 'report_' . time();
+			// $this->pdfgenerator->generate($html, $filename, true, 'A4', 'landscape');
+			$dompdf = new DOMPDF;
+			$dompdf->loadHtml($html);
+			$dompdf->setPaper('A4', 'landscape');
+			$dompdf->render();
+			$filename = 'report_' . time();
+			$x          = 400;
+			$y          = 570;
+			$text       = "{PAGE_NUM} of {PAGE_COUNT}";
+			$font       = null; // $dompdf->getFontMetrics()->get_font('Helvetica', 'normal');
+			$size       = 10;
+			$color      = array(0, 0, 0);
+			$word_space = 0.0;
+			$char_space = 0.0;
+			$angle      = 0.0;
+
+			$dompdf->getCanvas()->page_text(
+				$x,
+				$y,
+				$text,
+				$font,
+				$size,
+				$color,
+				$word_space,
+				$char_space,
+				$angle
+			);
+			$dompdf->stream($filename . ".pdf", array("Attachment" => 0));
+		}
+	}
 	function getReportHarianRekap_post()
 	{
 
@@ -1500,8 +1664,41 @@ class SlsTTB extends BD_Controller
 
 		}
 
+		$query3 = "select demo_booker_id,demo_booker,  sum(qty)as qty,sum(total)as total,sum(diskon)as diskon 
+		from sls_ttb_detail_vw  
+			where (tanggal between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	)		
+			and  lokasi_id = " . $lokasi_id . " 
+			group by demo_booker_id,demo_booker
+			ORDER BY demo_booker; 
+		";
+		$dataByDemoBooker = $this->db->query($query3)->result_array();
+		foreach ($dataByDemoBooker as $key => $sls) {
+			$bonus = 0;
+			$komisi = 0;
+			$jumlah_bonus = 0;
+			$jumlah_komisi = 0;
+			$jumlah_komisi_bonus = 0;
+			$qty = $sls['qty'] ? $sls['qty'] : 0;
+			$getSkema = $this->db->query("select * from gbm_setting_premi where lokasi_id = " . $lokasi_id . "  and jabatan='DM'
+			and " . $qty . " between awal and akhir")->row_array();
+			if ($getSkema) {
+				$bonus = $getSkema['bonus'];
+				$komisi = $getSkema['komisi'];
+				$jumlah_bonus = $qty * $bonus;
+				$jumlah_komisi = $qty * $komisi;
+				$jumlah_komisi_bonus = $jumlah_bonus + $jumlah_komisi;
+			}
+			$dataBySalesSupervisor[$key]['bonus']=$bonus;
+			$dataBySalesSupervisor[$key]['komisi']=$komisi;
+			$dataBySalesSupervisor[$key]['jumlah_bonus']=$jumlah_bonus;
+			$dataBySalesSupervisor[$key]['jumlah_komisi']=$jumlah_komisi;
+			$dataBySalesSupervisor[$key]['jumlah_komisi_bonus']=$jumlah_komisi_bonus;
+
+		}
+
 		$data['dataBySales'] = 	$dataBySales;
 		$data['dataBySalesSupervisor'] = 	$dataBySalesSupervisor;
+		$data['dataByDemoBooker'] = 	$dataByDemoBooker;
 
 		$data['filter_lokasi'] = 	$filter_lokasi;
 		$data['filter_tgl_awal'] = 	$tgl_mulai;
