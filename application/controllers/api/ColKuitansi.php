@@ -1213,6 +1213,9 @@ class ColKuitansi extends BD_Controller
 			$this->cetakKuitansiDotMatrix_2_lembar();
 		} elseif ($jumlah_per_halaman == 4) {
 			$this->cetakKuitansi_4_lembar();
+		
+		} elseif ($jumlah_per_halaman == 1) {
+			$this->cetakKuitansiDotMatrix_1lembar();
 		} else {
 			// $this->cetakKuitansi_2_lembar();
 			$this->cetakKuitansiDotMatrix_2_lembar();
@@ -1689,7 +1692,7 @@ body {
 
 			// ===== BAWAH =====
 			if (isset($data_kuitansi[$i + 1])) {
-				$k2 = $this->generateKuitansiDotMatrix3($data_kuitansi[$i + 1], $i + 1, $lokasi);
+				$k2 = $this->generateKuitansiDotMatrix2Lembar($data_kuitansi[$i + 1], $i + 1, $lokasi);
 				$page .= $this->fixHeight($k2, 32);
 			}
 
@@ -1730,7 +1733,7 @@ body {
 		return implode("\n", $lines);
 	}
 
-	function generateKuitansiDotMatrix3($data, $idx, $lokasi)
+	function generateKuitansiDotMatrix2Lembar($data, $idx, $lokasi)
 	{
 		$rupiah = 'Rp ' . number_format($data['nilai_angsuran'], 0, ',', '.');
 
@@ -1746,6 +1749,111 @@ body {
 		$out .= wordwrap($lokasi['alamat'], 85, "\n") . "\n";
 		$out .= "Telp: " . $lokasi['no_telp'] . "\n";
 		$out .= str_repeat("=", 85) . "\n";
+		$out .= "KUITANSI\n";
+		$out .= "No Urut : #" . str_pad(($idx + 1), 3, '0', STR_PAD_LEFT) . "\n";
+		$out .= str_repeat("-", 85) . "\n";
+
+		$out .= $this->kiri("No Kuitansi", $data['no_kuitansi']) . "\n";
+		$out .= $this->kiri("Tanggal", tgl_indo($data['tanggal_tempo'])) . "\n";
+		$out .= $this->kiri("Angsuran", $data['angsuran_ke'] . '/' . $data['tenor']) . "\n";
+		$out .= $this->kiri("Customer", $data['nama_customer']) . "\n";
+
+		$out .= str_pad("Alamat", 20) . ": " . $alamatLines[0] . "\n";
+		for ($i = 1; $i < count($alamatLines); $i++) {
+			$out .= str_repeat(" ", 22) . $alamatLines[$i] . "\n";
+		}
+
+		$out .= str_repeat("-", 85) . "\n";
+		$out .= "Telah diterima uang sejumlah:\n";
+		$out .= $this->kanan($rupiah, 80) . "\n";
+
+		$terbilangLines = $this->wrapText(terbilang($data['nilai_angsuran']) . " Rupiah", 85);
+		foreach ($terbilangLines as $line) {
+			$out .= $line . "\n";
+		}
+
+		$out .= str_repeat("-", 85) . "\n";
+
+		$out .= "ADMIN                            COLLECTOR                 CUSTOMER\n";
+		$out .= "\n\n\n";
+		$out .= "(__________)                    (__________)              (__________)\n";
+
+		$out .= str_repeat("-", 85) . "\n";
+		$out .= "Dicetak: " . date('d/m/Y H:i') . "\n";
+
+		return $out;
+	}
+	function cetakKuitansiDotMatrix_1lembar()
+	{
+		$tanggal_awal = $this->post('tgl_mulai', true);
+		$tanggal_akhir = $this->post('tgl_akhir', true);
+
+		$lokasi_id = $this->post('lokasi_id');
+		$customer_id = $this->post('customer_id');
+
+		$query = " SELECT *
+        FROM col_kuitansi_vw 
+        WHERE tanggal_tempo BETWEEN '$tanggal_awal' AND '$tanggal_akhir'
+        AND lokasi_id = $lokasi_id";
+
+		if ($customer_id) {
+			$query .= " AND customer_id = $customer_id";
+		}
+
+		$query .= " ORDER BY customer_id, tanggal_tempo, no_kuitansi";
+
+		$data_kuitansi = $this->db->query($query)->result_array();
+		$lokasi = $this->db->query("SELECT * FROM gbm_organisasi WHERE id=$lokasi_id")->row_array();
+
+		$html = '<html>
+    <head>
+        <style>
+            body {
+                font-family: "Courier New", monospace;
+                font-size: 12px;
+            }
+        </style>
+    </head>
+    <body>
+    <pre>';
+
+		foreach ($data_kuitansi as $i => $row) {
+
+			$page = $this->generateKuitansiDotMatrix1Lembar($row, $i, $lokasi);
+
+			// 🔥 FIX TINGGI 15 CM (~38 baris)
+			$page = $this->fixHeightFullPage($page, 38);
+
+			// optional margin atas
+			$page = $this->addTopMargin($page, 1);
+
+			$html .= $page;
+
+			// 🔥 pindah halaman (WAJIB)
+			$html .= "\f";
+		}
+
+		$html .= '</pre></body></html>';
+
+		echo $html;
+	}
+	function generateKuitansiDotMatrix1Lembar($data, $idx, $lokasi)
+	{
+		$rupiah = 'Rp ' . number_format($data['nilai_angsuran'], 0, ',', '.');
+
+		$alamatFull = $data['alamat'] . ' Kel: ' . $data['kelurahan'] .
+			' Kec: ' . $data['kecamatan'] .
+			' ' . $data['kabupaten'];
+
+		$alamatLines = $this->wrapText($alamatFull, 60);
+
+		$out  = "";
+		$out .= str_repeat("=", 85) . "\n";
+		$out .= strtoupper($lokasi['nama_pt']) . "\n";
+		$out .= wordwrap($lokasi['alamat'], 85, "\n") . "\n";
+		$out .= "Telp: " . $lokasi['no_telp'] . "\n";
+		$out .= str_repeat("=", 85) . "\n";
+
 		$out .= "KUITANSI\n";
 		$out .= "No Urut : #" . str_pad(($idx + 1), 3, '0', STR_PAD_LEFT) . "\n";
 		$out .= str_repeat("-", 85) . "\n";
