@@ -1681,7 +1681,7 @@ body {
 
 			// ===== ATAS =====
 			if (isset($data_kuitansi[$i])) {
-				$k1 = $this->generateKuitansiDotMatrix3($data_kuitansi[$i], $i, $lokasi);
+				$k1 = $this->generateKuitansiDotMatrix2Lembar($data_kuitansi[$i], $i, $lokasi);
 				$page .= $this->fixHeight($k1, 32);
 			}
 
@@ -1764,10 +1764,10 @@ body {
 		}
 
 		$out .= str_repeat("-", 85) . "\n";
-		$out .= "Telah diterima uang sejumlah:\n";
-		$out .= $this->kanan($rupiah, 80) . "\n";
+		$out .= "Telah diterima uang sejumlah:";
+		$out .= $this->kanan($rupiah, 10) . "\n";
 
-		$terbilangLines = $this->wrapText(terbilang($data['nilai_angsuran']) . " Rupiah", 85);
+		$terbilangLines = $this->wrapText("# ".terbilang($data['nilai_angsuran']) . " Rupiah #", 85);
 		foreach ($terbilangLines as $line) {
 			$out .= $line . "\n";
 		}
@@ -1822,10 +1822,10 @@ body {
 			$page = $this->generateKuitansiDotMatrix1Lembar($row, $i, $lokasi);
 
 			// 🔥 FIX TINGGI 15 CM (~38 baris)
-			$page = $this->fixHeightFullPage($page, 38);
+			$page = $this->fixHeightFullPage($page, 35);
 
 			// optional margin atas
-			$page = $this->addTopMargin($page, 1);
+			// $page = $this->addTopMargin($page, 1);
 
 			$html .= $page;
 
@@ -1869,10 +1869,11 @@ body {
 		}
 
 		$out .= str_repeat("-", 85) . "\n";
-		$out .= "Telah diterima uang sejumlah:\n";
-		$out .= $this->kanan($rupiah, 80) . "\n";
+		// $out .= "Telah diterima uang sejumlah:\n";
+		$out .= "Telah diterima uang sejumlah:";
+		$out .= $this->kanan($rupiah, 10) . "\n";
 
-		$terbilangLines = $this->wrapText(terbilang($data['nilai_angsuran']) . " Rupiah", 85);
+		$terbilangLines = $this->wrapText("# ".terbilang($data['nilai_angsuran']) . " Rupiah #", 85);
 		foreach ($terbilangLines as $line) {
 			$out .= $line . "\n";
 		}

@@ -24,7 +24,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 |
 */
 // $config['base_url'] = 'http://app.thermosigma.com/API/'. empty($_SERVER["HTTP_NAMAPATH"])?'':$_SERVER["HTTP_NAMAPATH"];
-$config['base_url'] = 'http://localhost/directselling_api';
+$config['base_url'] = 'http://localhost:8080/directselling_api';
 /*
 |--------------------------------------------------------------------------
 | Index File
