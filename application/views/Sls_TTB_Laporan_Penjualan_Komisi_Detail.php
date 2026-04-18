@@ -258,6 +258,107 @@
 
 
 
+		<br>
+		<br>
+		<hr>
+
+		<h3>DEMO BOOKER </h3>
+		<table class="table-bg border">
+			<thead>
+				<tr>
+					<th style="width:2%">No</th>
+					<th style="width:12%">Customer</th>
+					<th style="width:9%">No TTB</th>
+					<th style="width:6%">Tgl TTB</th>
+					<th style="width:5%">Kode Item</th>
+					<th style="width:15%">Nama Item</th>
+					<th style="width:5%">Qty</th>
+					<th style="width:5%">Harga</th>
+					<th style="width:5%">Diskon</th>
+					<th style="width:5%">Jumlah</th>
+
+				</tr>
+
+			</thead>
+			<tbody>
+				<?php
+				$no = 0;
+				$jum_qty = 0;
+				$jum_diskon = 0;
+				$jum_total = 0;
+
+				$tot_qty = 0;
+				$tot_diskon = 0;
+				$tot_total = 0;
+
+				?>
+
+				<?php foreach ($demo_booker as $key => $s) { ?>
+					<?php
+					$data = $dataByDemoBooker[$s['id']];
+					$no = 0;
+					$jum_qty = 0;
+					$jum_diskon = 0;
+					$jum_total = 0;
+
+					?>
+					<tr>
+						<td colspan='12'><?= $s['nama'] ?></td>
+					</tr>
+					<?php foreach ($data as $key => $res) { ?>
+						<tr>
+							<?php
+							$no = $no + 1;
+							$jum_qty += $res['qty'];
+							$jum_diskon += $res['diskon'];
+							$jum_total += $res['total'];
+
+
+							$tot_qty += $res['qty'];
+							$tot_diskon += $res['diskon'];
+							$tot_total += $res['total'];
+
+
+							?>
+
+							<td center> <?= $no ?> </td>
+							<td left><?= $res['nama_customer'] ?></td>
+							<td left> <?= $res['no_ttb'] ?></td>
+							<td center><?= tgl_indo($res['tanggal']) ?></td>
+							<td center><?= $res['kode_item'] ?></td>
+							<td left><?= $res['nama_item'] ?></td>
+							<td right><?= format_number_report($res['qty'], $format_laporan) ?></td>
+							<td right><?= format_number_report($res['harga'], $format_laporan) ?></td>
+							<td right><?= format_number_report($res['diskon'], $format_laporan) ?></td>
+							<td right><?= format_number_report($res['total'], $format_laporan) ?></td>
+
+						</tr>
+					<?php } ?>
+					<tr>
+						<td colspan=6><strong>Total <?= $s['nama'] ?></strong></td>
+						<td right><strong><?= format_number_report($jum_qty, $format_laporan) ?></strong></td>
+						<td right><strong></strong></td>
+						<td right><strong><?= format_number_report($jum_diskon, $format_laporan) ?></strong></td>
+						<td right><strong><?= format_number_report($jum_total, $format_laporan) ?></strong></td>
+					</tr>
+				<?php } ?>
+
+				<tr>
+					<td colspan=6><strong>Total</strong> </td>
+					<td right><strong><?= format_number_report($tot_qty, $format_laporan) ?></strong></td>
+					<td right><strong></strong></td>
+					<td right><strong><?= format_number_report($tot_diskon, $format_laporan) ?></strong></td>
+					<td right><strong><?= format_number_report($tot_total, $format_laporan) ?></strong></td>
+
+				</tr>
+
+
+			</tbody>
+			<tfoot></tfoot>
+		</table>
+
+
+
 	</body>
 
 	</html>

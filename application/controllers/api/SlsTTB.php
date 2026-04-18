@@ -1511,16 +1511,22 @@ class SlsTTB extends BD_Controller
 		$res = $this->db->query($query)->result_array();
 		$dataBySales = [];
 		$dataBySalesSupervisor = [];
+		$dataByDemoBooker = [];
 		$sales = [];
 		$sales_supervisor = [];
+		$demo_booker = [];
 		foreach ($res as $key => $v) {
 			$sales_id = $v['sales_id'];
 			$sales_supervisor_id = $v['sales_supervisor_id'];
+			$demo_booker_id = $v['demo_booker_id'];
 			$dataBySales[$sales_id][] = $v;
 			$sales[$sales_id] = array('id' => $sales_id, 'nama' => $v['sales']);
 
 			$dataBySalesSupervisor[$sales_supervisor_id][] = $v;
 			$sales_supervisor[$sales_supervisor_id] = array('id' => $sales_supervisor_id, 'nama' => $v['sales_supervisor']);
+
+			$dataByDemoBooker[$demo_booker_id][] = $v;
+			$demo_booker[$demo_booker_id] = array('id' => $demo_booker_id, 'nama' => $v['demo_booker']);
 		}
 
 
@@ -1530,6 +1536,9 @@ class SlsTTB extends BD_Controller
 
 		$data['dataBySalesSupervisor'] = 	$dataBySalesSupervisor;
 		$data['sales_supervisor'] = 	$sales_supervisor;
+
+		$data['dataByDemoBooker'] = 	$dataByDemoBooker;
+		$data['demo_booker'] = 	$demo_booker;
 
 		$data['filter_lokasi'] = 	$filter_lokasi;
 		$data['filter_tgl_awal'] = 	$tgl_mulai;
