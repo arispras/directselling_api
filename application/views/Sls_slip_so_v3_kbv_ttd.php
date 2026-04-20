@@ -250,7 +250,7 @@
 							<td bold >Procurement Office :</td>
 						</tr>
 						<tr>
-							<td left bold> <i>PT. Annajah Technology Indonesia</i> </td>
+							<td left bold> <i>PT SAHABAT</i> </td>
 						</tr>
 						<tr>
 							<td>&nbsp;</td>

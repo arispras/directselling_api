@@ -1,16 +1,6 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 require 'vendor/autoload.php';
 
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-
-use PhpOffice\PhpSpreadsheet\Shared\Date;
-use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
-use PhpOffice\PhpSpreadsheet\Cell\DataType;
-use PhpOffice\PhpSpreadsheet\Style\Border;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
-use PhpOffice\PhpSpreadsheet\IOFactory;
-use Carbon\Carbon;
 use Restserver\Libraries\REST_Controller;
 
 class AccJurnal extends BD_Controller //Rest_Controller
@@ -146,7 +136,7 @@ class AccJurnal extends BD_Controller //Rest_Controller
 	}
 	function import_detail_post()
 	{
-		
+
 		$config['upload_path']   = $this->get_path_file();
 		$config['allowed_types'] = 'Xls|xls';
 		// $config['max_size']      = '0';
@@ -155,7 +145,7 @@ class AccJurnal extends BD_Controller //Rest_Controller
 		$config['overwrite'] = true;
 		$config['file_name']     = 'import_jurnal.xls';
 		$this->upload->initialize($config);
-		
+
 		if ($this->upload->do_upload()) {
 			$upload_data = $this->upload->data();
 			$filename = $upload_data['file_name'];
@@ -199,8 +189,8 @@ class AccJurnal extends BD_Controller //Rest_Controller
 			if (!empty($_FILES['userfile']['tmp_name'])) {
 				$this->set_response([
 					'status' => 'NOT OK',
-					'message' => 'Gagal import' ,
-					'data'=>$this->upload->display_errors(),
+					'message' => 'Gagal import',
+					'data' => $this->upload->display_errors(),
 				], REST_Controller::HTTP_OK);
 			}
 		}
@@ -393,9 +383,9 @@ class AccJurnal extends BD_Controller //Rest_Controller
   <div class="span12">
 	  <br>
 	<div class="kop-print">
-    <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-    <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-    <div class="kop-info">Telp : 081387373939</div>
+    <div class="kop-nama">PT SAHABAT</div>
+    <div class="kop-info"> KOTA BOGOR</div>
+    <div class="kop-info">Telp : -</div>
   </div>
 	  <hr class="kop-print-hr">
   </div>
@@ -630,9 +620,9 @@ class AccJurnal extends BD_Controller //Rest_Controller
   <div class="span12">
 	  <br>
 	<div class="kop-print">
-    <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-    <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-    <div class="kop-info">Telp : 081387373939</div>
+    <div class="kop-nama">PT SAHABAT</div>
+    <div class="kop-info"> KOTA BOGOR</div>
+    <div class="kop-info">Telp : -</div>
   </div>
 	  <hr class="kop-print-hr">
   </div>
@@ -838,9 +828,9 @@ class AccJurnal extends BD_Controller //Rest_Controller
 <div class="span12">
 	<br>
 	<div class="kop-print">
-    <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-    <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-    <div class="kop-info">Telp : 081387373939</div>
+    <div class="kop-nama">PT SAHABAT</div>
+    <div class="kop-info"> KOTA BOGOR</div>
+    <div class="kop-info">Telp : -</div>
   </div>
 	  <hr class="kop-print-hr">
 </div>
@@ -1015,9 +1005,9 @@ class AccJurnal extends BD_Controller //Rest_Controller
 <div class="span12">
 	<br>
 	<div class="kop-print">
-    <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-    <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-    <div class="kop-info">Telp : 081387373939</div>
+    <div class="kop-nama">PT SAHABAT</div>
+    <div class="kop-info"> KOTA BOGOR</div>
+    <div class="kop-info">Telp : -</div>
   </div>
 	  <hr class="kop-print-hr">
 </div>
@@ -1192,9 +1182,9 @@ class AccJurnal extends BD_Controller //Rest_Controller
 <div class="span12">
 	<br>
 	<div class="kop-print">
-    <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-    <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-    <div class="kop-info">Telp : 081387373939</div>
+    <div class="kop-nama">PT SAHABAT</div>
+    <div class="kop-info"> KOTA BOGOR</div>
+    <div class="kop-info">Telp : -</div>
   </div>
 	  <hr class="kop-print-hr">
 </div>
@@ -1383,9 +1373,9 @@ class AccJurnal extends BD_Controller //Rest_Controller
 <div class="span12">
 	<br>
 	<div class="kop-print">
-    <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-    <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-    <div class="kop-info">Telp : 081387373939</div>
+    <div class="kop-nama">PT SAHABAT</div>
+    <div class="kop-info"> KOTA BOGOR</div>
+    <div class="kop-info">Telp : -</div>
   </div>
 	  <hr class="kop-print-hr">
 </div>
@@ -1556,9 +1546,9 @@ class AccJurnal extends BD_Controller //Rest_Controller
 <div class="span12">
 	<br>
 	<div class="kop-print">
-    <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-    <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-    <div class="kop-info">Telp : 081387373939</div>
+    <div class="kop-nama">PT SAHABAT</div>
+    <div class="kop-info"> KOTA BOGOR</div>
+    <div class="kop-info">Telp : -</div>
   </div>
 	  <hr class="kop-print-hr">
 </div>
@@ -1730,9 +1720,9 @@ class AccJurnal extends BD_Controller //Rest_Controller
 <div class="span12">
 	<br>
 	<div class="kop-print">
-    <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-    <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-    <div class="kop-info">Telp : 081387373939</div>
+    <div class="kop-nama">PT SAHABAT</div>
+    <div class="kop-info"> KOTA BOGOR</div>
+    <div class="kop-info">Telp : -</div>
   </div>
 	  <hr class="kop-print-hr">
 </div>
@@ -1974,9 +1964,9 @@ class AccJurnal extends BD_Controller //Rest_Controller
 		<div class="span12">
 			<br>
 		  <div class="kop-print">
-		  <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-		  <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-		  <div class="kop-info">Telp : 081387373939</div>
+		  <div class="kop-nama">PT SAHABAT</div>
+		  <div class="kop-info"> KOTA BOGOR</div>
+		  <div class="kop-info">Telp : -</div>
 		</div>
 			<hr class="kop-print-hr">
 		</div>
@@ -2129,33 +2119,33 @@ class AccJurnal extends BD_Controller //Rest_Controller
 					$jumlah =  $jumlahLaba;
 
 					// if ($tanggal_mulai <= '2022-12-31') { // SAldo awal diinput tgl 31 Des 2022
-						/* hitung akun laba berjalan yg dinput manual di jurnal */
-						$queryLabaBerjalan = "SELECT b.acc_akun_id,sum(debet-kredit)as jumlah FROM acc_jurnal_ht a inner join acc_jurnal_dt b 
+					/* hitung akun laba berjalan yg dinput manual di jurnal */
+					$queryLabaBerjalan = "SELECT b.acc_akun_id,sum(debet-kredit)as jumlah FROM acc_jurnal_ht a inner join acc_jurnal_dt b 
 						on a.id=b.jurnal_id
 						where b.acc_akun_id=" . $akun['id'] . " 
 						and a.tanggal <= '" . $tanggal_akhir . "' and b.lokasi_id=" . $lokasi_array['id'] . "
 						group by b.acc_akun_id ;";
-						$resJumlahLabaBerjalan  = $this->db->query($queryLabaBerjalan)->row_array();
-						$JumlahLabaBerjalan = (!empty($resJumlahLabaBerjalan['jumlah'])) ? ($resJumlahLabaBerjalan['jumlah'] * -1) : 0;
-						$jumlah = $jumlah + $JumlahLabaBerjalan;
+					$resJumlahLabaBerjalan  = $this->db->query($queryLabaBerjalan)->row_array();
+					$JumlahLabaBerjalan = (!empty($resJumlahLabaBerjalan['jumlah'])) ? ($resJumlahLabaBerjalan['jumlah'] * -1) : 0;
+					$jumlah = $jumlah + $JumlahLabaBerjalan;
 					// }
 				} elseif ($akun_laba_ditahan == $akun['id']) {
 					// $jumlah = $labaditahanTahunLalu[$lokasi_array['id']];
-					$jumlah =0;
+					$jumlah = 0;
 
 					// if ($tanggal_mulai <= '2022-12-31') { // SAldo awal diinput tgl 31 Des 2022
-						/* hitung akun laba berjalan yg dinput manual di jurnal */
-						$queryLabaDitahan = "SELECT b.acc_akun_id,sum(debet-kredit)as jumlah FROM acc_jurnal_ht a inner join acc_jurnal_dt b 
+					/* hitung akun laba berjalan yg dinput manual di jurnal */
+					$queryLabaDitahan = "SELECT b.acc_akun_id,sum(debet-kredit)as jumlah FROM acc_jurnal_ht a inner join acc_jurnal_dt b 
 						on a.id=b.jurnal_id
 						where b.acc_akun_id=" . $akun['id'] . " 
 						and a.tanggal <= '" . $tanggal_akhir . "' and b.lokasi_id=" . $lokasi_array['id'] . "
 						group by b.acc_akun_id ;";
-						
-						$resJumlahLabaDitahan  = $this->db->query($queryLabaDitahan)->row_array();
 
-						$jumlahLabaDitahan = (!empty($resJumlahLabaDitahan['jumlah'])) ? ($resJumlahLabaDitahan['jumlah'] * -1) : 0;
+					$resJumlahLabaDitahan  = $this->db->query($queryLabaDitahan)->row_array();
 
-						$jumlah = $jumlah + $jumlahLabaDitahan;
+					$jumlahLabaDitahan = (!empty($resJumlahLabaDitahan['jumlah'])) ? ($resJumlahLabaDitahan['jumlah'] * -1) : 0;
+
+					$jumlah = $jumlah + $jumlahLabaDitahan;
 					// }
 				} else {
 					$query1 = "SELECT b.acc_akun_id,sum(debet-kredit)as jumlah FROM acc_jurnal_ht a inner join acc_jurnal_dt b 
@@ -2294,9 +2284,9 @@ class AccJurnal extends BD_Controller //Rest_Controller
 		<div class="span12">
 			<br>
 		  <div class="kop-print">
-		  <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-		  <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-		  <div class="kop-info">Telp : 081387373939</div>
+		  <div class="kop-nama">PT SAHABAT</div>
+		  <div class="kop-info"> KOTA BOGOR</div>
+		  <div class="kop-info">Telp : -</div>
 		</div>
 			<hr class="kop-print-hr">
 		</div>
@@ -2541,6 +2531,14 @@ class AccJurnal extends BD_Controller //Rest_Controller
 		$tanggal_akhir =  $this->post('tgl_akhir', true);
 		$format_laporan =  $this->post('format_laporan', true);
 		$judulLokasi = 'Semua';
+		$lokasi_id = $this->post('lokasi_id', true);
+		$lokasi = $this->db->query("select * from gbm_organisasi where id='$lokasi_id'")->row_array();
+		if ($lokasi) {
+			$judulLokasi = $lokasi['nama'];
+			$lokasi = array($lokasi);
+		} else {
+			$judulLokasi = 'Semua';
+		}
 
 		/* Ambil AKUN */
 		$queryAkunAktiva = "select * from acc_akun
@@ -2588,14 +2586,14 @@ class AccJurnal extends BD_Controller //Rest_Controller
 		<div class="span12">
 			<br>
 		  <div class="kop-print">
-		  <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-		  <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-		  <div class="kop-info">Telp : 081387373939</div>
+		  <div class="kop-nama">PT SAHABAT</div>
+		  <div class="kop-info"> KOTA BOGOR</div>
+		  <div class="kop-info">Telp : -</div>
 		</div>
 			<hr class="kop-print-hr">
 		</div>
 		</div>
-		<h3 class="title">LAPORAN NERACA V2</h3>
+		<h3 class="title"> NERACA </h3>
 		<table class="no_border" style="width:30%">
 				  
 				  
@@ -2603,6 +2601,11 @@ class AccJurnal extends BD_Controller //Rest_Controller
 						  <td style="width:20%">Periode</td>
 						  <td>:</td>
 						  <td>' . $tanggal_akhir . '</td>
+				  </tr>
+				    <tr>	
+						  <td style="width:20%">Lokasi</td>
+						  <td>:</td>
+						  <td>' . $judulLokasi . '</td>
 				  </tr>
 	  
 				  
@@ -2637,15 +2640,19 @@ class AccJurnal extends BD_Controller //Rest_Controller
 				where b.acc_akun_id=" . $akun['id'] . " 
 				and a.tanggal <= '" . $tanggal_akhir . "' 
 				group by b.acc_akun_id ;";
-			} else  if ($tipe_laporan == 'v2') { // Selain SBNE
+			} else  if ($tipe_laporan == 'v2') { // Selain 
 				$query1 = "SELECT b.acc_akun_id,sum(debet-kredit)as jumlah FROM acc_jurnal_ht a inner join acc_jurnal_dt b 
 				on a.id=b.jurnal_id
 				inner join gbm_organisasi c on b.lokasi_id=c.id
 				where b.acc_akun_id=" . $akun['id'] . " 
-				and a.tanggal <= '" . $tanggal_akhir . "' 
-				and c.kode not in('SBME')
-				group by b.acc_akun_id ;";
-			} elseif ($tipe_laporan == 'v3') { // SBME saja
+				and a.tanggal <= '" . $tanggal_akhir . "' ";
+
+				if ($lokasi_id) {
+					$query1 = $query1 . " and b.lokasi_id = " . $lokasi_id;
+				}
+
+				$query1 = $query1 . " group by b.acc_akun_id ;";
+			} elseif ($tipe_laporan == 'v3') { // 
 				$query1 = "SELECT b.acc_akun_id,sum(debet-kredit)as jumlah FROM acc_jurnal_ht a inner join acc_jurnal_dt b 
 				on a.id=b.jurnal_id
 				inner join gbm_organisasi c on b.lokasi_id=c.id
@@ -2699,8 +2706,10 @@ class AccJurnal extends BD_Controller //Rest_Controller
 			inner join acc_akun c on c.id=b.acc_akun_id
 			inner join gbm_organisasi d on b.lokasi_id=d.id
 			where ( c.kode like '5%' or c.kode like '6%' or c.kode like '7%' or c.kode like '8%' or c.kode like '9%') 
-			and d.kode not in('SBME')
-			and a.tanggal < '" . $tanggal_mulai . "' ";
+			and a.tanggal < '" . $tanggal_mulai . "'";
+			if ($lokasi_id) {
+				$query1 = $query1 . " and b.lokasi_id = " . $lokasi_id;
+			}
 		} else 	if ($tipe_laporan == 'v3') {
 			$query1 = "SELECT sum(debet-kredit)as jumlah FROM acc_jurnal_ht a 
 			inner join acc_jurnal_dt b 	on a.id=b.jurnal_id
@@ -2728,9 +2737,12 @@ class AccJurnal extends BD_Controller //Rest_Controller
 					on a.id=b.jurnal_id
 					inner join gbm_organisasi c on b.lokasi_id=c.id
 					where b.acc_akun_id=" . $akun_laba_berjalan . " 
-					and a.tanggal < '" . $tanggal_mulai . "' 
-					and c.kode not in('SBME') 
-					group by b.acc_akun_id ;";
+					and a.tanggal < '" . $tanggal_mulai . "' ";
+			if ($lokasi_id) {
+				$query1 = $query1 . " and b.lokasi_id = " . $lokasi_id;
+			}
+
+			$query1 = $query1 . " 	group by b.acc_akun_id ;";
 		} else if ($tipe_laporan == 'v3') {
 			$query1 = "SELECT b.acc_akun_id,sum(debet-kredit)as jumlah FROM acc_jurnal_ht a inner join acc_jurnal_dt b 
 					on a.id=b.jurnal_id
@@ -2761,9 +2773,12 @@ class AccJurnal extends BD_Controller //Rest_Controller
 				on a.id=b.jurnal_id
 				inner join gbm_organisasi c on b.lokasi_id=c.id
 				where b.acc_akun_id=" . $akun_laba_ditahan . " 
-				and a.tanggal < '" . $tanggal_mulai . "'
-				and c.kode not in('SBME') 
-				group by b.acc_akun_id ;";
+				and a.tanggal < '" . $tanggal_mulai . "'";
+			if ($lokasi_id) {
+				$query1 = $query1 . " and b.lokasi_id = " . $lokasi_id;
+			}
+
+			$query1 = $query1 . " 	group by b.acc_akun_id ;";
 		} else if ($tipe_laporan == 'v3') {
 			$query1 = "SELECT b.acc_akun_id,sum(debet-kredit)as jumlah FROM acc_jurnal_ht a inner join acc_jurnal_dt b 
 				on a.id=b.jurnal_id
@@ -2776,7 +2791,7 @@ class AccJurnal extends BD_Controller //Rest_Controller
 		$resJLaba  = $this->db->query($query1)->row_array();
 		$jLaba3 = (!empty($resJLaba['jumlah'])) ? ($resJLaba['jumlah'] * -1) : 0;
 		// $labarugi_ditahan = $jLaba1 + $jLaba2 + $jLaba3;
-		$labarugi_ditahan =$jLaba3;
+		$labarugi_ditahan = $jLaba3;
 		$labaditahanTahunLalu = $labarugi_ditahan;
 
 
@@ -2796,7 +2811,13 @@ class AccJurnal extends BD_Controller //Rest_Controller
 				on a.id=b.jurnal_id
 				where b.acc_akun_id=" . $akun['id'] . " 
 				and a.tanggal <= '" . $tanggal_akhir . "' 
-				group by b.acc_akun_id ;";
+				";
+			if ($lokasi_id) {
+				$query1 = $query1 . " and b.lokasi_id = " . $lokasi_id;
+			}
+
+			$query1 = $query1 . " 	group by b.acc_akun_id ;";
+
 
 			$resJumlah  = $this->db->query($query1)->row_array();
 			$jumlah = (!empty($resJumlah['jumlah'])) ? ($resJumlah['jumlah'] * -1) : 0;
@@ -2814,15 +2835,17 @@ class AccJurnal extends BD_Controller //Rest_Controller
 					inner join acc_akun c on c.id=b.acc_akun_id
 					where ( c.kode like '5%' or c.kode like '6%' or c.kode like '7%' or c.kode like '8%' or c.kode like '9%') 
 					and (a.tanggal <= '" . $tanggal_akhir . "') ;";
-
 				} else 	if ($tipe_laporan == 'v2') {
 					$query2 = "SELECT sum(debet-kredit)as jumlah FROM acc_jurnal_ht a 
 					inner join acc_jurnal_dt b 	on a.id=b.jurnal_id
 					inner join acc_akun c on c.id=b.acc_akun_id
 					inner join gbm_organisasi d on b.lokasi_id=d.id
-					where ( c.kode like '5%' or c.kode like '6%' or c.kode like '7%' or c.kode like '8%' or c.kode like '9%') 
+					where (c.kode like '4%' or c.kode like '5%' or c.kode like '6%' or c.kode like '7%' or c.kode like '8%' or c.kode like '9%') 
 					and (a.tanggal >= '" . $tanggal_mulai . "' and a.tanggal <= '" . $tanggal_akhir . "')
-					and c.kode not in ('SBME')  ;";
+					";
+					if ($lokasi_id) {
+						$query2 = $query2 . " and b.lokasi_id = " . $lokasi_id;
+					}
 				} else 	if ($tipe_laporan == 'v3') {
 					$query2 = "SELECT sum(debet-kredit)as jumlah FROM acc_jurnal_ht a 
 					inner join acc_jurnal_dt b 	on a.id=b.jurnal_id
@@ -2838,75 +2861,81 @@ class AccJurnal extends BD_Controller //Rest_Controller
 				$jumlah =  $jumlahLaba;
 
 				// if ($tanggal_mulai <= '2022-12-31') { // Saldo awla diinput 31-des 2022
-					/* hitung akun laba berjalan yg dinput manual di jurnal */
-					if ($tipe_laporan == 'v1') {
-						$queryLabaBerjalan = "SELECT b.acc_akun_id,sum(debet-kredit)as jumlah FROM acc_jurnal_ht a inner join acc_jurnal_dt b 
+				/* hitung akun laba berjalan yg dinput manual di jurnal */
+				if ($tipe_laporan == 'v1') {
+					$queryLabaBerjalan = "SELECT b.acc_akun_id,sum(debet-kredit)as jumlah FROM acc_jurnal_ht a inner join acc_jurnal_dt b 
 						on a.id=b.jurnal_id
 						where b.acc_akun_id=" . $akun['id'] . " 
 						and a.tanggal <= '" . $tanggal_akhir . "' 
 						group by b.acc_akun_id ;";
-					} else if ($tipe_laporan == 'v2') {
-						$queryLabaBerjalan = "SELECT b.acc_akun_id,sum(debet-kredit)as jumlah FROM acc_jurnal_ht a inner join acc_jurnal_dt b 
+				} else if ($tipe_laporan == 'v2') {
+					$queryLabaBerjalan = "SELECT b.acc_akun_id,sum(debet-kredit)as jumlah FROM acc_jurnal_ht a inner join acc_jurnal_dt b 
 						on a.id=b.jurnal_id
 						inner join gbm_organisasi c on b.lokasi_id=c.id
 						where b.acc_akun_id=" . $akun['id'] . " 
-						and a.tanggal <= '" . $tanggal_akhir . "' 
-						and c.kode not in ('SBME')
-						group by b.acc_akun_id ;";
-					} else if ($tipe_laporan == 'v3') {
-						$queryLabaBerjalan = "SELECT b.acc_akun_id,sum(debet-kredit)as jumlah FROM acc_jurnal_ht a inner join acc_jurnal_dt b 
+						and a.tanggal <= '" . $tanggal_akhir . "' ";
+					if ($lokasi_id) {
+						$query1 = $query1 . " and b.lokasi_id = " . $lokasi_id;
+					}
+
+					$query1 = $query1 . " 	group by b.acc_akun_id ;";
+				} else if ($tipe_laporan == 'v3') {
+					$queryLabaBerjalan = "SELECT b.acc_akun_id,sum(debet-kredit)as jumlah FROM acc_jurnal_ht a inner join acc_jurnal_dt b 
 						on a.id=b.jurnal_id
 						inner join gbm_organisasi c on b.lokasi_id=c.id
 						where b.acc_akun_id=" . $akun['id'] . " 
 						and a.tanggal <= '" . $tanggal_akhir . "' 
 						and c.kode  in ('SBME')
 						group by b.acc_akun_id ;";
-					}
-					$resJumlahLabaBerjalan  = $this->db->query($queryLabaBerjalan)->row_array();
-					$JumlahLabaBerjalan = (!empty($resJumlahLabaBerjalan['jumlah'])) ? ($resJumlahLabaBerjalan['jumlah'] * -1) : 0;
-					$jumlah = $jumlah + $JumlahLabaBerjalan;
+				}
+				$resJumlahLabaBerjalan  = $this->db->query($queryLabaBerjalan)->row_array();
+				$JumlahLabaBerjalan = (!empty($resJumlahLabaBerjalan['jumlah'])) ? ($resJumlahLabaBerjalan['jumlah'] * -1) : 0;
+				$jumlah = $jumlah + $JumlahLabaBerjalan;
 				// }
 			} elseif ($akun_laba_ditahan == $akun['id']) {
 				// $jumlah = $labaditahanTahunLalu;
 				$jumlah = 0;
 				// if ($tanggal_mulai <= '2022-12-31') { // SAldo awal diinput tgl 31 Des 2022
-					/* hitung akun laba berjalan yg dinput manual di jurnal */
-					if ($tipe_laporan == 'v1') {
-						$queryLabaDitahan = "SELECT b.acc_akun_id,sum(debet-kredit)as jumlah FROM acc_jurnal_ht a inner join acc_jurnal_dt b 
+				/* hitung akun laba berjalan yg dinput manual di jurnal */
+				if ($tipe_laporan == 'v1') {
+					$queryLabaDitahan = "SELECT b.acc_akun_id,sum(debet-kredit)as jumlah FROM acc_jurnal_ht a inner join acc_jurnal_dt b 
 						on a.id=b.jurnal_id
 						where b.acc_akun_id=" . $akun['id'] . " 
 						and a.tanggal <= '" . $tanggal_akhir . "'
 						group by b.acc_akun_id ;";
-					} else if ($tipe_laporan == 'v2') {
-						$queryLabaDitahan = "SELECT b.acc_akun_id,sum(debet-kredit)as jumlah FROM acc_jurnal_ht a inner join acc_jurnal_dt b 
+				} else if ($tipe_laporan == 'v2') {
+					$queryLabaDitahan = "SELECT b.acc_akun_id,sum(debet-kredit)as jumlah FROM acc_jurnal_ht a inner join acc_jurnal_dt b 
 						on a.id=b.jurnal_id
 						inner join gbm_organisasi c on b.lokasi_id=c.id
 						where b.acc_akun_id=" . $akun['id'] . " 
-						and a.tanggal <= '" . $tanggal_akhir . "'
-						and c.kode not in ('SBME')
-						group by b.acc_akun_id ;";
+						and a.tanggal <= '" . $tanggal_akhir . "'";
+					if ($lokasi_id) {
+						$query1 = $query1 . " and b.lokasi_id = " . $lokasi_id;
 					}
-					if ($tipe_laporan == 'v3') {
-						$queryLabaDitahan = "SELECT b.acc_akun_id,sum(debet-kredit)as jumlah FROM acc_jurnal_ht a inner join acc_jurnal_dt b 
+
+					$query1 = $query1 . " 	group by b.acc_akun_id ;";
+				}
+				if ($tipe_laporan == 'v3') {
+					$queryLabaDitahan = "SELECT b.acc_akun_id,sum(debet-kredit)as jumlah FROM acc_jurnal_ht a inner join acc_jurnal_dt b 
 						on a.id=b.jurnal_id
 						inner join gbm_organisasi c on b.lokasi_id=c.id
 						where b.acc_akun_id=" . $akun['id'] . " 
 						and a.tanggal <= '" . $tanggal_akhir . "'
 						and c.kode  in ('SBME')
 						group by b.acc_akun_id ;";
-					}
+				}
 
-					$resJumlahLabaDitahan  = $this->db->query($queryLabaDitahan)->row_array();
+				$resJumlahLabaDitahan  = $this->db->query($queryLabaDitahan)->row_array();
 
-					$jumlahLabaDitahan = (!empty($resJumlahLabaDitahan['jumlah'])) ? ($resJumlahLabaDitahan['jumlah'] * -1) : 0;
+				$jumlahLabaDitahan = (!empty($resJumlahLabaDitahan['jumlah'])) ? ($resJumlahLabaDitahan['jumlah'] * -1) : 0;
 
-					$jumlah = $jumlah + $jumlahLabaDitahan;
+				$jumlah = $jumlah + $jumlahLabaDitahan;
 				// }
 			}
 
 			$total = $total + $jumlah;
 			$grandtotal = $grandtotal + $jumlah;
-			$html = $html . "<td style='text-align: right'>" . $this->format_number_report($total) . " </td>";
+			$html = $html . "<td style='text-align: right'>" . $this->format_number_report($jumlah) . " </td>";
 			$html = $html . "</tr>";
 		}
 
@@ -2924,19 +2953,20 @@ class AccJurnal extends BD_Controller //Rest_Controller
 			$spreadsheet = $reader->loadFromString($html);
 			// $reader->setSheetIndex(1);
 			//$spreadhseet = $reader->loadFromString($secondHtmlString, $spreadsheet);
-			$objWriter = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
-			header("Pragma: public");
-			header("Expires: 0");
-			header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-			header("Content-Type: application/force-download");
-			header("Content-Type: application/octet-stream");
-			header("Content-Type: application/download");
-			header("Content-Disposition: attachment;filename=test.xlsx");
-			header("Content-Transfer-Encoding: binary ");
+			// $objWriter = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
+			// header("Pragma: public");
+			// header("Expires: 0");
+			// header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+			// header("Content-Type: application/force-download");
+			// header("Content-Type: application/octet-stream");
+			// header("Content-Type: application/download");
+			// header("Content-Disposition: attachment;filename=test.xlsx");
+			// header("Content-Transfer-Encoding: binary ");
 
-			ob_end_clean();
-			ob_start();
-			$objWriter->save('php://output');
+			// ob_end_clean();
+			// ob_start();
+			// $objWriter->save('php://output');
+			echo $html;
 		} else if ($format_laporan == 'view') {
 			echo $html;
 		} else {
@@ -2997,9 +3027,9 @@ class AccJurnal extends BD_Controller //Rest_Controller
 		<div class="span12">
 			<br>
 		  <div class="kop-print">
-		  <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-		  <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-		  <div class="kop-info">Telp : 081387373939</div>
+		  <div class="kop-nama">PT SAHABAT</div>
+		  <div class="kop-info"> KOTA BOGOR</div>
+		  <div class="kop-info">Telp : -</div>
 		</div>
 			<hr class="kop-print-hr">
 		</div>
@@ -3246,9 +3276,9 @@ class AccJurnal extends BD_Controller //Rest_Controller
 		<div class="span12">
 			<br>
 		  <div class="kop-print">
-		  <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-		  <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-		  <div class="kop-info">Telp : 081387373939</div>
+		  <div class="kop-nama">PT SAHABAT</div>
+		  <div class="kop-info"> KOTA BOGOR</div>
+		  <div class="kop-info">Telp : -</div>
 		</div>
 			<hr class="kop-print-hr">
 		</div>
@@ -3680,9 +3710,9 @@ class AccJurnal extends BD_Controller //Rest_Controller
 		<div class="span12">
 			<br>
 		  <div class="kop-print">
-		  <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-		  <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-		  <div class="kop-info">Telp : 081387373939</div>
+		  <div class="kop-nama">PT SAHABAT</div>
+		  <div class="kop-info"> KOTA BOGOR</div>
+		  <div class="kop-info">Telp : -</div>
 		</div>
 			<hr class="kop-print-hr">
 		</div>
@@ -4024,9 +4054,9 @@ class AccJurnal extends BD_Controller //Rest_Controller
 		<div class="span12">
 			<br>
 		  <div class="kop-print">
-		  <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-		  <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-		  <div class="kop-info">Telp : 081387373939</div>
+		  <div class="kop-nama">PT SAHABAT</div>
+		  <div class="kop-info"> KOTA BOGOR</div>
+		  <div class="kop-info">Telp : -</div>
 		</div>
 			<hr class="kop-print-hr">
 		</div>
@@ -4359,9 +4389,9 @@ class AccJurnal extends BD_Controller //Rest_Controller
 		<div class="span12">
 			<br>
 		  <div class="kop-print">
-		  <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-		  <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-		  <div class="kop-info">Telp : 081387373939</div>
+		  <div class="kop-nama">PT SAHABAT</div>
+		  <div class="kop-info"> KOTA BOGOR</div>
+		  <div class="kop-info">Telp : -</div>
 		</div>
 			<hr class="kop-print-hr">
 		</div>
@@ -4701,9 +4731,9 @@ class AccJurnal extends BD_Controller //Rest_Controller
 		<div class="span12">
 			<br>
 		  <div class="kop-print">
-		  <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-		  <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-		  <div class="kop-info">Telp : 081387373939</div>
+		  <div class="kop-nama">PT SAHABAT</div>
+		  <div class="kop-info"> KOTA BOGOR</div>
+		  <div class="kop-info">Telp : -</div>
 		</div>
 			<hr class="kop-print-hr">
 		</div>
@@ -5172,7 +5202,17 @@ class AccJurnal extends BD_Controller //Rest_Controller
 		$tanggal_mulai =  $this->post('tgl_mulai', true);
 		$tanggal_akhir =  $this->post('tgl_akhir', true);
 		$format_laporan =  $this->post('format_laporan', true);
-		$judulLokasi = 'Semua';
+		$lokasi_id = $this->post('lokasi_id', true);
+		$lokasi = $this->db->query("select * from gbm_organisasi where id='$lokasi_id'")->row_array();
+		if ($lokasi) {
+			$judulLokasi = $lokasi['nama'];
+			$lokasi = array($lokasi);
+		} else {
+			$judulLokasi = 'Semua';
+		}
+
+		/* Ambil AKUN */
+		$queryAkun4= "select * from acc_akun where  (kode like '4%')  order by kode ";
 
 		/* Ambil AKUN */
 		$queryAkun5 = "select * from acc_akun where  (kode like '5%')  order by kode ";
@@ -5201,15 +5241,17 @@ class AccJurnal extends BD_Controller //Rest_Controller
   <div class="span12">
 	<br>
 	<div class="kop-print">
-    <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-    <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-    <div class="kop-info">Telp : 081387373939</div>
+    <div class="kop-nama">PT SAHABAT</div>
+    <div class="kop-info"> KOTA BOGOR</div>
+    <div class="kop-info">Telp : -</div>
   </div>
 	  <hr class="kop-print-hr">
   </div>
   </div>
   <h3 class="title">LAPORAN LABA RUGI</h3>
-<h3>Periode: ' . $tanggal_mulai . ' s/d ' . $tanggal_akhir . '  </h3>';
+<h5>Periode: ' . $tanggal_mulai . ' s/d ' . $tanggal_akhir . '  </h5>
+<h5>Lokasi: ' . $judulLokasi . ' </h5>
+';
 		$html = $html . "
 <table   border='1' width='100%' style='border-collapse: collapse;'>
 <thead>
@@ -5217,105 +5259,11 @@ class AccJurnal extends BD_Controller //Rest_Controller
 ";
 
 
-		/* Note: Utk Plasma Nilai akun pembelian Plasma di Pindah menjadi Penjualan Plasma
-		3407 - 6310131 - Pembelian TBS Plasma
-		3708 - 5110207 - Penjualan TBS Plasma Ke PT. XXX
-		*/
-		// $queryPembelianTBSPlasma = "SELECT b.acc_akun_id,sum(debet-kredit)as jumlah FROM acc_jurnal_ht a inner join acc_jurnal_dt b 
-		// on a.id=b.jurnal_id
-		// inner join gbm_organisasi c on b.lokasi_id=c.id
-		// where b.acc_akun_id=3407 
-		// and (a.tanggal >= '" . $tanggal_mulai . "' and a.tanggal <= '" . $tanggal_akhir . "' )
-		// and  c.kode  in('DPHO','DPAM')
-		// group by b.acc_akun_id ;";
-		// $resJumlahPembelianTBSPlasma  = $this->db->query($queryPembelianTBSPlasma)->row_array();
-		// $nilaiPembelianTBSHOMill =  (!empty($resJumlahPembelianTBSPlasma['jumlah'])) ? ($resJumlahPembelianTBSPlasma['jumlah']) : 0;
-
-		/* QTy TBS */
-		// if ($tipe_laporan == 'v3') {
-
-		// 	$resJumlah = $this->db->query("SELECT SUM(jum_kg_pks)AS jumlah,SUM(jum_ha)AS ha FROM est_produksi_panen_ht a
-		// 	INNER JOIN est_produksi_panen_dt b ON a.id=b.produksi_panen_id
-		// 	INNER JOIN gbm_organisasi c ON a.divisi_id=c.id
-		// 	INNER JOIN gbm_organisasi d ON c.parent_id=d.id 
-		// 	INNER JOIN gbm_organisasi e ON d.parent_id=e.id 
-		// 	where e.kode='SBME' 
-		// 	and a.tanggal>='" . $tanggal_mulai . "' and a.tanggal<='" . $tanggal_akhir . "' ")->row_array();
-
-		// 	$jumlah = (!empty($resJumlah['jumlah'])) ? ($resJumlah['jumlah']) : 0;
-		// } else {
-		// 	$query1 = "SELECT sum(qty_real) as jumlah FROM acc_sales_invoice a 
-		// 	INNER JOIN sls_kontrak b ON a.sls_kontrak_id=b.id
-		// 	INNER JOIN  inv_item c ON b.produk_id=c.id
-		// 	WHERE c.tipe_produk='TBS'  
-		// 	and (a.tanggal >= '" . $tanggal_mulai . "' and a.tanggal <= '" . $tanggal_akhir . "' ) ;";
-		// 	$resJumlah  = $this->db->query($query1)->row_array();
-		// 	$jumlah = (!empty($resJumlah['jumlah'])) ? ($resJumlah['jumlah']) : 0;
-		// }
-		// $html = $html . "<tr>";
-		// $html = $html . "<td style='text-align: left'></td>";
-		// $html = $html . "<td style='text-align: left'>Quantity TBS </td>";
-		// $html = $html . "<td style='text-align: right'><b>" . $this->format_number_report($jumlah) . " </b></td>";
-		// $html = $html . "</tr>";
-
-
-		/* QTy CPO */
-		// if ($tipe_laporan == 'v3') {
-		// 	$jumlah = 0;
-		// } else {
-		// 	$query1 = "SELECT sum(qty_real) as jumlah FROM acc_sales_invoice a 
-		// 	INNER JOIN sls_kontrak b ON a.sls_kontrak_id=b.id
-		// 	INNER JOIN  inv_item c ON b.produk_id=c.id
-		// 	WHERE c.tipe_produk='CPO'  
-		// 	and (a.tanggal >= '" . $tanggal_mulai . "' and a.tanggal <= '" . $tanggal_akhir . "' ) ;";
-		// 	$resJumlah  = $this->db->query($query1)->row_array();
-		// 	$jumlah = (!empty($resJumlah['jumlah'])) ? ($resJumlah['jumlah']) : 0;
-		// }
-
-		// $html = $html . "<tr>";
-		// $html = $html . "<td style='text-align: left'></td>";
-		// $html = $html . "<td style='text-align: left'>Quantity CPO </td>";
-		// $html = $html . "<td style='text-align: right'><b>" . $this->format_number_report($jumlah) . " </b></td>";
-		// $html = $html . "</tr>";
-
-		/* QTy PK */
-		// if ($tipe_laporan == 'v3') {
-		// 	$jumlah = 0;
-		// } else {
-		// 	$query1 = "SELECT sum(qty_real) as jumlah FROM acc_sales_invoice a 
-		// 	INNER JOIN sls_kontrak b ON a.sls_kontrak_id=b.id
-		// 	INNER JOIN  inv_item c ON b.produk_id=c.id
-		// 	WHERE c.tipe_produk='PK'  
-		// 	and (a.tanggal >= '" . $tanggal_mulai . "' and a.tanggal <= '" . $tanggal_akhir . "' ) ;";
-		// 	$resJumlah  = $this->db->query($query1)->row_array();
-		// 	$jumlah = (!empty($resJumlah['jumlah'])) ? ($resJumlah['jumlah']) : 0;
-		// }
-		// $html = $html . "<tr>";
-		// $html = $html . "<td style='text-align: left'></td>";
-		// $html = $html . "<td style='text-align: left'>Quantity PK </td>";
-		// $html = $html . "<td style='text-align: right'><b>" . $this->format_number_report($jumlah) . " </b></td>";
-		// $html = $html . "</tr>";
-
-		/* QTy PK SHELL */
-		// if ($tipe_laporan == 'v3') {
-		// 	$jumlah = 0;
-		// } else {
-		// 	$query1 = "SELECT sum(qty_real) as jumlah FROM acc_sales_invoice a 
-		// 	INNER JOIN sls_kontrak b ON a.sls_kontrak_id=b.id
-		// 	INNER JOIN  inv_item c ON b.produk_id=c.id
-		// 	WHERE c.tipe_produk='CANGKANG'  
-		// 	and (a.tanggal >= '" . $tanggal_mulai . "' and a.tanggal <= '" . $tanggal_akhir . "' ) ;";
-		// 	$resJumlah  = $this->db->query($query1)->row_array();
-		// 	$jumlah = (!empty($resJumlah['jumlah'])) ? ($resJumlah['jumlah']) : 0;
-		// }
-		// $html = $html . "<tr>";
-		// $html = $html . "<td style='text-align: left'></td>";
-		// $html = $html . "<td style='text-align: left'>Quantity PK Shell</td>";
-		// $html = $html . "<td style='text-align: right'><b>" . $this->format_number_report($jumlah) . " </b></td>";
-		// $html = $html . "</tr>";
+	
 		$nourut = 0;
-		/* Pendapatan Kepala 5 */
+		/* Pendapatan Kepala  */
 		$grandtotal = 0;
+		$total_kepala4 = 0;
 		$total_kepala5 = 0;
 		$total_kepala6 = 0;
 		$total_kepala7 = 0;
@@ -5324,8 +5272,8 @@ class AccJurnal extends BD_Controller //Rest_Controller
 		$totalBiaya = 0;
 		$totalLabaRugi = 0;
 		$sub_total = 0;
-		$akun_kepala5   = $this->db->query($queryAkun5)->result_array();
-		foreach ($akun_kepala5 as $key => $akun) {
+		$akun_kepala4   = $this->db->query($queryAkun4)->result_array();
+		foreach ($akun_kepala4 as $key => $akun) {
 			$nourut = $nourut + 1;
 			$total = 0;
 			$html = $html . "<tr> ";
@@ -5352,7 +5300,6 @@ class AccJurnal extends BD_Controller //Rest_Controller
 						inner join gbm_organisasi c on b.lokasi_id=c.id
 						where b.acc_akun_id=" . $akun['id'] . " 
 						and (a.tanggal >= '" . $tanggal_mulai . "' and a.tanggal <= '" . $tanggal_akhir . "' )
-						and  c.kode not in('SBME')
 						group by b.acc_akun_id ;";
 					} else if ($tipe_laporan == 'v3') {
 						$query1 = "SELECT b.acc_akun_id,sum(debet-kredit)as jumlah FROM acc_jurnal_ht a inner join acc_jurnal_dt b 
@@ -5397,6 +5344,85 @@ class AccJurnal extends BD_Controller //Rest_Controller
 		$html = $html . "<tr>";
 		$html = $html . "<td style='text-align: center'> </td>";
 		$html = $html . "<td style='text-align: left'><b>TOTAL PENDAPATAN</b></td>";
+
+		$html = $html . "<td style='text-align: right'><b>" . $this->format_number_report($sub_total) . " </b></td>";
+		$html = $html . "</tr>";
+
+		$total_kepala4 = $sub_total;
+
+		$sub_total = 0;
+		$akun_kepala5   = $this->db->query($queryAkun5)->result_array();
+		foreach ($akun_kepala5 as $key => $akun) {
+			$nourut = $nourut + 1;
+			$total = 0;
+			$html = $html . "<tr> ";
+			if ($akun['is_transaksi_akun'] == 1) {
+				$html = $html . "<td style='text-align: left'>" . $akun['kode'] . " </td>";
+				$html = $html . "<td style='text-align: left'>" . $akun['nama'] . " </td>";
+				if ($lokasi_id) {
+					$query1 = "SELECT b.acc_akun_id,sum(debet-kredit)as jumlah FROM acc_jurnal_ht a inner join acc_jurnal_dt b 
+						on a.id=b.jurnal_id
+						where b.acc_akun_id=" . $akun['id'] . " 
+						and (a.tanggal >= '" . $tanggal_mulai . "' and a.tanggal <= '" . $tanggal_akhir . "' )
+						and  b.lokasi_id=" . $lokasi_id . "
+						group by b.acc_akun_id ;";
+				} else {
+					if ($tipe_laporan == 'v1') {
+						$query1 = "SELECT b.acc_akun_id,sum(debet-kredit)as jumlah FROM acc_jurnal_ht a inner join acc_jurnal_dt b 
+						on a.id=b.jurnal_id
+						where b.acc_akun_id=" . $akun['id'] . " 
+						and (a.tanggal >= '" . $tanggal_mulai . "' and a.tanggal <= '" . $tanggal_akhir . "' )
+						group by b.acc_akun_id ;";
+					} else if ($tipe_laporan == 'v2') {
+						$query1 = "SELECT b.acc_akun_id,sum(debet-kredit)as jumlah FROM acc_jurnal_ht a inner join acc_jurnal_dt b 
+						on a.id=b.jurnal_id
+						inner join gbm_organisasi c on b.lokasi_id=c.id
+						where b.acc_akun_id=" . $akun['id'] . " 
+						and (a.tanggal >= '" . $tanggal_mulai . "' and a.tanggal <= '" . $tanggal_akhir . "' )
+						group by b.acc_akun_id ;";
+					} else if ($tipe_laporan == 'v3') {
+						$query1 = "SELECT b.acc_akun_id,sum(debet-kredit)as jumlah FROM acc_jurnal_ht a inner join acc_jurnal_dt b 
+							on a.id=b.jurnal_id
+							inner join gbm_organisasi c on b.lokasi_id=c.id
+							where b.acc_akun_id=" . $akun['id'] . " 
+							and (a.tanggal >= '" . $tanggal_mulai . "' and a.tanggal <= '" . $tanggal_akhir . "' )
+							and  c.kode  in('SBME')
+							group by b.acc_akun_id ;";
+					}
+				}
+
+				$resJumlah  = $this->db->query($query1)->row_array();
+				$jumlah = (!empty($resJumlah['jumlah'])) ? ($resJumlah['jumlah'] * -1) : 0;
+				if ($tipe_laporan == 'v3') {
+					/* Note:
+						    Utk Plasma, Nilai akun pembelian Plasma di Pindah menjadi Penjualan Plasma
+							3407 - 6310131 - Pembelian TBS Plasma
+							3708 - 5110207 - Penjualan TBS Plasma Ke PT. XXX
+						   JIka akun penjualan TBS plasma maka dijumlahkan Nilai Pembelian TBS HO/MILL
+
+						*/
+					if ($akun['id'] == '3708' || $akun['id'] == 3708) {
+						$jumlah = $jumlah + $nilaiPembelianTBSHOMill;
+					}
+				}
+
+				$total = $total + $jumlah;
+				$sub_total = $sub_total + $jumlah;
+				$grandtotal = $grandtotal + $jumlah;
+				$html = $html . "<td style='text-align: right'>" . $this->format_number_report($jumlah) . " </td>";
+			} else {
+				$html = $html . "<td style='text-align: left'><b>" . $akun['kode'] . "</b> </td>";
+				$html = $html . "<td style='text-align: left'><b>" . $akun['nama'] . "</b> </td>";
+				$html = $html . "<td style='text-align: right'> </td>";
+			}
+
+
+			$html = $html . "</tr>";
+		}
+
+		$html = $html . "<tr>";
+		$html = $html . "<td style='text-align: center'> </td>";
+		$html = $html . "<td style='text-align: left'><b>TOTAL HARGA POKOK PENJUALAN</b></td>";
 
 		$html = $html . "<td style='text-align: right'><b>" . $this->format_number_report($sub_total) . " </b></td>";
 		$html = $html . "</tr>";
@@ -5679,7 +5705,7 @@ class AccJurnal extends BD_Controller //Rest_Controller
 		$html = $html . "<td style='text-align: right'><b>" . $this->format_number_report($sub_total) . " </b></td>";
 		$html = $html . "</tr>";
 
-		$totalLabaRugi = ($total_kepala5 + $total_kepala8) - ($total_kepala6 + $total_kepala7+$total_kepala9);
+		$totalLabaRugi = ($total_kepala4 +$total_kepala5 + $total_kepala8) - ($total_kepala6 + $total_kepala7 + $total_kepala9);
 		$html = $html . "<tr>";
 		$html = $html . "<td style='text-align: center'> </td>";
 		$html = $html . "<td style='text-align: left'><b>TOTAL LABA RUGI</b></td>";
@@ -5746,14 +5772,14 @@ class AccJurnal extends BD_Controller //Rest_Controller
   <div class="span12">
 	<br>
 	<div class="kop-print">
-    <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-    <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-    <div class="kop-info">Telp : 081387373939</div>
+    <div class="kop-nama">PT SAHABAT</div>
+    <div class="kop-info"> KOTA BOGOR</div>
+    <div class="kop-info">Telp : -</div>
   </div>
 	  <hr class="kop-print-hr">
   </div>
   </div>
-  <h3 class="title">LAPORAN LABA RUGI</h3>
+  <h3 class="title">LAPORAN LABA RUGI V2</h3>
 <h3>Periode: ' . $tanggal_mulai . ' s/d ' . $tanggal_akhir . '  </h3>';
 		$html = $html . "
 <table   border='1' width='100%' style='border-collapse: collapse;'>
@@ -6096,14 +6122,14 @@ class AccJurnal extends BD_Controller //Rest_Controller
   <div class="span12">
 	<br>
 	<div class="kop-print">
-    <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-    <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-    <div class="kop-info">Telp : 081387373939</div>
+    <div class="kop-nama">PT SAHABAT</div>
+    <div class="kop-info"> KOTA BOGOR</div>
+    <div class="kop-info">Telp : -</div>
   </div>
 	  <hr class="kop-print-hr">
   </div>
   </div>
-  <h3 class="title">LAPORAN LABA RUGI</h3>
+  <h3 class="title">LAPORAN LABA RUGI V3</h3>
 <h3>Periode: ' . $tanggal_mulai . ' s/d ' . $tanggal_akhir . '  </h3>';
 		$html = $html . "
 <table   border='1' width='100%' style='border-collapse: collapse;'>
@@ -6510,14 +6536,14 @@ class AccJurnal extends BD_Controller //Rest_Controller
   <div class="span12">
 	<br>
 	<div class="kop-print">
-    <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-    <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-    <div class="kop-info">Telp : 081387373939</div>
+    <div class="kop-nama">PT SAHABAT</div>
+    <div class="kop-info"> KOTA BOGOR</div>
+    <div class="kop-info">Telp : -</div>
   </div>
 	  <hr class="kop-print-hr">
   </div>
   </div>
-  <h3 class="title">LAPORAN LABA RUGI</h3>
+  <h3 class="title">LAPORAN LABA RUGI V4</h3>
 <h3>Periode: ' . $tanggal_mulai . ' s/d ' . $tanggal_akhir . '  </h3>';
 		$html = $html . "
 <table   border='1' width='100%' style='border-collapse: collapse;'>
@@ -6811,9 +6837,9 @@ class AccJurnal extends BD_Controller //Rest_Controller
   <div class="span12">
 	  <br>
 	<div class="kop-print">
-    <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-    <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-    <div class="kop-info">Telp : 081387373939</div>
+    <div class="kop-nama">PT SAHABAT</div>
+    <div class="kop-info"> KOTA BOGOR</div>
+    <div class="kop-info">Telp : -</div>
   	</div>
 	  <hr class="kop-print-hr">
   </div>
@@ -7210,9 +7236,9 @@ class AccJurnal extends BD_Controller //Rest_Controller
   <div class="span12">
 	  <br>
 	<div class="kop-print">
-    <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-    <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-    <div class="kop-info">Telp : 081387373939</div>
+    <div class="kop-nama">PT SAHABAT</div>
+    <div class="kop-info"> KOTA BOGOR</div>
+    <div class="kop-info">Telp : -</div>
   	</div>
 	  <hr class="kop-print-hr">
   </div>
@@ -7745,9 +7771,9 @@ class AccJurnal extends BD_Controller //Rest_Controller
   	<div class="span12">
 	  <br>
 	<div class="kop-print">
-	  <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-	  <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-	  <div class="kop-info">Telp : 081387373939</div>
+	  <div class="kop-nama">PT SAHABAT</div>
+	  <div class="kop-info"> KOTA BOGOR</div>
+	  <div class="kop-info">Telp : -</div>
 	</div>
 	  <hr class="kop-print-hr">
   	</div>
@@ -7911,9 +7937,9 @@ class AccJurnal extends BD_Controller //Rest_Controller
   	<div class="span12">
 	  <br>
 	<div class="kop-print">
-	  <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-	  <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-	  <div class="kop-info">Telp : 081387373939</div>
+	  <div class="kop-nama">PT SAHABAT</div>
+	  <div class="kop-info"> KOTA BOGOR</div>
+	  <div class="kop-info">Telp : -</div>
 	</div>
 	  <hr class="kop-print-hr">
   	</div>
@@ -8137,9 +8163,9 @@ class AccJurnal extends BD_Controller //Rest_Controller
   	<div class="span12">
 	  <br>
 	<div class="kop-print">
-	  <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-	  <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-	  <div class="kop-info">Telp : 081387373939</div>
+	  <div class="kop-nama">PT SAHABAT</div>
+	  <div class="kop-info"> KOTA BOGOR</div>
+	  <div class="kop-info">Telp : -</div>
 	</div>
 	  <hr class="kop-print-hr">
   	</div>
@@ -8371,9 +8397,9 @@ class AccJurnal extends BD_Controller //Rest_Controller
   	<div class="span12">
 	  <br>
 	<div class="kop-print">
-	  <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-	  <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-	  <div class="kop-info">Telp : 081387373939</div>
+	  <div class="kop-nama">PT SAHABAT</div>
+	  <div class="kop-info"> KOTA BOGOR</div>
+	  <div class="kop-info">Telp : -</div>
 	</div>
 	  <hr class="kop-print-hr">
   	</div>
@@ -8580,9 +8606,9 @@ class AccJurnal extends BD_Controller //Rest_Controller
   	<div class="span12">
 	  <br>
 	<div class="kop-print">
-	  <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-	  <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-	  <div class="kop-info">Telp : 081387373939</div>
+	  <div class="kop-nama">PT SAHABAT</div>
+	  <div class="kop-info"> KOTA BOGOR</div>
+	  <div class="kop-info">Telp : -</div>
 	</div>
 	  <hr class="kop-print-hr">
   	</div>
@@ -8973,9 +8999,9 @@ class AccJurnal extends BD_Controller //Rest_Controller
   	<div class="span12">
 	  <br>
 	<div class="kop-print">
-	  <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-	  <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-	  <div class="kop-info">Telp : 081387373939</div>
+	  <div class="kop-nama">PT SAHABAT</div>
+	  <div class="kop-info"> KOTA BOGOR</div>
+	  <div class="kop-info">Telp : -</div>
 	</div>
 	  <hr class="kop-print-hr">
   	</div>
@@ -9434,9 +9460,9 @@ class AccJurnal extends BD_Controller //Rest_Controller
   	<div class="span12">
 	  <br>
 	<div class="kop-print">
-	  <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-	  <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-	  <div class="kop-info">Telp : 081387373939</div>
+	  <div class="kop-nama">PT SAHABAT</div>
+	  <div class="kop-info"> KOTA BOGOR</div>
+	  <div class="kop-info">Telp : -</div>
 	</div>
 	  <hr class="kop-print-hr">
   	</div>
@@ -9710,9 +9736,9 @@ class AccJurnal extends BD_Controller //Rest_Controller
   	<div class="span12">
 	  <br>
 	<div class="kop-print">
-	  <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-	  <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-	  <div class="kop-info">Telp : 081387373939</div>
+	  <div class="kop-nama">PT SAHABAT</div>
+	  <div class="kop-info"> KOTA BOGOR</div>
+	  <div class="kop-info">Telp : -</div>
 	</div>
 	  <hr class="kop-print-hr">
   	</div>
@@ -10398,9 +10424,9 @@ class AccJurnal extends BD_Controller //Rest_Controller
   	<div class="span12">
 	  <br>
 	<div class="kop-print">
-	  <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-	  <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-	  <div class="kop-info">Telp : 081387373939</div>
+	  <div class="kop-nama">PT SAHABAT</div>
+	  <div class="kop-info"> KOTA BOGOR</div>
+	  <div class="kop-info">Telp : -</div>
 	</div>
 	  <hr class="kop-print-hr">
   	</div>
@@ -10583,9 +10609,9 @@ class AccJurnal extends BD_Controller //Rest_Controller
 		<div class="span12">
 		<br>
 	  <div class="kop-print">
-		<div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-		<div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-		<div class="kop-info">Telp : 081387373939</div>
+		<div class="kop-nama">PT SAHABAT</div>
+		<div class="kop-info"> KOTA BOGOR</div>
+		<div class="kop-info">Telp : -</div>
 	  </div>
 		<hr class="kop-print-hr">
 		</div>
@@ -10773,9 +10799,9 @@ class AccJurnal extends BD_Controller //Rest_Controller
 		<div class="span12">
 		<br>
 	  <div class="kop-print">
-		<div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-		<div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-		<div class="kop-info">Telp : 081387373939</div>
+		<div class="kop-nama">PT SAHABAT</div>
+		<div class="kop-info"> KOTA BOGOR</div>
+		<div class="kop-info">Telp : -</div>
 	  </div>
 		<hr class="kop-print-hr">
 		</div>
@@ -11012,9 +11038,9 @@ class AccJurnal extends BD_Controller //Rest_Controller
 		<div class="span12">
 		<br>
 	  <div class="kop-print">
-		<div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-		<div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-		<div class="kop-info">Telp : 081387373939</div>
+		<div class="kop-nama">PT SAHABAT</div>
+		<div class="kop-info"> KOTA BOGOR</div>
+		<div class="kop-info">Telp : -</div>
 	  </div>
 		<hr class="kop-print-hr">
 		</div>
@@ -11859,9 +11885,9 @@ class AccJurnal extends BD_Controller //Rest_Controller
   	<div class="span12">
 	  <br>
 	<div class="kop-print">
-	  <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-	  <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-	  <div class="kop-info">Telp : 081387373939</div>
+	  <div class="kop-nama">PT SAHABAT</div>
+	  <div class="kop-info"> KOTA BOGOR</div>
+	  <div class="kop-info">Telp : -</div>
 	</div>
 	  <hr class="kop-print-hr">
   	</div>
@@ -12040,9 +12066,9 @@ class AccJurnal extends BD_Controller //Rest_Controller
   <div class="span12">
 	  <br>
 	<div class="kop-print">
-    <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-    <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-    <div class="kop-info">Telp : 081387373939</div>
+    <div class="kop-nama">PT SAHABAT</div>
+    <div class="kop-info"> KOTA BOGOR</div>
+    <div class="kop-info">Telp : -</div>
   	</div>
 	  <hr class="kop-print-hr">
   </div>
@@ -12214,9 +12240,9 @@ class AccJurnal extends BD_Controller //Rest_Controller
   	<div class="span12">
 	  <br>
 	<div class="kop-print">
-	  <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-	  <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-	  <div class="kop-info">Telp : 081387373939</div>
+	  <div class="kop-nama">PT SAHABAT</div>
+	  <div class="kop-info"> KOTA BOGOR</div>
+	  <div class="kop-info">Telp : -</div>
 	</div>
 	  <hr class="kop-print-hr">
   	</div>
@@ -12675,9 +12701,9 @@ class AccJurnal extends BD_Controller //Rest_Controller
   <div class="span12">
 	  <br>
 	<div class="kop-print">
-    <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-    <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-    <div class="kop-info">Telp : 081387373939</div>
+    <div class="kop-nama">PT SAHABAT</div>
+    <div class="kop-info"> KOTA BOGOR</div>
+    <div class="kop-info">Telp : -</div>
   	</div>
 	  <hr class="kop-print-hr">
   </div>
@@ -13028,9 +13054,9 @@ class AccJurnal extends BD_Controller //Rest_Controller
   <div class="span12">
 	  <br>
 	<div class="kop-print">
-    <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-    <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-    <div class="kop-info">Telp : 081387373939</div>
+    <div class="kop-nama">PT SAHABAT</div>
+    <div class="kop-info"> KOTA BOGOR</div>
+    <div class="kop-info">Telp : -</div>
   	</div>
 	  <hr class="kop-print-hr">
   </div>
@@ -13233,9 +13259,9 @@ class AccJurnal extends BD_Controller //Rest_Controller
 		<div class="span12">
 			<br>
 		  <div class="kop-print">
-		  <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-		  <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-		  <div class="kop-info">Telp : 081387373939</div>
+		  <div class="kop-nama">PT SAHABAT</div>
+		  <div class="kop-info"> KOTA BOGOR</div>
+		  <div class="kop-info">Telp : -</div>
 			</div>
 			<hr class="kop-print-hr">
 		</div>
@@ -13461,9 +13487,9 @@ class AccJurnal extends BD_Controller //Rest_Controller
 		<div class="span12">
 			<br>
 		  <div class="kop-print">
-		  <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-		  <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-		  <div class="kop-info">Telp : 081387373939</div>
+		  <div class="kop-nama">PT SAHABAT</div>
+		  <div class="kop-info"> KOTA BOGOR</div>
+		  <div class="kop-info">Telp : -</div>
 			</div>
 			<hr class="kop-print-hr">
 		</div>
@@ -13652,9 +13678,9 @@ class AccJurnal extends BD_Controller //Rest_Controller
 		<div class="span12">
 			<br>
 		  <div class="kop-print">
-		  <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-		  <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-		  <div class="kop-info">Telp : 081387373939</div>
+		  <div class="kop-nama">PT SAHABAT</div>
+		  <div class="kop-info"> KOTA BOGOR</div>
+		  <div class="kop-info">Telp : -</div>
 			</div>
 			<hr class="kop-print-hr">
 		</div>
@@ -13845,9 +13871,9 @@ class AccJurnal extends BD_Controller //Rest_Controller
 		<div class="span12">
 			<br>
 		  <div class="kop-print">
-		  <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-		  <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-		  <div class="kop-info">Telp : 081387373939</div>
+		  <div class="kop-nama">PT SAHABAT</div>
+		  <div class="kop-info"> KOTA BOGOR</div>
+		  <div class="kop-info">Telp : -</div>
 		</div>
 			<hr class="kop-print-hr">
 		</div>

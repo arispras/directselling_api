@@ -809,9 +809,9 @@ $html=$html.'<script type="text/javascript">
   <div class="span12">
 	  <br>
 	<div class="kop-print">
-	  <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-	  <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-	  <div class="kop-info">Telp : 081387373939</div>
+	  <div class="kop-nama">PT SAHABAT</div>
+	  <div class="kop-info"> KOTA BOGOR</div>
+	  <div class="kop-info">Telp : -</div>
 	</div>
 	  <hr class="kop-print-hr">
   </div>
@@ -1014,9 +1014,9 @@ $html=$html.'<script type="text/javascript">
   <div class="span12">
 	  <br>
 	<div class="kop-print">
-	  <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-	  <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-	  <div class="kop-info">Telp : 081387373939</div>
+	  <div class="kop-nama">PT SAHABAT</div>
+	  <div class="kop-info"> KOTA BOGOR</div>
+	  <div class="kop-info">Telp : -</div>
 	</div>
 	  <hr class="kop-print-hr">
   </div>
@@ -1273,9 +1273,9 @@ $html=$html.'<script type="text/javascript">
   <div class="span12">
 	  <br>
 	<div class="kop-print">
-	  <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-	  <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-	  <div class="kop-info">Telp : 081387373939</div>
+	  <div class="kop-nama">PT SAHABAT</div>
+	  <div class="kop-info"> KOTA BOGOR</div>
+	  <div class="kop-info">Telp : -</div>
 	</div>
 	  <hr class="kop-print-hr">
   </div>
@@ -1536,9 +1536,9 @@ $html=$html.'<script type="text/javascript">
   <div class="span12">
 	  <br>
 	<div class="kop-print">
-    <div class="kop-nama">PT. ANNAJAH TECHNOLOGY INDONESIA</div>
-    <div class="kop-info"> Komplek Vila Sehati B12 , Tapos - Depok</div>
-    <div class="kop-info">Telp : 081387373939</div>
+    <div class="kop-nama">PT SAHABAT</div>
+    <div class="kop-info"> KOTA BOGOR</div>
+    <div class="kop-info">Telp : -</div>
   </div>
 	  <hr class="kop-print-hr">
   </div>
