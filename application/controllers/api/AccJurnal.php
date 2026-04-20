@@ -5497,7 +5497,7 @@ class AccJurnal extends BD_Controller //Rest_Controller
 		$total_kepala6 = $sub_total;
 		$html = $html . "<tr>";
 		$html = $html . "<td style='text-align: center'> </td>";
-		$html = $html . "<td style='text-align: left'><b>TOTAL BIAYA LANGSUNG</b></td>";
+		$html = $html . "<td style='text-align: left'><b>TOTAL BIAYA</b></td>";
 		$html = $html . "<td style='text-align: right'><b>" . $this->format_number_report($sub_total) . " </b></td>";
 		$html = $html . "</tr>";
 
@@ -5533,7 +5533,6 @@ class AccJurnal extends BD_Controller //Rest_Controller
 						inner join gbm_organisasi c on b.lokasi_id=c.id
 						where b.acc_akun_id=" . $akun['id'] . " 
 						and (a.tanggal >= '" . $tanggal_mulai . "' and a.tanggal <= '" . $tanggal_akhir . "' )
-						and  c.kode not  in('SBME')
 						group by b.acc_akun_id ;";
 					} else 	if ($tipe_laporan == 'v3') {
 						$query1 = "SELECT b.acc_akun_id,sum(debet-kredit)as jumlah FROM acc_jurnal_ht a inner join acc_jurnal_dt b 
@@ -5548,7 +5547,7 @@ class AccJurnal extends BD_Controller //Rest_Controller
 
 
 				$resJumlah  = $this->db->query($query1)->row_array();
-				$jumlah = (!empty($resJumlah['jumlah'])) ? ($resJumlah['jumlah']) : 0;
+				$jumlah = (!empty($resJumlah['jumlah'])) ? (($resJumlah['jumlah']) * -1) : 0;
 
 
 				$total = $total + $jumlah;
@@ -5565,7 +5564,7 @@ class AccJurnal extends BD_Controller //Rest_Controller
 		$total_kepala7 = $sub_total;
 		$html = $html . "<tr>";
 		$html = $html . "<td style='text-align: center'> </td>";
-		$html = $html . "<td style='text-align: left'><b>TOTAL BIAYA TAK LANGSUNG</b></td>";
+		$html = $html . "<td style='text-align: left'><b>TOTAL PENDAPATANNYA</b></td>";
 		$html = $html . "<td style='text-align: right'><b>" . $this->format_number_report($sub_total) . " </b></td>";
 		$html = $html . "</tr>";
 
@@ -5616,7 +5615,7 @@ class AccJurnal extends BD_Controller //Rest_Controller
 
 
 				$resJumlah  = $this->db->query($query1)->row_array();
-				$jumlah = (!empty($resJumlah['jumlah'])) ? ($resJumlah['jumlah'] * -1) : 0;
+				$jumlah = (!empty($resJumlah['jumlah'])) ? ($resJumlah['jumlah'] * 1) : 0;
 
 				$total = $total + $jumlah;
 				$sub_total = $sub_total + $jumlah;
@@ -5632,78 +5631,78 @@ class AccJurnal extends BD_Controller //Rest_Controller
 		$total_kepala8 = $sub_total;
 		$html = $html . "<tr>";
 		$html = $html . "<td style='text-align: center'> </td>";
-		$html = $html . "<td style='text-align: left'><b>TOTAL PENDAPATAN LAIN-LAIN</b></td>";
+		$html = $html . "<td style='text-align: left'><b>TOTAL BIAYA LAINNYA</b></td>";
 		$html = $html . "<td style='text-align: right'><b>" . $this->format_number_report($sub_total) . " </b></td>";
 		$html = $html . "</tr>";
 
 
-		/* KEPALA 9 */
-		$akun_kepala9   = $this->db->query($queryAkun9)->result_array();
-		$sub_total = 0;
-		foreach ($akun_kepala9 as $key => $akun) {
-			$nourut = $nourut + 1;
-			$total = 0;
-			$html = $html . "<tr> ";
+		// /* KEPALA 9 */
+		// $akun_kepala9   = $this->db->query($queryAkun9)->result_array();
+		// $sub_total = 0;
+		// foreach ($akun_kepala9 as $key => $akun) {
+		// 	$nourut = $nourut + 1;
+		// 	$total = 0;
+		// 	$html = $html . "<tr> ";
 
-			if ($akun['is_transaksi_akun'] == 1) {
-				$html = $html . "<td style='text-align: left'>" . $akun['kode'] . " </td>";
-				$html = $html . "<td style='text-align: left'>" . $akun['nama'] . " </td>";
+		// 	if ($akun['is_transaksi_akun'] == 1) {
+		// 		$html = $html . "<td style='text-align: left'>" . $akun['kode'] . " </td>";
+		// 		$html = $html . "<td style='text-align: left'>" . $akun['nama'] . " </td>";
 
-				if ($lokasi_id) {
-					$query1 = "SELECT b.acc_akun_id,sum(debet-kredit)as jumlah FROM acc_jurnal_ht a inner join acc_jurnal_dt b 
-					on a.id=b.jurnal_id
-					where b.acc_akun_id=" . $akun['id'] . " 
-					and (a.tanggal >= '" . $tanggal_mulai . "' and a.tanggal <= '" . $tanggal_akhir . "' )
-					and  b.lokasi_id=" . $lokasi_id . "
-					group by b.acc_akun_id ;";
-				} else {
-					if ($tipe_laporan == 'v1') {
-						$query1 = "SELECT b.acc_akun_id,sum(debet-kredit)as jumlah FROM acc_jurnal_ht a inner join acc_jurnal_dt b 
-						on a.id=b.jurnal_id
-						where b.acc_akun_id=" . $akun['id'] . " 
-						and (a.tanggal >= '" . $tanggal_mulai . "' and a.tanggal <= '" . $tanggal_akhir . "' )
-						group by b.acc_akun_id ;";
-					} else if ($tipe_laporan == 'v2') {
-						$query1 = "SELECT b.acc_akun_id,sum(debet-kredit)as jumlah FROM acc_jurnal_ht a inner join acc_jurnal_dt b 
-						on a.id=b.jurnal_id
-						inner join gbm_organisasi c on b.lokasi_id=c.id
-						where b.acc_akun_id=" . $akun['id'] . " 
-						and (a.tanggal >= '" . $tanggal_mulai . "' and a.tanggal <= '" . $tanggal_akhir . "' )
-						and  c.kode not in('SBME')
-						group by b.acc_akun_id ;";
-					} else if ($tipe_laporan == 'v3') {
-						$query1 = "SELECT b.acc_akun_id,sum(debet-kredit)as jumlah FROM acc_jurnal_ht a inner join acc_jurnal_dt b 
-						on a.id=b.jurnal_id
-						inner join gbm_organisasi c on b.lokasi_id=c.id
-						where b.acc_akun_id=" . $akun['id'] . " 
-						and (a.tanggal >= '" . $tanggal_mulai . "' and a.tanggal <= '" . $tanggal_akhir . "' )
-						and  c.kode  in('SBME')
-						group by b.acc_akun_id ;";
-					}
-				}
-
-
-				$resJumlah  = $this->db->query($query1)->row_array();
-				$jumlah = (!empty($resJumlah['jumlah'])) ? ($resJumlah['jumlah']) : 0;
+		// 		if ($lokasi_id) {
+		// 			$query1 = "SELECT b.acc_akun_id,sum(debet-kredit)as jumlah FROM acc_jurnal_ht a inner join acc_jurnal_dt b 
+		// 			on a.id=b.jurnal_id
+		// 			where b.acc_akun_id=" . $akun['id'] . " 
+		// 			and (a.tanggal >= '" . $tanggal_mulai . "' and a.tanggal <= '" . $tanggal_akhir . "' )
+		// 			and  b.lokasi_id=" . $lokasi_id . "
+		// 			group by b.acc_akun_id ;";
+		// 		} else {
+		// 			if ($tipe_laporan == 'v1') {
+		// 				$query1 = "SELECT b.acc_akun_id,sum(debet-kredit)as jumlah FROM acc_jurnal_ht a inner join acc_jurnal_dt b 
+		// 				on a.id=b.jurnal_id
+		// 				where b.acc_akun_id=" . $akun['id'] . " 
+		// 				and (a.tanggal >= '" . $tanggal_mulai . "' and a.tanggal <= '" . $tanggal_akhir . "' )
+		// 				group by b.acc_akun_id ;";
+		// 			} else if ($tipe_laporan == 'v2') {
+		// 				$query1 = "SELECT b.acc_akun_id,sum(debet-kredit)as jumlah FROM acc_jurnal_ht a inner join acc_jurnal_dt b 
+		// 				on a.id=b.jurnal_id
+		// 				inner join gbm_organisasi c on b.lokasi_id=c.id
+		// 				where b.acc_akun_id=" . $akun['id'] . " 
+		// 				and (a.tanggal >= '" . $tanggal_mulai . "' and a.tanggal <= '" . $tanggal_akhir . "' )
+		// 				and  c.kode not in('SBME')
+		// 				group by b.acc_akun_id ;";
+		// 			} else if ($tipe_laporan == 'v3') {
+		// 				$query1 = "SELECT b.acc_akun_id,sum(debet-kredit)as jumlah FROM acc_jurnal_ht a inner join acc_jurnal_dt b 
+		// 				on a.id=b.jurnal_id
+		// 				inner join gbm_organisasi c on b.lokasi_id=c.id
+		// 				where b.acc_akun_id=" . $akun['id'] . " 
+		// 				and (a.tanggal >= '" . $tanggal_mulai . "' and a.tanggal <= '" . $tanggal_akhir . "' )
+		// 				and  c.kode  in('SBME')
+		// 				group by b.acc_akun_id ;";
+		// 			}
+		// 		}
 
 
-				$total = $total + $jumlah;
-				$sub_total = $sub_total + $jumlah;
-				$grandtotal = $grandtotal + $jumlah;
-				$html = $html . "<td style='text-align: right'>" . $this->format_number_report($jumlah) . " </td>";
-			} else {
-				$html = $html . "<td style='text-align: left'><b>" . $akun['kode'] . "</b> </td>";
-				$html = $html . "<td style='text-align: left'><b>" . $akun['nama'] . "</b> </td>";
+		// 		$resJumlah  = $this->db->query($query1)->row_array();
+		// 		$jumlah = (!empty($resJumlah['jumlah'])) ? ($resJumlah['jumlah']) : 0;
 
-				$html = $html . "<td style='text-align: right'> </td>";
-			}
-		}
-		$total_kepala9 = $sub_total;
-		$html = $html . "<tr>";
-		$html = $html . "<td style='text-align: center'> </td>";
-		$html = $html . "<td style='text-align: left'><b>BIAYA LAIN-LAIN</b></td>";
-		$html = $html . "<td style='text-align: right'><b>" . $this->format_number_report($sub_total) . " </b></td>";
-		$html = $html . "</tr>";
+
+		// 		$total = $total + $jumlah;
+		// 		$sub_total = $sub_total + $jumlah;
+		// 		$grandtotal = $grandtotal + $jumlah;
+		// 		$html = $html . "<td style='text-align: right'>" . $this->format_number_report($jumlah) . " </td>";
+		// 	} else {
+		// 		$html = $html . "<td style='text-align: left'><b>" . $akun['kode'] . "</b> </td>";
+		// 		$html = $html . "<td style='text-align: left'><b>" . $akun['nama'] . "</b> </td>";
+
+		// 		$html = $html . "<td style='text-align: right'> </td>";
+		// 	}
+		// }
+		// $total_kepala9 = $sub_total;
+		// $html = $html . "<tr>";
+		// $html = $html . "<td style='text-align: center'> </td>";
+		// $html = $html . "<td style='text-align: left'><b>BIAYA LAIN-LAIN</b></td>";
+		// $html = $html . "<td style='text-align: right'><b>" . $this->format_number_report($sub_total) . " </b></td>";
+		// $html = $html . "</tr>";
 
 		$totalLabaRugi = ($total_kepala4 +$total_kepala5 + $total_kepala8) - ($total_kepala6 + $total_kepala7 + $total_kepala9);
 		$html = $html . "<tr>";
@@ -5714,23 +5713,23 @@ class AccJurnal extends BD_Controller //Rest_Controller
 		$html = $html . "</table>";
 
 		if ($format_laporan == 'xls') {
-			$reader = new \PhpOffice\PhpSpreadsheet\Reader\Html;
-			$spreadsheet = $reader->loadFromString($html);
-			// $reader->setSheetIndex(1);
-			//$spreadhseet = $reader->loadFromString($secondHtmlString, $spreadsheet);
-			$objWriter = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
-			header("Pragma: public");
-			header("Expires: 0");
-			header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
-			header("Content-Type: application/force-download");
-			header("Content-Type: application/octet-stream");
-			header("Content-Type: application/download");
-			header("Content-Disposition: attachment;filename=test.xlsx");
-			header("Content-Transfer-Encoding: binary ");
+			// $reader = new \PhpOffice\PhpSpreadsheet\Reader\Html;
+			// $spreadsheet = $reader->loadFromString($html);
+		
+			// $objWriter = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
+			// header("Pragma: public");
+			// header("Expires: 0");
+			// header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+			// header("Content-Type: application/force-download");
+			// header("Content-Type: application/octet-stream");
+			// header("Content-Type: application/download");
+			// header("Content-Disposition: attachment;filename=test.xlsx");
+			// header("Content-Transfer-Encoding: binary ");
 
-			ob_end_clean();
-			ob_start();
-			$objWriter->save('php://output');
+			// ob_end_clean();
+			// ob_start();
+			// $objWriter->save('php://output');
+			echo $html;
 		} else if ($format_laporan == 'view') {
 			echo $html;
 		} else {
