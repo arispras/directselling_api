@@ -1213,7 +1213,6 @@ class ColKuitansi extends BD_Controller
 			$this->cetakKuitansiDotMatrix_2_lembar();
 		} elseif ($jumlah_per_halaman == 4) {
 			$this->cetakKuitansi_4_lembar();
-		
 		} elseif ($jumlah_per_halaman == 1) {
 			$this->cetakKuitansiDotMatrix_1lembar();
 		} else {
@@ -1767,7 +1766,7 @@ body {
 		$out .= "Telah diterima uang sejumlah:";
 		$out .= $this->kanan($rupiah, 10) . "\n";
 
-		$terbilangLines = $this->wrapText("# ".terbilang($data['nilai_angsuran']) . " Rupiah #", 85);
+		$terbilangLines = $this->wrapText("# " . terbilang($data['nilai_angsuran']) . " Rupiah #", 85);
 		foreach ($terbilangLines as $line) {
 			$out .= $line . "\n";
 		}
@@ -1810,7 +1809,8 @@ body {
         <style>
             body {
                 font-family: "Courier New", monospace;
-                font-size: 12px;
+                font-size: 18px;
+				font-weight:bold;
             }
         </style>
     </head>
@@ -1822,7 +1822,7 @@ body {
 			$page = $this->generateKuitansiDotMatrix1Lembar($row, $i, $lokasi);
 
 			// 🔥 FIX TINGGI 15 CM (~38 baris)
-			$page = $this->fixHeightFullPage($page, 35);
+			$page = $this->fixHeightFullPage($page, 33);
 
 			// optional margin atas
 			// $page = $this->addTopMargin($page, 1);
@@ -1861,7 +1861,8 @@ body {
 		$out .= $this->kiri("No Kuitansi", $data['no_kuitansi']) . "\n";
 		$out .= $this->kiri("Tanggal", tgl_indo($data['tanggal_tempo'])) . "\n";
 		$out .= $this->kiri("Angsuran", $data['angsuran_ke'] . '/' . $data['tenor']) . "\n";
-		$out .= $this->kiri("Customer", $data['nama_customer']) . "\n";
+		$out .= $this->kiri("Customer", $data['nama_customer']) . " (";
+		$out .= "Telp: " . $data['no_telpon'] . ")\n";
 
 		$out .= str_pad("Alamat", 20) . ": " . $alamatLines[0] . "\n";
 		for ($i = 1; $i < count($alamatLines); $i++) {
@@ -1873,7 +1874,7 @@ body {
 		$out .= "Telah diterima uang sejumlah:";
 		$out .= $this->kanan($rupiah, 10) . "\n";
 
-		$terbilangLines = $this->wrapText("# ".terbilang($data['nilai_angsuran']) . " Rupiah #", 85);
+		$terbilangLines = $this->wrapText("# " . terbilang($data['nilai_angsuran']) . " Rupiah #", 85);
 		foreach ($terbilangLines as $line) {
 			$out .= $line . "\n";
 		}
@@ -2300,6 +2301,120 @@ body {
 		$data['format_laporan'] = $format_laporan;
 
 		$html = $this->load->view('Col_Saldo_Piutang_By_TTB', $data, true);
+
+		// $filename = 'report_' . time();
+		// $this->pdfgenerator->generate($html, $filename, true, 'A4', 'landscape');
+		// echo $html;
+		if ($format_laporan == 'xls') {
+			echo $html;
+		} else if ($format_laporan == 'view') {
+			echo $html;
+		} else {
+			$filename = 'report_' . time();
+			// $this->pdfgenerator->generate($html, $filename, true, 'A4', 'landscape');
+			$dompdf = new DOMPDF;
+			$dompdf->loadHtml($html);
+			$dompdf->setPaper('A4', 'landscape');
+			$dompdf->render();
+			$filename = 'report_' . time();
+			$x          = 400;
+			$y          = 570;
+			$text       = "{PAGE_NUM} of {PAGE_COUNT}";
+			$font       = null; // $dompdf->getFontMetrics()->get_font('Helvetica', 'normal');
+			$size       = 10;
+			$color      = array(0, 0, 0);
+			$word_space = 0.0;
+			$char_space = 0.0;
+			$angle      = 0.0;
+
+			$dompdf->getCanvas()->page_text(
+				$x,
+				$y,
+				$text,
+				$font,
+				$size,
+				$color,
+				$word_space,
+				$char_space,
+				$angle
+			);
+			$dompdf->stream($filename . ".pdf", array("Attachment" => 0));
+		}
+	}
+	function getLaporanRekapPiutangByTTBPerKuitansi_post()
+	{
+
+		$format_laporan =  $this->post('format_laporan', true);
+
+
+		$data = [];
+
+		$input = $this->post();
+
+		$lokasi_id = $input['lokasi_id'];
+		$tgl_mulai = $input['tgl_mulai'];
+		$tgl_akhir = $input['tgl_akhir'];
+		$format_laporan = $input['format_laporan'];
+		$per_tanggal = $input['per_tanggal'];
+		$status_lunas = $input['status_lunas'];
+
+		$lokasi = $this->db->query("select * from gbm_organisasi where id=" . $lokasi_id)->row_array();
+		if ($lokasi) {
+			$filter_lokasi = $lokasi['nama'];
+			$lokasi_id = "= " . $lokasi_id;
+		} else {
+			$filter_lokasi = "Semua Lokasi";
+		}
+
+		if ($status_lunas == 'lunas') {
+			$query = "select DISTINCT collector_id,collector from col_piutang_by_ttb_detail_vw where tanggal_ttb between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
+		and lokasi_id  " . $lokasi_id . " and nilai_angsuran <= dibayar
+		and  tanggal_tempo  <='" . $per_tanggal . "' order by collector";
+		} else if ($status_lunas == 'belum_lunas') {
+			$query = "select DISTINCT collector_id,collector from col_piutang_by_ttb_detail_vw where tanggal_ttb between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
+		and lokasi_id  " . $lokasi_id . "
+		and nilai_angsuran > dibayar
+		and  tanggal_tempo  <='" . $per_tanggal . "' order by collector";
+		} else {
+			$query = "select DISTINCT collector_id,collector from col_piutang_by_ttb_detail_vw where tanggal_ttb between  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
+		and lokasi_id  " . $lokasi_id . "
+		and  tanggal_tempo  <='" . $per_tanggal . "' order by collector";
+		}
+
+		$dataDtl = $this->db->query($query)->result_array();
+
+		foreach ($dataDtl as $key => $d) {
+			if ($status_lunas == 'lunas') {
+				$queryKuitansi = "select * from col_piutang_by_ttb_detail_vw where 
+			collector_id=" . $d['collector_id'] . " and  tanggal_tempo  <='" . $per_tanggal . "'
+			and lokasi_id  " . $lokasi_id . " and nilai_angsuran <= dibayar
+			 order by angsuran_ke";
+			} else if ($status_lunas == 'belum_lunas') {
+				$queryKuitansi = "select * from col_piutang_by_ttb_detail_vw where 
+			collector_id=" . $d['collector_id'] . " and  tanggal_tempo  <='" . $per_tanggal . "'
+				and nilai_angsuran > dibayar
+			 order by angsuran_ke";
+			} else {
+				$queryKuitansi = "select * from col_piutang_by_ttb_detail_vw where 
+			collector_id=" . $d['collector_id'] . " and  tanggal_tempo  <='" . $per_tanggal . "'
+			 order by angsuran_ke";
+			}
+
+
+
+			$kuitansi = $this->db->query($queryKuitansi)->result_array();
+			$dataDtl[$key]['kuitansi'] = $kuitansi;
+		}
+
+
+		$data['data'] = 	$dataDtl;
+
+		$data['filter_lokasi'] = 	$filter_lokasi;
+		$data['filter_tgl_awal'] = 	$tgl_mulai;
+		$data['filter_tgl_akhir'] = $tgl_akhir;
+		$data['format_laporan'] = $format_laporan;
+
+		$html = $this->load->view('Col_Piutang_By_TTB_Per_Kuitansi', $data, true);
 
 		// $filename = 'report_' . time();
 		// $this->pdfgenerator->generate($html, $filename, true, 'A4', 'landscape');
