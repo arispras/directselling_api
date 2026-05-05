@@ -66,7 +66,7 @@
 			<thead>
 				<tr>
 					<th style="width:2%">No</th>
-					<th style="width:9%">Collector</th>
+					<th style="width:12%">Collector</th>
 					<th style="width:12%">Customer</th>
 					<th style="width:6%">No Kuitansi</th>
 					<th style="width:6%">Tgl Tempo</th>
@@ -81,10 +81,11 @@
 				<?php
 				$no = 0;
 				$jum_dibayar = 0;
-				$jum_qty = 0;
-				$jum_dp = 0;
-				$jum_total = 0;
-				$jum_nilai_ttb = 0;
+				$jum_nilai_angsuran = 0;
+				$jum_sisa = 0;
+				$total_nilai_angsuran = 0;
+				$total_dibayar = 0;
+				$total_sisa = 0;
 				$jum_nilai_angsuran = 0;
 
 				?>
@@ -93,47 +94,53 @@
 				<?php foreach ($data as $key => $res) { ?>
 					<?php
 					$kuitansi = $res['kuitansi'];
-					$no = $no + 1;
-					$jum_dibayar += $res['dibayar']?$res['dibayar']:0;
-					$jum_nilai_ttb += $res['nilai_ttb'];
+					$no = 0;
+					$jum_dibayar = 0;
+					$jum_nilai_angsuran = 0;
+					$jum_sisa = 0;
 					?>
 					<tr>
 
-						<td center> <?= $no ?> </td>
-						<td left><strong><?= $res['collector'] ?></strong></td>
-						<!-- <td center><strong><?= tgl_indo($res['tanggal_ttb']) ?></strong></td> -->
-						<!-- <td left><strong><?= $res['nama_customer'] ?></strong></td> -->
-						<!-- <td right><?= format_number_report($res['nilai_ttb'], $format_laporan) ?></td>
-						<td right><?= format_number_report($res['dibayar'], $format_laporan) ?></td>
-						<td right><?= format_number_report($res['nilai_ttb'] - $res['dibayar'], $format_laporan) ?></td> -->
-
+						<!-- <td center > <?= $no ?> </td> -->
+						<td left colspan="9"><strong><?= $res['collector'] ?></strong></td>
+						
 					</tr>
 
-					<?php foreach ($kuitansi as $k => $v) { ?>
+					<?php foreach ($kuitansi as $k => $v) {
+							$no = $no + 1;
+						$sisa += ($v['nilai_angsuran'] - ($v['dibayar'] ? $v['dibayar'] : 0));
+						$jum_dibayar += ($v['dibayar'] ? $v['dibayar'] : 0);
+						$jum_nilai_angsuran += ($v['nilai_angsuran']);						
+						$jum_sisa += $sisa;
+						$total_dibayar += ($v['dibayar'] ? $v['dibayar'] : 0);
+						$total_nilai_angsuran += ($v['nilai_angsuran']);						
+						$total_sisa += $sisa;
+
+					?>
 						<tr>
-							<td></td>
-							<td></td>
-							<td center><?= $v['nama_customer'] ?></td>
+							<td> <?= $no ?> </td>
+							<td><?= $v['collector'] ?></td>
+							<td left><?= $v['nama_customer'] ?></td>
 							<td center><?= $v['no_kuitansi'] ?></td>
 							<td center><?= tgl_indo($v['tanggal_tempo']) ?></td>
 							<td center><?= $v['angsuran_ke'] ?></td>
 							<td right><?= format_number_report($v['nilai_angsuran'], $format_laporan) ?></td>
 							<td right><?= format_number_report($v['dibayar'], $format_laporan) ?></td>
-							<td right><?= format_number_report(($v['nilai_angsuran'] - ($v['dibayar']?$v['dibayar']:0)), $format_laporan) ?></td>
+							<td right><?= format_number_report(($v['nilai_angsuran'] - ($v['dibayar'] ? $v['dibayar'] : 0)), $format_laporan) ?></td>
 						</tr>
 					<?php } ?>
-					<td colspan=7><strong>SUB TOTAL</strong></td>
-					<td right><strong><?= format_number_report($res['nilai_ttb'], $format_laporan) ?></strong></td>
-					<td right><strong><?= format_number_report($res['dibayar'], $format_laporan) ?></strong></td>
-					<td right><strong><?= format_number_report($res['nilai_ttb'] - ($res['dibayar']?$res['dibayar']:0), $format_laporan) ?></strong></td>
+					<td colspan=6><strong>SUB TOTAL</strong></td>
+					<td right><strong><?= format_number_report($jum_nilai_angsuran, $format_laporan) ?></strong></td>
+					<td right><strong><?= format_number_report($jum_dibayar, $format_laporan) ?></strong></td>
+					<td right><strong><?= format_number_report($jum_sisa, $format_laporan) ?></strong></td>
 
 				<?php } ?>
 
 				<tr>
-					<td colspan=7>TOTAL</td>
-					<td right><strong><?= format_number_report($jum_nilai_ttb, $format_laporan) ?></strong></td>
-					<td right><strong><?= format_number_report($jum_dibayar, $format_laporan) ?></strong></td>
-					<td right><strong><?= format_number_report($jum_nilai_ttb - $jum_dibayar, $format_laporan) ?></strong></td>
+					<td colspan=6><strong>TOTAL</strong></td>
+					<td right><strong><?= format_number_report($total_nilai_angsuran, $format_laporan) ?></strong></td>
+					<td right><strong><?= format_number_report($total_dibayar, $format_laporan) ?></strong></td>
+					<td right><strong><?= format_number_report($total_sisa, $format_laporan) ?></strong></td>
 				</tr>
 
 			</tbody>

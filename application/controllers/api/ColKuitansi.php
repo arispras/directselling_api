@@ -1809,7 +1809,7 @@ body {
         <style>
             body {
                 font-family: "Courier New", monospace;
-                font-size: 18px;
+                font-size: 16px;
 				font-weight:bold;
             }
         </style>
@@ -1822,7 +1822,7 @@ body {
 			$page = $this->generateKuitansiDotMatrix1Lembar($row, $i, $lokasi);
 
 			// 🔥 FIX TINGGI 15 CM (~38 baris)
-			$page = $this->fixHeightFullPage($page, 33);
+			$page = $this->fixHeightFullPage($page, 25);
 
 			// optional margin atas
 			// $page = $this->addTopMargin($page, 1);
@@ -1855,7 +1855,7 @@ body {
 		$out .= str_repeat("=", 85) . "\n";
 
 		$out .= "KUITANSI\n";
-		$out .= "No Urut : #" . str_pad(($idx + 1), 3, '0', STR_PAD_LEFT) . "\n";
+		// $out .= "No Urut : #" . str_pad(($idx + 1), 3, '0', STR_PAD_LEFT) . "\n";
 		$out .= str_repeat("-", 85) . "\n";
 
 		$out .= $this->kiri("No Kuitansi", $data['no_kuitansi']) . "\n";
@@ -1882,11 +1882,11 @@ body {
 		$out .= str_repeat("-", 85) . "\n";
 
 		$out .= "ADMIN                            COLLECTOR                 CUSTOMER\n";
-		$out .= "\n\n\n";
+		$out .= "\n\n";
 		$out .= "(__________)                    (__________)              (__________)\n";
 
 		$out .= str_repeat("-", 85) . "\n";
-		$out .= "Dicetak: " . date('d/m/Y H:i') . "\n";
+		$out .= "#" . str_pad(($idx + 1), 3, '0', STR_PAD_LEFT) . " " . "Dicetak: " . date('d/m/Y H:i') . "\n";
 
 		return $out;
 	}
@@ -2342,6 +2342,170 @@ body {
 		}
 	}
 	function getLaporanRekapPiutangByTTBPerKuitansi_post()
+	{
+
+		$format_laporan =  $this->post('format_laporan', true);
+
+
+		$data = [];
+
+		$input = $this->post();
+
+		$lokasi_id = $input['lokasi_id'];
+		$tgl_mulai = $input['tgl_mulai'];
+		$tgl_akhir = $input['tgl_akhir'];
+		$format_laporan = $input['format_laporan'];
+		$per_tanggal = $input['per_tanggal'];
+		$status_lunas = $input['status_lunas'];
+
+		$lokasi = $this->db->query("select * from gbm_organisasi where id=" . $lokasi_id)->row_array();
+		if ($lokasi) {
+			$filter_lokasi = $lokasi['nama'];
+			// $lokasi_id = "= " . $lokasi_id;
+		} else {
+			$filter_lokasi = "Semua Lokasi";
+		}
+
+		if ($status_lunas == 'lunas') {
+			$query = "SELECT DISTINCT collector_id,collector from col_kuitansi_vw a
+				LEFT JOIN ( SELECT kuitansi_id,IFNULL(SUM(dibayar),0) AS dibayar from col_lhi_detail_vw 
+				WHERE tanggal<='" . $per_tanggal . "' GROUP BY kuitansi_id ) b 
+				ON a.id=b.kuitansi_id
+				WHERE 1=1
+				AND a.tanggal_tempo<='" . $per_tanggal . "'
+				 AND angsuran_ke>1
+				AND lokasi_id = " . $lokasi_id . "
+				AND  a.tanggal_ttb BETWEEN  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
+				AND nilai_angsuran-IFNULL(b.dibayar,0) <=0
+				order by collector";
+		} else if ($status_lunas == 'belum_lunas') {
+			$query = "SELECT DISTINCT collector_id,collector from col_kuitansi_vw a
+				LEFT JOIN ( SELECT kuitansi_id,IFNULL(SUM(dibayar),0) AS dibayar from col_lhi_detail_vw 
+				WHERE tanggal<='" . $per_tanggal . "' GROUP BY kuitansi_id ) b 
+				ON a.id=b.kuitansi_id
+				WHERE 1=1
+				AND a.tanggal_tempo<='" . $per_tanggal . "'
+				 AND angsuran_ke>1
+				AND lokasi_id = " . $lokasi_id . "
+				AND  a.tanggal_ttb BETWEEN  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
+				AND nilai_angsuran-IFNULL(b.dibayar,0) >0
+				order by collector";
+		} else {
+			$query = "SELECT DISTINCT collector_id,collector from col_kuitansi_vw a
+				LEFT JOIN ( SELECT kuitansi_id,IFNULL(SUM(dibayar),0) AS dibayar from col_lhi_detail_vw 
+				WHERE tanggal<='" . $per_tanggal . "' GROUP BY kuitansi_id ) b 
+				ON a.id=b.kuitansi_id
+				WHERE 1=1
+				AND a.tanggal_tempo<='" . $per_tanggal . "'
+				 AND angsuran_ke>1
+				AND lokasi_id = " . $lokasi_id . "
+				AND  a.tanggal_ttb BETWEEN  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
+				order by collector";
+		}
+	
+// echo $query.'\n';exit();
+		$dataDtl = $this->db->query($query)->result_array();
+
+
+		foreach ($dataDtl as $key => $d) {
+			if ($status_lunas == 'lunas') {
+				$queryKuitansi="SELECT a.*,IFNULL(b.dibayar,0) as dibayar from col_kuitansi_vw a
+				LEFT JOIN ( SELECT kuitansi_id,IFNULL(SUM(dibayar),0) AS dibayar from col_lhi_detail_vw 
+				WHERE tanggal<='" . $per_tanggal . "' GROUP BY kuitansi_id ) b 
+				ON a.id=b.kuitansi_id
+				WHERE 
+				 a.tanggal_tempo<='" . $per_tanggal . "'
+				 AND angsuran_ke>1
+				AND collector_id=" . $d['collector_id'] . " 
+				AND lokasi_id = " . $lokasi_id . "
+				AND  a.tanggal_ttb BETWEEN  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
+				AND nilai_angsuran-IFNULL(b.dibayar,0) <=0
+				ORDER BY a.tanggal_tempo,a.angsuran_ke";
+
+				
+			} else if ($status_lunas == 'belum_lunas') {
+				$queryKuitansi="SELECT a.*,IFNULL(b.dibayar,0) as dibayar from col_kuitansi_vw a
+				LEFT JOIN ( SELECT kuitansi_id,IFNULL(SUM(dibayar),0) AS dibayar from col_lhi_detail_vw 
+				WHERE tanggal<='" . $per_tanggal . "' GROUP BY kuitansi_id ) b 
+				ON a.id=b.kuitansi_id
+				WHERE 
+				 a.tanggal_tempo<='" . $per_tanggal . "'
+				  AND angsuran_ke>1
+				AND collector_id=" . $d['collector_id'] . " 
+				AND lokasi_id = " . $lokasi_id . "
+				AND  a.tanggal_ttb BETWEEN  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
+				AND nilai_angsuran-IFNULL(b.dibayar,0) >0
+				ORDER BY a.tanggal_tempo,a.angsuran_ke";
+			} else {
+				$queryKuitansi="SELECT a.*,IFNULL(b.dibayar,0) as dibayar from col_kuitansi_vw a
+				LEFT JOIN ( SELECT kuitansi_id,IFNULL(SUM(dibayar),0) AS dibayar from col_lhi_detail_vw 
+				WHERE tanggal<='" . $per_tanggal . "' GROUP BY kuitansi_id ) b 
+				ON a.id=b.kuitansi_id
+				WHERE 
+				 a.tanggal_tempo<='" . $per_tanggal . "'
+				  AND angsuran_ke>1
+				AND collector_id=" . $d['collector_id'] . " 
+				AND lokasi_id = " . $lokasi_id . "
+				AND  a.tanggal_ttb BETWEEN  '" . $tgl_mulai . "' and  '" . $tgl_akhir . "'	
+				ORDER BY a.tanggal_tempo,a.angsuran_ke";
+			}
+
+			// echo $queryKuitansi.'\n';exit();
+
+			$kuitansi = $this->db->query($queryKuitansi)->result_array();
+			$dataDtl[$key]['kuitansi'] = $kuitansi;
+		}
+
+
+		$data['data'] = 	$dataDtl;
+
+		$data['filter_lokasi'] = 	$filter_lokasi;
+		$data['filter_tgl_awal'] = 	$tgl_mulai;
+		$data['filter_tgl_akhir'] = $tgl_akhir;
+		$data['format_laporan'] = $format_laporan;
+
+		$html = $this->load->view('Col_Piutang_By_TTB_Per_Kuitansi', $data, true);
+
+		// $filename = 'report_' . time();
+		// $this->pdfgenerator->generate($html, $filename, true, 'A4', 'landscape');
+		// echo $html;
+		if ($format_laporan == 'xls') {
+			echo $html;
+		} else if ($format_laporan == 'view') {
+			echo $html;
+		} else {
+			$filename = 'report_' . time();
+			// $this->pdfgenerator->generate($html, $filename, true, 'A4', 'landscape');
+			$dompdf = new DOMPDF;
+			$dompdf->loadHtml($html);
+			$dompdf->setPaper('A4', 'landscape');
+			$dompdf->render();
+			$filename = 'report_' . time();
+			$x          = 400;
+			$y          = 570;
+			$text       = "{PAGE_NUM} of {PAGE_COUNT}";
+			$font       = null; // $dompdf->getFontMetrics()->get_font('Helvetica', 'normal');
+			$size       = 10;
+			$color      = array(0, 0, 0);
+			$word_space = 0.0;
+			$char_space = 0.0;
+			$angle      = 0.0;
+
+			$dompdf->getCanvas()->page_text(
+				$x,
+				$y,
+				$text,
+				$font,
+				$size,
+				$color,
+				$word_space,
+				$char_space,
+				$angle
+			);
+			$dompdf->stream($filename . ".pdf", array("Attachment" => 0));
+		}
+	}
+	function getLaporanRekapPiutangByTTBPerKuitansiV2_post()
 	{
 
 		$format_laporan =  $this->post('format_laporan', true);
