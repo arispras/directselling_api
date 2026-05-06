@@ -46,6 +46,21 @@ class ColKuitansi extends BD_Controller
 		$where  = null;
 
 		$isWhere = " 1=1 ";
+		if (($param['status'] == 'baru')) {
+			$isWhere = $isWhere .  "  and kuitansi.kuitansi_id is null ";
+		}elseif (($param['status'] == 'pending')) {
+			$isWhere = $isWhere .  "  and kuitansi.kuitansi_id is not null ";
+		}else{
+
+		}
+		if (($param['status_lunas'] == 'lunas')) {
+			$isWhere = $isWhere .  "  and (nilai_angsuran - ifnull(kuitansi.dibayar,0)) <= 0 ";
+		}elseif (($param['status_lunas'] == 'belum_lunas')) {
+			$isWhere = $isWhere .  "  and (nilai_angsuran - ifnull(kuitansi.dibayar,0)) > 0 ";
+		}else{
+			
+		}
+
 		if (($param['tampil_angsuran_1'] != true)) {
 			$isWhere = $isWhere .  "  and a.angsuran_ke>1 ";
 		}
@@ -55,6 +70,9 @@ class ColKuitansi extends BD_Controller
 		}
 		if (!empty($param['customer_id'])) {
 			$isWhere = $isWhere .  "  and a.customer_id=" . $param['customer_id'] . "";
+		}
+		if (!empty($param['collector_id'])) {
+			$isWhere = $isWhere .  "  and a.collector_id=" . $param['collector_id'] . "";
 		}
 		if ($param['lokasi_id']) {
 			$isWhere = $isWhere . " and a.lokasi_id =" . $param['lokasi_id'] . "";
@@ -2403,7 +2421,7 @@ body {
 				order by collector";
 		}
 	
-// echo $query.'\n';exit();
+// echo $query.'\n';
 		$dataDtl = $this->db->query($query)->result_array();
 
 
@@ -2450,7 +2468,7 @@ body {
 				ORDER BY a.tanggal_tempo,a.angsuran_ke";
 			}
 
-			// echo $queryKuitansi.'\n';exit();
+			// echo $queryKuitansi.'\n';
 
 			$kuitansi = $this->db->query($queryKuitansi)->result_array();
 			$dataDtl[$key]['kuitansi'] = $kuitansi;

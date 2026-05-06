@@ -107,8 +107,9 @@
 					</tr>
 
 					<?php foreach ($kuitansi as $k => $v) {
-							$no = $no + 1;
-						$sisa += ($v['nilai_angsuran'] - ($v['dibayar'] ? $v['dibayar'] : 0));
+						$sisa=0;
+						$no = $no + 1;
+						$sisa += ((float)$v['nilai_angsuran']) - ((float)($v['dibayar'] ?? 0));
 						$jum_dibayar += ($v['dibayar'] ? $v['dibayar'] : 0);
 						$jum_nilai_angsuran += ($v['nilai_angsuran']);						
 						$jum_sisa += $sisa;
